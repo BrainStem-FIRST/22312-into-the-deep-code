@@ -19,75 +19,16 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 // then would need to adjust robot (and potentially extension) position to search new area for block
 
 public class Collector extends Subsystem {
-    // need servo for grabber (wheels)
-    // need dcExMotor for rollers
-    private DcMotorEx rollerMotor;
-    private ServoImplEx grabberServo;
 
-    // camera for finding blocks
-    Opencv stupidCam;
-
-    // arbitrary numbers to judge against encoder ticks
-    private TickChecker collectTickChecker = new TickChecker(5000);
-    private double collectPower = 0.8;
-    private TickChecker spitTickChecker = new TickChecker(1000);
-    private double spitPower = -0.8;
-
-    private enum States {
+    private enum State {
         COLLECTING, SPITTING, OFF
     }
-    private States state;
+    private State state = State.OFF;
 
-    public CollectorTele(HardwareMap hwMap, Telemetry telemetry, Opencv stupidCam) {
+    public Collector(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
-        this.stupidCam = stupidCam;
-
-        this.rollerMotor = new CachingMotor(this.hwMap.get(DcMotorEx.class, "roller"));
-        this.grabberServo = new CachingServo(this.hwMap.get(ServoImpleEx.class, "grabber"), MIN, MAX); // MIN AND MAX HAVE NOT BEEN INITIALIZED YET
     }
-
-    // state setters
-    public setCollect() {
-        state = States.COLLECTING;
-    }
-    public setSpit() {
-        state = States.SPITTING;
-    }
-    public setOff() {
-        state = States.OFF;
-    }
-
-    // should be called once every "frame"
-    public void checkState() {
-        switch(state) {
-            case COLLECTING:
-                collect();
-                break;
-            case SPITTING:
-                spit();
-                break;
-            case OFF:
-                off();
-                
-    // internal functionality
-    private void collect() {
-        if(collectTickChecker.valid()) {
-            rollerMotor.setPower(collectPower);
-        } else {
-            setOff();
-        }
-    }
-    private void spit() {
-        grabberServo.setPosition(0.99);
-        if(spitTickChecker.valid()) {
-            rollerMotor.setPower(spitPower);
-        } else {
-            setOff();
-        }
-    }
-    private void off() {
-        rollerMotor.setPower(0);
-    }
+}
 
 
 

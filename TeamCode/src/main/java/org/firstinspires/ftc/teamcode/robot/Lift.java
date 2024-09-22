@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tele;
+package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class LiftTele extends Subsystem {
+public class Lift extends Subsystem {
 
     DcMotorEx liftMotor;
 
@@ -16,7 +16,7 @@ public class LiftTele extends Subsystem {
 
     LiftStates liftState;
 
-    public LiftTele(HardwareMap hwMap, Telemetry telemetry) {
+    public Lift(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");

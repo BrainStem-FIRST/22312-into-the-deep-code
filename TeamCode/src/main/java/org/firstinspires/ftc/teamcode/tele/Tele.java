@@ -57,22 +57,6 @@ public class Tele extends LinearOpMode {
             stop();
         }
 
-        // lift
-        if (gamepad1.a) {
-            robot.lift.liftState = LiftTele.LiftStates.DOWN;
-        } else if (gamepad1.b) {
-            robot.lift.liftState = LiftTele.LiftStates.UP;
-        } else {
-            robot.lift.liftState = LiftTele.LiftStates.STATIC;
-        }
-
-        // collector
-        if (gamepad1.right_trigger > 0.1) {
-            robot.collector.setAmp(gamepad1.right_trigger);
-        }
-
-        robot.update();
-
         telemetry.addData("front left tick: ", robot.driveTrain.getTick());
         telemetry.update();
     }

@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
@@ -25,9 +26,7 @@ public class Auto extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
                 robot.lift.raiseLift(),
-                robot.lift.lowerLift(),
-                robot.drive.actionBuilder(beginPose)
-                .splineToSplineHeading(position1Pose)
+                robot.lift.lowerLift()
         ));
     }
 }

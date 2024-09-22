@@ -30,7 +30,5 @@ public class BrainSTEMRobotTele {
     }
 
     public void update() {
-        lift.update();
-        collector.update();
     }
 }
