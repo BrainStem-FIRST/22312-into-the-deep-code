@@ -8,48 +8,33 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Lift extends Subsystem {
 
-    DcMotorEx liftMotor;
+    // TODO: use encoder to find max and min positions of lift
+    public static int MAX_TICK_POSITION = 100;
+    public static int MIN_TICK_POSITION = 1000;
 
-    enum LiftStates {
+    public enum State {
         UP, DOWN, STATIC
     };
+    private State state;
 
-    LiftStates liftState;
+    private DcMotorEx liftMotor;
 
     public Lift(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftState = LiftStates.STATIC;
+        state = State.STATIC;
     }
 
-    private void raiseLift() {
-        liftMotor.setPower(0.3);
+    public State getState() {
+        return state;
     }
-    private void dropLift() {
-        liftMotor.setPower(-0.3);
+    public void setState(State state) {
+        this.state = state;
     }
-    private void holdLift() {
-        liftMotor.setPower(0);
-    }
-
-    private void updateState() {
-        switch(liftState) {
-            case UP:
-                raiseLift();
-                break;
-            case DOWN:
-                dropLift();
-                break;
-            case STATIC:
-                holdLift();
-                break;
-        }
-    }
-
-    public void update() {
-        updateState();
+    public DcMotorEx getLiftMotor() {
+        return liftMotor;
     }
 }
 

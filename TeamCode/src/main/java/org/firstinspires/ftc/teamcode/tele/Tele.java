@@ -32,6 +32,13 @@ public class Tele extends LinearOpMode {
     private void updateRobotControls() {
 
         // drivetrain
+        updateDriveTrainControls();
+
+        // collector
+        updateCollectorControls();
+    }
+
+    private void updateDriveTrainControls() {
         double leftStickX = gamepad1.left_stick_x;
         double leftStickY = gamepad1.left_stick_y * -1;
         double rightStickX;
@@ -61,4 +68,12 @@ public class Tele extends LinearOpMode {
         telemetry.update();
     }
 
+    private void updateCollectorControls() {
+        if (gamepad1.a) {
+            robot.collector.takeInBlock();
+        }
+        else if (gamepad1.b) {
+            robot.collector.spitOutBlock();
+        }
+    }
 }

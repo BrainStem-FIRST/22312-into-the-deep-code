@@ -11,12 +11,22 @@ public class Extension extends Subsystem {
     private DcMotorEx extensionMotor;
     private ServoImplEx hingeServo;
 
-    private enum States {
-        IN, LOW, MED, HIGH
+    public enum State {
+        IN, OUT, EXTENDING, RETRACTING
     }
-    private States state = States.LOW;
+    private State state = State.IN;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
+
+        extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
+        hingeServo = hwMap.get(ServoImplEx.class, "HingeServo");
+    }
+
+    public State getState() {
+        return state;
+    }
+    public void setState(State state) {
+        this.state = state;
     }
 }

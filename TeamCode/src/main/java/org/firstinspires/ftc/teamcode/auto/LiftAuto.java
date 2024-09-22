@@ -9,37 +9,21 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.tele.SubsystemTele;
+import org.firstinspires.ftc.teamcode.robot.Lift;
 
 public class LiftAuto extends Lift {
 
-    // TODO: use encoder to find max and min positions of lift
-    public static int MAX_TICK_POSITION = 100;
-    public static int MIN_TICK_POSITION = 1000;
-
-    HardwareMap hwMap;
-    Telemetry telemetry;
-    DcMotorEx liftMotor;
-
-    enum LiftStates {
-        UP, DOWN, STATIC
-    };
-
-    LiftStates liftState;
-
     public LiftAuto(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
+        getLiftMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftState = LiftStates.STATIC;
     }
 
     public Action raiseLift() {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                liftMotor.setTargetPosition(LiftAuto.MAX_TICK_POSITION);
+                getLiftMotor().setTargetPosition(LiftAuto.MAX_TICK_POSITION);
                 return false;
             }
         };
@@ -49,7 +33,7 @@ public class LiftAuto extends Lift {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                liftMotor.setTargetPosition(LiftAuto.MIN_TICK_POSITION);
+                getLiftMotor().setTargetPosition(LiftAuto.MIN_TICK_POSITION);
                 return false;
             }
         };

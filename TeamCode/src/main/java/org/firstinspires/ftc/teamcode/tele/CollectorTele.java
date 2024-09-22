@@ -22,13 +22,24 @@ import org.firstinspires.ftc.teamcode.robot.Collector;
 
 public class CollectorTele extends Collector {
 
-    private enum States {
-        COLLECTING, SPITTING, OFF
-    }
-    private States state = States.OFF;
-
     public CollectorTele(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
+    }
+
+    public void update() {
+
+        // stop motor once you have finished intaking block
+        if (getFullyCollectedSensor().isPressed()) {
+            setState(State.FULL);
+        }
+        // spit out blocks for certain amount of time
+        if (getState() == State.SPITTING) {
+            if (getSpittingFrames() >= SPITTING_FRAME_TIME) setState(State.EMPTY);
+             else incrementSpittingFrames();
+        }
+        else resetSpittingFrames();
+        
+        updateSpindleMotorState();
     }
 }
 
