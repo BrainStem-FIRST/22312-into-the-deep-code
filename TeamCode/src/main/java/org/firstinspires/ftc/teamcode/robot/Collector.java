@@ -1,13 +1,10 @@
-package org.firstinspires.ftc.teamcode.tele;
+package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import org.firstinspires.ftc.teamcode.util.CachingServo;
-import org.firstinspires.ftc.teamcode.util.CachingMotor;
-import org.firstinspires.ftc.teamcode.util.TickChecker;
 
 
 // state mechanics: once collector/spit state initiated, will power until time reached, them automatically turn off
