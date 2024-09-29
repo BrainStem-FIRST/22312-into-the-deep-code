@@ -29,4 +29,6 @@ public class Extension extends Subsystem {
     public void setState(State state) {
         this.state = state;
     }
+
+    private void update() {}
 }
