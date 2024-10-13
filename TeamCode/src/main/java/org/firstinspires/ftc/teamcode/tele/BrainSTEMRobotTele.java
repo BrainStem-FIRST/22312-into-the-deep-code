@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 
 public class BrainSTEMRobotTele {
     // Don't touch these
@@ -17,6 +19,7 @@ public class BrainSTEMRobotTele {
 
     public DriveTrainTele driveTrain;
     public LiftTele lift;
+    public ExtensionTele extension;
     public CollectorTele collector;
     public GrabberTele grabber;
     public BrainSTEMRobotTele(HardwareMap hwMap, Telemetry telemetry, OpMode opMode) {
@@ -26,10 +29,21 @@ public class BrainSTEMRobotTele {
 
         driveTrain = new DriveTrainTele(hwMap, telemetry);
         lift = new LiftTele(hwMap, telemetry);
+        extension = new ExtensionTele(hwMap, telemetry);
         collector = new CollectorTele(hwMap, telemetry);
     }
 
     public void update() {
+        extension.update();
         collector.update();
+    }
+
+    public void extendAndCollect() {
+        if (extension.isRetracted()) {
+            extension.setState(Extension.State.EXTENDING);
+            // assuming robot is flush with barrier
+            collector.setHingeState(Collector.HingeState.HINGING_DOWN);
+            collector.setCollectState(Collector.CollectState.COLLECTING);
+        }
     }
 }

@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.tele;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.robot.Collector;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpwRoadrunner")
 public class Tele extends LinearOpMode {
@@ -70,10 +72,7 @@ public class Tele extends LinearOpMode {
 
     private void updateCollectorControls() {
         if (gamepad1.a) {
-            robot.collector.takeInBlock();
-        }
-        else if (gamepad1.b) {
-            robot.collector.spitOutBlock();
+            robot.extendAndCollect();
         }
     }
 }

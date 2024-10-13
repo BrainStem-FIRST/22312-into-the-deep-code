@@ -28,18 +28,54 @@ public class CollectorTele extends Collector {
 
     public void update() {
 
-        // stop motor once you have finished intaking block
-        if (getFullyCollectedSensor().isPressed()) {
-            setState(State.FULL);
-        }
+        // stop motor once you have finished taking in block with correct color
+        if (hasBlockColor(BlockColor.RED))
+            setCollectState(CollectState.SPITTING);
+        else
+            setCollectState(CollectState.FULL);
+
         // spit out blocks for certain amount of time
-        if (getState() == State.SPITTING) {
-            if (getSpittingFrames() >= SPITTING_FRAME_TIME) setState(State.EMPTY);
-             else incrementSpittingFrames();
-        }
-        else resetSpittingFrames();
-        
+        if (getCollectState() == CollectState.SPITTING)
+            if (getSpittingFrames() >= SPITTING_FRAME_TIME)
+                setCollectState(CollectState.EMPTY);
+            else
+                incrementSpittingFrames();
+        else
+            resetSpittingFrames();
+
+        updateHingeState();
         updateSpindleMotorState();
+    }
+
+    private void updateSpindleMotorState() {
+        switch(getCollectState()) {
+            case EMPTY:
+                getSpindleMotor().setPower(0);
+                break;
+            case FULL:
+                getSpindleMotor().setPower(HOLD_SPIN_POWER);
+                break;
+            case COLLECTING:
+                getSpindleMotor().setPower(MAX_SPIN_POWER);
+                break;
+            case SPITTING:
+                getSpindleMotor().setPower(-MAX_SPIN_POWER);
+                break;
+        }
+    }
+
+    private void updateHingeState() {
+        switch (getHingeState()) {
+            case HINGING_UP:
+                setHingeServosPosition(HINGE_UP_POSITION);
+                if (getHingeServos()[0].getPosition() >= HINGE_UP_POSITION) setHingeState(HingeState.UP);
+                break;
+            case HINGING_DOWN:
+                setHingeServosPosition(HINGE_DOWN_POSITION);
+                if (getHingeServos()[0].getPosition() <= HINGE_DOWN_POSITION) setHingeState(HingeState.DOWN);
+                break;
+            default: break;
+        }
     }
 }
 

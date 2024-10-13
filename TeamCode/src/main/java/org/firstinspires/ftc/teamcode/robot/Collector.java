@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import android.graphics.Color;
 import android.text.method.Touch;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -24,73 +26,86 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 1;
+    public static final double HOLD_SPIN_POWER = 0.3;
+    // servos range from 0-1
     public static final double HINGE_UP_POSITION = 1;
     public static final double HINGE_DOWN_POSITION = 0;
+    // number of frames on REV hub to spit out for
     public static final int SPITTING_FRAME_TIME = 20;
-    public enum State {
+    public enum CollectState {
         COLLECTING, SPITTING, EMPTY, FULL
     }
-    private State state;
+    public enum HingeState {
+        HINGING_UP,
+        HINGING_DOWN,
+        UP,
+        DOWN
+    }
+    public static enum BlockColor {
+        RED,
+        YELLOW,
+        BLUE
+    };
+    final public static int MAX_COLOR_THRESHOLD = 20;
+    final public static int[] RED_BLOCK_COLOR = { 255, 0, 0 };
+    final public static int[] YELLOW_BLOCK_COLOR = { 255, 255, 0 };
+    final public static int[] BLUE_BLOCK_COLOR = { 0, 0, 255 };
+    private CollectState collectState;
+    private HingeState hingeState;
     private int spittingFrames = 0;
 
     private ServoImplEx hingeServos[];
     private DcMotorEx spindleMotor;
-    private TouchSensor fullyHasBlockSensor;
+
+    // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
+    private ColorSensor blockColorSensor;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
-        state = State.EMPTY;
+        collectState = CollectState.EMPTY;
 
         hingeServos = new ServoImplEx[2];
         hingeServos[0] = hwMap.get(ServoImplEx.class, "CollectHingeServoLeft");
         hingeServos[1] = hwMap.get(ServoImplEx.class, "CollectHingeServoRight");
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
-        fullyHasBlockSensor = hwMap.get(TouchSensor.class, "CollectFullyTouchSensor");
+        blockColorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
     }
 
-    public State getState() {
-        return state;
+    public CollectState getCollectState() {
+        return collectState;
     }
-    public void setState(State state) {
-        this.state = state;
+    public void setCollectState(CollectState collectState) {
+        this.collectState = collectState;
     }
+
+    public HingeState getHingeState() { return hingeState; }
+    public void setHingeState(HingeState hingeState) { this.hingeState = hingeState; }
 
     public ServoImplEx[] getHingeServos() {
         return hingeServos;
     }
+
+    public void setHingeServosPosition(double position) {
+        for (ServoImplEx hingeServo : hingeServos) {
+            hingeServo.setPosition(position);
+        }
+    }
     public DcMotorEx getSpindleMotor() {
         return spindleMotor;
     }
-    public TouchSensor getFullyCollectedSensor() {
-        return fullyHasBlockSensor;
-    }
-
-    public void updateSpindleMotorState() {
-        switch(state) {
-            case EMPTY:
-            case FULL:
-                getSpindleMotor().setPower(0);
-                break;
-            case COLLECTING:
-                getSpindleMotor().setPower(MAX_SPIN_POWER);
-                break;
-            case SPITTING:
-                getSpindleMotor().setPower(-MAX_SPIN_POWER);
-                break;
+    public boolean hasBlockColor(BlockColor blockColor) {
+        switch (blockColor) {
+            case RED: return hasColor(RED_BLOCK_COLOR);
+            case YELLOW: return hasColor(YELLOW_BLOCK_COLOR);
+            case BLUE: return hasColor(BLUE_BLOCK_COLOR);
+            default: return false;
         }
     }
 
-    public void takeInBlock() {
-        setState(State.COLLECTING);
-    }
-
-    public void spitOutBlock() {
-        setState(State.SPITTING);
-    }
-
-    public void stopSpindles() {
-        setState(getFullyCollectedSensor().isPressed() ? State.FULL : State.EMPTY);
+    private boolean hasColor(int[] color) {
+        int diff = Math.abs(blockColorSensor.red() - color[0]) + Math.abs(blockColorSensor.green() - color[1]) + Math.abs(blockColorSensor.blue() - color[2]);
+        return diff < MAX_COLOR_THRESHOLD;
     }
 
     public int getSpittingFrames() {
