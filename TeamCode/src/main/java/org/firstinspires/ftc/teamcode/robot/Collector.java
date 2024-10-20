@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -27,14 +29,15 @@ public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 1;
     public static final double HOLD_SPIN_POWER = 0.3;
-    // servos range from 0-1
-    public static final double HINGE_UP_POSITION = 1;
-    public static final double HINGE_DOWN_POSITION = 0;
+    // TODO: FIND SERVO POSITIONS
+    public static final double HINGE_UP_POSITION = 1300;
+    public static final double HINGE_DOWN_POSITION = 500;
     // number of frames on REV hub to spit out for
     public static final int SPITTING_FRAME_TIME = 20;
     public enum CollectState {
-        COLLECTING, SPITTING, EMPTY, FULL
+        COLLECTING, SPITTING, EMPTY, FULL_SLOW, FULL_MAX
     }
+
     public enum HingeState {
         HINGING_UP,
         HINGING_DOWN,
@@ -44,8 +47,9 @@ public class Collector extends Subsystem {
     public static enum BlockColor {
         RED,
         YELLOW,
-        BLUE
-    };
+        BLUE,
+        NONE
+    }
     final public static int MAX_COLOR_THRESHOLD = 20;
     final public static int[] RED_BLOCK_COLOR = { 255, 0, 0 };
     final public static int[] YELLOW_BLOCK_COLOR = { 255, 255, 0 };
@@ -54,22 +58,25 @@ public class Collector extends Subsystem {
     private HingeState hingeState;
     private int spittingFrames = 0;
 
-    private ServoImplEx hingeServos[];
+    private ServoImplEx hingeServo;
     private DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private ColorSensor blockColorSensor;
+    private boolean updatedBlockColor;
+    private BlockColor blockColor;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
         collectState = CollectState.EMPTY;
-
-        hingeServos = new ServoImplEx[2];
-        hingeServos[0] = hwMap.get(ServoImplEx.class, "CollectHingeServoLeft");
-        hingeServos[1] = hwMap.get(ServoImplEx.class, "CollectHingeServoRight");
+        hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
         blockColorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
+        updatedBlockColor = false;
+        blockColor = BlockColor.NONE;
+
+        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_POSITION, HINGE_UP_POSITION));
     }
 
     public CollectState getCollectState() {
@@ -82,25 +89,35 @@ public class Collector extends Subsystem {
     public HingeState getHingeState() { return hingeState; }
     public void setHingeState(HingeState hingeState) { this.hingeState = hingeState; }
 
-    public ServoImplEx[] getHingeServos() {
-        return hingeServos;
+    public ServoImplEx getHingeServo() {
+        return hingeServo;
     }
 
-    public void setHingeServosPosition(double position) {
-        for (ServoImplEx hingeServo : hingeServos) {
-            hingeServo.setPosition(position);
-        }
+    public void setHingeServoPosition(double position) {
+        hingeServo.setPosition(position);
     }
     public DcMotorEx getSpindleMotor() {
         return spindleMotor;
     }
-    public boolean hasBlockColor(BlockColor blockColor) {
-        switch (blockColor) {
-            case RED: return hasColor(RED_BLOCK_COLOR);
-            case YELLOW: return hasColor(YELLOW_BLOCK_COLOR);
-            case BLUE: return hasColor(BLUE_BLOCK_COLOR);
-            default: return false;
+
+    public void resetUpdateBlockColor() {
+        updatedBlockColor = false;
+    }
+    public BlockColor getBlockColor() {
+        if (!updatedBlockColor) {
+            updatedBlockColor = true;
+
+            // actually find block color
+            if (hasColor(RED_BLOCK_COLOR))
+                blockColor = BlockColor.RED;
+            else if (hasColor(BLUE_BLOCK_COLOR))
+                blockColor = BlockColor.BLUE;
+            else if (hasColor(YELLOW_BLOCK_COLOR))
+                blockColor = BlockColor.YELLOW;
+            else
+                blockColor = BlockColor.NONE;
         }
+        return blockColor;
     }
 
     private boolean hasColor(int[] color) {

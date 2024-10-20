@@ -82,3 +82,11 @@ lint/tmp/
 
 .DS_Store
 /.idea
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/ManualFeedbackTuner.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/LocalizationTest.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/LocalizationTest.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/ManualFeedbackTuner.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/SplineTest.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/tuning/TuningOpModes.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/util/TankDrive.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/util/ThreeDeadWheelLocalizer.java

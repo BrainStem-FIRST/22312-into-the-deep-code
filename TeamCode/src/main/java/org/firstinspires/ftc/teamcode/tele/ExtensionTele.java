@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,6 +19,8 @@ public class ExtensionTele extends Extension {
     public ExtensionTele(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, telemetry);
 
+        setState(State.IN);
+
         // TODO: FINE TUNE PID
         pidController = new PIDController(0.5, 0, 0);
     }
@@ -32,13 +35,13 @@ public class ExtensionTele extends Extension {
     }
 
     private void updateExtending() {
-        getExtensionMotor().setTargetPosition(EXTENDED_POSITION);
+        setMotorPosition(getExtensionMotor(), EXTENDED_POSITION);
         if (getExtensionMotor().getCurrentPosition() >= EXTENDED_POSITION) {
             setState(State.OUT);
         }
     }
     private void updateRetracting() {
-        getExtensionMotor().setTargetPosition(RETRACTED_POSITION);
+        setMotorPosition(getExtensionMotor(), RETRACTED_POSITION);
         if (getExtensionMotor().getCurrentPosition() <= RETRACTED_POSITION) {
             setState(State.IN);
         }

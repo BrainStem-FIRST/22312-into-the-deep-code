@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.DriveTrain;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpwRoadrunner")
@@ -27,7 +31,6 @@ public class Tele extends LinearOpMode {
             updateRobotControls();
 
             robot.update();
-            telemetry.addData("drivetrain encoder", robot.driveTrain.getTick());
         }
     }
 
@@ -41,6 +44,7 @@ public class Tele extends LinearOpMode {
     }
 
     private void updateDriveTrainControls() {
+
         double leftStickX = gamepad1.left_stick_x;
         double leftStickY = gamepad1.left_stick_y * -1;
         double rightStickX;
@@ -62,17 +66,23 @@ public class Tele extends LinearOpMode {
 
             //Set motor speed variables
             robot.driveTrain.setDTMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
-        } else {
-            stop();
-        }
-
-        telemetry.addData("front left tick: ", robot.driveTrain.getTick());
-        telemetry.update();
+        } else
+            robot.driveTrain.stop();
     }
 
     private void updateCollectorControls() {
         if (gamepad1.a) {
             robot.extendAndCollect();
+        }
+
+        // manual hinge up
+        if (gamepad1.b) {
+            robot.collector.setFull();
+        }
+
+        // manual reset (for now)
+        if (gamepad1.x) {
+            robot.collector.reset();
         }
     }
 }

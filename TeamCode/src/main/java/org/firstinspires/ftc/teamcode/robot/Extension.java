@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -25,9 +26,12 @@ public class Extension extends Subsystem {
         super(hwMap, telemetry);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
+        extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public DcMotorEx getExtensionMotor() { return extensionMotor; }
+
     public State getState() {
         return state;
     }

@@ -23,16 +23,27 @@ import org.firstinspires.ftc.teamcode.robot.Collector;
 public class CollectorTele extends Collector {
 
     public CollectorTele(HardwareMap hwMap, Telemetry telemetry) {
+
         super(hwMap, telemetry);
+        setHingeState(HingeState.UP);
+        setCollectState(CollectState.EMPTY);
     }
 
     public void update() {
 
         // stop motor once you have finished taking in block with correct color
-        if (hasBlockColor(BlockColor.RED))
-            setCollectState(CollectState.SPITTING);
-        else
-            setCollectState(CollectState.FULL);
+        if (getCollectState() == CollectState.COLLECTING)
+            if (getBlockColor() == BlockColor.RED)
+                setCollectState(CollectState.SPITTING);
+            else if (getBlockColor() == BlockColor.BLUE || getBlockColor() == BlockColor.YELLOW) {
+                setCollectState(CollectState.FULL_MAX);
+                setHingeState(HingeState.HINGING_UP);
+            }
+
+        // slow down spindles once hinging is finished
+        if (getHingeState() == Collector.HingeState.UP
+                && getCollectState() == Collector.CollectState.FULL_MAX)
+             setCollectState(Collector.CollectState.FULL_SLOW);
 
         // spit out blocks for certain amount of time
         if (getCollectState() == CollectState.SPITTING)
@@ -52,9 +63,10 @@ public class CollectorTele extends Collector {
             case EMPTY:
                 getSpindleMotor().setPower(0);
                 break;
-            case FULL:
+            case FULL_SLOW:
                 getSpindleMotor().setPower(HOLD_SPIN_POWER);
                 break;
+            case FULL_MAX:
             case COLLECTING:
                 getSpindleMotor().setPower(MAX_SPIN_POWER);
                 break;
@@ -67,18 +79,22 @@ public class CollectorTele extends Collector {
     private void updateHingeState() {
         switch (getHingeState()) {
             case HINGING_UP:
-                setHingeServosPosition(HINGE_UP_POSITION);
-                if (getHingeServos()[0].getPosition() >= HINGE_UP_POSITION) setHingeState(HingeState.UP);
+                setHingeServoPosition(1);
+                if (getHingeServo().getPosition() >= 1) setHingeState(HingeState.UP);
                 break;
             case HINGING_DOWN:
-                setHingeServosPosition(HINGE_DOWN_POSITION);
-                if (getHingeServos()[0].getPosition() <= HINGE_DOWN_POSITION) setHingeState(HingeState.DOWN);
+                setHingeServoPosition(0);
+                if (getHingeServo().getPosition() <= 0) setHingeState(HingeState.DOWN);
                 break;
             default: break;
         }
     }
+    public void setFull() {
+        setHingeState(Collector.HingeState.HINGING_UP);
+        setCollectState(Collector.CollectState.FULL_MAX);
+    }
+    public void reset() {
+        setCollectState(Collector.CollectState.EMPTY);
+        setHingeState(Collector.HingeState.UP);
+    }
 }
-
-
-
-

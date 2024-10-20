@@ -28,22 +28,38 @@ public class BrainSTEMRobotTele {
         this.opMode = opMode;
 
         driveTrain = new DriveTrainTele(hwMap, telemetry);
-        lift = new LiftTele(hwMap, telemetry);
-        extension = new ExtensionTele(hwMap, telemetry);
+        //lift = new LiftTele(hwMap, telemetry);
+        //extension = new ExtensionTele(hwMap, telemetry);
         collector = new CollectorTele(hwMap, telemetry);
     }
 
     public void update() {
-        extension.update();
+        //extension.update();
         collector.update();
     }
 
     public void extendAndCollect() {
-        if (extension.isRetracted()) {
+        /*if (extension.isRetracted()) {
             extension.setState(Extension.State.EXTENDING);
             // assuming robot is flush with barrier
             collector.setHingeState(Collector.HingeState.HINGING_DOWN);
             collector.setCollectState(Collector.CollectState.COLLECTING);
+        }*/
+        if (collector.getCollectState() == Collector.CollectState.EMPTY && collector.getHingeState() == Collector.HingeState.UP) {
+            //extension.setState(Extension.State.EXTENDING);
+            // collector automatically sets hingeState to DOWN when it finishes hinging
+            collector.setHingeState(Collector.HingeState.HINGING_DOWN);
+            // collector keeps collecting until block is in chamber, then it sets collectState to FULL_MAX
+            collector.setCollectState(Collector.CollectState.COLLECTING);
+        }
+
+        //if (extension.isExtended() && collector.getCollectState() == Collector.CollectState.FULL_MAX) {
+        //if (gamepad1.b && collector.getHingeState() == Collector.HingeState.DOWN) {
+        // keep spindle motors spinning at full speed when hinge position is down
+        // only slows down spindle motors when hinge position is up
+        if (collector.getCollectState() == Collector.CollectState.FULL_MAX) {
+            //extension.setState(Extension.State.RETRACTING);
+            collector.setHingeState(Collector.HingeState.HINGING_UP);
         }
     }
 }

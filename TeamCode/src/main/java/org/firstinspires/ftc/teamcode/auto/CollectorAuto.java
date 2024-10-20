@@ -25,7 +25,7 @@ public class CollectorAuto extends Collector {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 getSpindleMotor().setPower(MAX_SPIN_POWER);
-                return !getFullyCollectedSensor().isPressed();
+                return false;
             }
         };
     }
@@ -33,9 +33,7 @@ public class CollectorAuto extends Collector {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                for (ServoImplEx servo : getHingeServos()) {
-                    servo.setPosition(HINGE_UP_POSITION);
-                }
+                setHingeServoPosition(HINGE_UP_POSITION);
                 return false;
             }
         };
@@ -44,9 +42,7 @@ public class CollectorAuto extends Collector {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                for (ServoImplEx servo : getHingeServos()) {
-                    servo.setPosition(HINGE_DOWN_POSITION);
-                }
+                setHingeServoPosition(HINGE_DOWN_POSITION);
                 return false;
             }
         };
