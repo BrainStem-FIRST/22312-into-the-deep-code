@@ -97,5 +97,6 @@ public class CollectorAuto extends Collector {
                     setHingeState(HingeState.DOWN);
                 return getHingeState() != HingeState.DOWN;
             }
+        };
     }
 }
