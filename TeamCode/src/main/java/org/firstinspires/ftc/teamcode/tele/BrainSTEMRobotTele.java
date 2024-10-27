@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 
@@ -16,21 +17,27 @@ public class BrainSTEMRobotTele {
     // Don't touch these
     public Telemetry telemetry;
     public OpMode opMode;
+    private AllianceColor allianceColor;
 
     public DriveTrainTele driveTrain;
     public LiftTele lift;
     public ExtensionTele extension;
     public CollectorTele collector;
     public GrabberTele grabber;
-    public BrainSTEMRobotTele(HardwareMap hwMap, Telemetry telemetry, OpMode opMode) {
+    public BrainSTEMRobotTele(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor) {
 
         this.telemetry = telemetry;
         this.opMode = opMode;
+        this.allianceColor = allianceColor;
 
-        driveTrain = new DriveTrainTele(hwMap, telemetry);
-        //lift = new LiftTele(hwMap, telemetry);
-        //extension = new ExtensionTele(hwMap, telemetry);
-        collector = new CollectorTele(hwMap, telemetry);
+        driveTrain = new DriveTrainTele(hwMap, telemetry, allianceColor);
+        //lift = new LiftTele(hwMap, telemetry, allianceColor);
+        //extension = new ExtensionTele(hwMap, telemetry, allianceColor);
+        collector = new CollectorTele(hwMap, telemetry, allianceColor);
+    }
+
+    public AllianceColor getAllianceColor() {
+        return allianceColor;
     }
 
     public void update() {

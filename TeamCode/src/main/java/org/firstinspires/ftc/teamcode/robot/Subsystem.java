@@ -10,10 +10,15 @@ public class Subsystem {
 
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
+    private AllianceColor allianceColor;
 
-    public Subsystem(HardwareMap hwMap, Telemetry telemetry) {
+    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         this.hwMap = hwMap;
         this.telemetry = telemetry;
+        this.allianceColor = allianceColor;
+    }
+    public AllianceColor getAllianceColor() {
+        return allianceColor;
     }
 
     public void setMotorPosition(DcMotorEx motor, int position) {

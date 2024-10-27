@@ -10,8 +10,8 @@ public class Grabber extends Subsystem {
     }
     private State state;
 
-    public Grabber(HardwareMap hwMap, Telemetry telemetry) {
-        super(hwMap, telemetry);
+    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
+        super(hwMap, telemetry, allianceColor);
         state = State.OFF;
     }
     public State getState() {

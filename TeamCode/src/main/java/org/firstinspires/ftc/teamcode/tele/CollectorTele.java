@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 
 
@@ -22,9 +23,9 @@ import org.firstinspires.ftc.teamcode.robot.Collector;
 
 public class CollectorTele extends Collector {
 
-    public CollectorTele(HardwareMap hwMap, Telemetry telemetry) {
+    public CollectorTele(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
 
-        super(hwMap, telemetry);
+        super(hwMap, telemetry, allianceColor);
         setHingeState(HingeState.UP);
         setCollectState(CollectState.EMPTY);
     }
