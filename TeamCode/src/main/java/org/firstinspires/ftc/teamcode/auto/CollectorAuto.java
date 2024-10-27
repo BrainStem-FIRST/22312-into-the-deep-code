@@ -32,7 +32,6 @@ public class CollectorAuto extends Collector {
                 Actions.runBlocking(
                         new ParallelAction(
                             hingeUp(),
-
                         )
                 );
                 return true;
@@ -98,5 +97,6 @@ public class CollectorAuto extends Collector {
                     setHingeState(HingeState.DOWN);
                 return getHingeState() != HingeState.DOWN;
             }
+        };
     }
 }
