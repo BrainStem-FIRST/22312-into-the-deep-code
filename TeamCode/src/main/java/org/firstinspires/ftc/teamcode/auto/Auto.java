@@ -11,10 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
 
-public class Auto extends LinearOpMode {
+public abstract class Auto extends LinearOpMode {
 
-    public static Pose2d beginPose = new Pose2d(0, 0, 0);
-    public static Pose2d position1Pose = new Pose2d(50, 20, 0);
+    public Pose2d beginPose;
     private AllianceColor allianceColor;
 
     public Auto(AllianceColor allianceColor) {
@@ -32,12 +31,9 @@ public class Auto extends LinearOpMode {
         waitForStart();
 
         robot.drive.pose = beginPose;
-
-
-
-        Actions.runBlocking(new SequentialAction(
-                robot.lift.raiseLift(),
-                robot.lift.lowerLift()
-        ));
+        runAuto();
     }
+
+    public abstract void runAuto();
+
 }
