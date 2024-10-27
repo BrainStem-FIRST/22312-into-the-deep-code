@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+
+
 import android.graphics.Color;
 import android.text.method.Touch;
 
@@ -58,11 +60,11 @@ public class Collector extends Subsystem {
     private HingeState hingeState;
     private int spittingFrames = 0;
 
-    private ServoImplEx hingeServo;
-    private DcMotorEx spindleMotor;
+    private final ServoImplEx hingeServo;
+    private final DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
-    private ColorSensor blockColorSensor;
+    private final ColorSensor blockColorSensor;
     private boolean updatedBlockColor;
     private BlockColor blockColor;
 

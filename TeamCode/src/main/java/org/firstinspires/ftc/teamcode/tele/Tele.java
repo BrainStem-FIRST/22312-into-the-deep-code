@@ -28,22 +28,19 @@ public class Tele extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            updateRobotControls();
-
+            listenForRobotControls();
             robot.update();
         }
     }
 
-    private void updateRobotControls() {
+    private void listenForRobotControls() {
 
         // drivetrain
-        updateDriveTrainControls();
-
-        // collector
-        updateCollectorControls();
+        listenForDriveTrainInput();
+        listenForCollectionInput();
     }
 
-    private void updateDriveTrainControls() {
+    private void listenForDriveTrainInput() {
 
         double leftStickX = gamepad1.left_stick_x;
         double leftStickY = gamepad1.left_stick_y * -1;
@@ -70,7 +67,7 @@ public class Tele extends LinearOpMode {
             robot.driveTrain.stop();
     }
 
-    private void updateCollectorControls() {
+    private void listenForCollectionInput() {
         if (gamepad1.a) {
             robot.extendAndCollect();
         }
@@ -79,7 +76,6 @@ public class Tele extends LinearOpMode {
         if (gamepad1.b) {
             robot.collector.setFull();
         }
-
         // manual reset (for now)
         if (gamepad1.x) {
             robot.collector.reset();

@@ -17,8 +17,6 @@ public class DriveTrain extends MecanumDrive {
     public float frontRightPower = 0;
     public float backRightPower = 0;
 
-    public GoBildaPinpointDriver.EncoderDirection xDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
-    public GoBildaPinpointDriver.EncoderDirection yDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
     public DriveTrain(HardwareMap hwMap, Telemetry telemetry) {
         super(hwMap, new Pose2d(0, 0, 0));
     }

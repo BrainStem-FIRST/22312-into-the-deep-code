@@ -34,32 +34,22 @@ public class BrainSTEMRobotTele {
     }
 
     public void update() {
-        //extension.update();
         collector.update();
+
+        // checking if collector found color and is hinging up
+        if (collector.getHingeState() == Collector.HingeState.HINGING_UP)
+            extension.setState(Extension.State.RETRACTING);
+        extension.update();
     }
 
     public void extendAndCollect() {
-        /*if (extension.isRetracted()) {
-            extension.setState(Extension.State.EXTENDING);
-            // assuming robot is flush with barrier
-            collector.setHingeState(Collector.HingeState.HINGING_DOWN);
-            collector.setCollectState(Collector.CollectState.COLLECTING);
-        }*/
+        // ensuring collector is ready for extension before extension
         if (collector.getCollectState() == Collector.CollectState.EMPTY && collector.getHingeState() == Collector.HingeState.UP) {
-            //extension.setState(Extension.State.EXTENDING);
+            extension.setState(Extension.State.EXTENDING);
             // collector automatically sets hingeState to DOWN when it finishes hinging
             collector.setHingeState(Collector.HingeState.HINGING_DOWN);
             // collector keeps collecting until block is in chamber, then it sets collectState to FULL_MAX
             collector.setCollectState(Collector.CollectState.COLLECTING);
-        }
-
-        //if (extension.isExtended() && collector.getCollectState() == Collector.CollectState.FULL_MAX) {
-        //if (gamepad1.b && collector.getHingeState() == Collector.HingeState.DOWN) {
-        // keep spindle motors spinning at full speed when hinge position is down
-        // only slows down spindle motors when hinge position is up
-        if (collector.getCollectState() == Collector.CollectState.FULL_MAX) {
-            //extension.setState(Extension.State.RETRACTING);
-            collector.setHingeState(Collector.HingeState.HINGING_UP);
         }
     }
 }

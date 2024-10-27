@@ -15,7 +15,10 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class Extension extends Subsystem {
 
-    private DcMotorEx extensionMotor;
+    private final DcMotorEx extensionMotor;
+
+    private final int minExtensionTick = 0;
+    private final int maxExtensionTick = 1000;
 
     public enum State {
         IN, OUT, EXTENDING, RETRACTING
@@ -29,6 +32,7 @@ public class Extension extends Subsystem {
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
 
     public DcMotorEx getExtensionMotor() { return extensionMotor; }
 
