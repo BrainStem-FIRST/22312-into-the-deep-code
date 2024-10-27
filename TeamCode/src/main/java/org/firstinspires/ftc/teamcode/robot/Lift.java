@@ -17,10 +17,10 @@ public class Lift extends Subsystem {
     };
     private State state;
 
-    private DcMotorEx liftMotor;
+    private final DcMotorEx liftMotor;
 
-    public Lift(HardwareMap hwMap, Telemetry telemetry) {
-        super(hwMap, telemetry);
+    public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
+        super(hwMap, telemetry, allianceColor);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

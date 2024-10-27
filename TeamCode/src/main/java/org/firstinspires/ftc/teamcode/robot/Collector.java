@@ -69,7 +69,7 @@ public class Collector extends Subsystem {
     private BlockColor blockColor;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, telemetry);
+        super(hwMap, telemetry, allianceColor);
         collectState = CollectState.EMPTY;
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
 

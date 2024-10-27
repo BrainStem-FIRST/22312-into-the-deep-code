@@ -25,8 +25,8 @@ public class Extension extends Subsystem {
     }
     private State state = State.IN;
 
-    public Extension(HardwareMap hwMap, Telemetry telemetry) {
-        super(hwMap, telemetry);
+    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
+        super(hwMap, telemetry, allianceColor);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

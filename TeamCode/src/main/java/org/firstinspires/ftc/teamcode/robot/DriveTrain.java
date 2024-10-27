@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
 
 public class DriveTrain extends MecanumDrive {
+    private AllianceColor allianceColor;
     private int tick;
 
     private double leftStickX, leftStickY, rightStickX;
@@ -17,8 +18,12 @@ public class DriveTrain extends MecanumDrive {
     public float frontRightPower = 0;
     public float backRightPower = 0;
 
-    public DriveTrain(HardwareMap hwMap, Telemetry telemetry) {
+    public DriveTrain(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, new Pose2d(0, 0, 0));
+        this.allianceColor = allianceColor;
+    }
+    public AllianceColor getAllianceColor() {
+        return allianceColor;
     }
     public void setDTMotorPowers(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
         leftFront.setPower(frontLeftPower);

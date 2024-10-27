@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.DriveTrain;
 import org.firstinspires.ftc.teamcode.robot.Extension;
@@ -18,11 +19,20 @@ public class Tele extends LinearOpMode {
 
     private BrainSTEMRobotTele robot;
 
+    private AllianceColor allianceColor;
+
+    public Tele(AllianceColor allianceColor) {
+        this.allianceColor = allianceColor;
+    }
+
+    public AllianceColor getAllianceColor() {
+        return allianceColor;
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new BrainSTEMRobotTele(this.hardwareMap, this.telemetry, this);
+        robot = new BrainSTEMRobotTele(this.hardwareMap, this.telemetry, this, allianceColor);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();

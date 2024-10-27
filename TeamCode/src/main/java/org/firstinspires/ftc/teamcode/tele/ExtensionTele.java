@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
@@ -16,8 +17,8 @@ public class ExtensionTele extends Extension {
     final public static double RETRACTING_POWER = 0.2;
     private PIDController pidController;
 
-    public ExtensionTele(HardwareMap hwMap, Telemetry telemetry) {
-        super(hwMap, telemetry);
+    public ExtensionTele(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
+        super(hwMap, telemetry, allianceColor);
 
         setState(State.IN);
 
