@@ -52,4 +52,12 @@ public class BrainSTEMRobotTele {
             collector.setCollectState(Collector.CollectState.COLLECTING);
         }
     }
+
+    // Note: this assumes collector does not have block in it
+    public void resetExtensionAndCollector() {
+        collector.setHingeState(Collector.HingeState.HINGING_UP);
+        collector.setCollectState(Collector.CollectState.EMPTY);
+        extension.setState(Extension.State.RETRACTING);
+
+    }
 }

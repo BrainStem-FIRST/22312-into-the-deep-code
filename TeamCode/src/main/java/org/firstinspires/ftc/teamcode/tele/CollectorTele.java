@@ -36,10 +36,10 @@ public class CollectorTele extends Collector {
 
     private void updateSpindleMotorState() {
         switch(getCollectState()) {
-            case EMPTY:
+            case EMPTY: // could be in retracted state or after spitting
                 getSpindleMotor().setPower(0);
                 break;
-                
+
             case FULL_SLOW: // when extension in extended/retracting and collector is hinged up with block
                 getSpindleMotor().setPower(HOLD_SPIN_POWER);
                 break;

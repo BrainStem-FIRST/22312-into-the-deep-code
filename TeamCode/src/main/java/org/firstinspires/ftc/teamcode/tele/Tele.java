@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.DriveTrain;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpwRoadrunner")
@@ -34,8 +35,6 @@ public class Tele extends LinearOpMode {
     }
 
     private void listenForRobotControls() {
-
-        // drivetrain
         listenForDriveTrainInput();
         listenForCollectionInput();
     }
@@ -69,7 +68,13 @@ public class Tele extends LinearOpMode {
 
     private void listenForCollectionInput() {
         if (gamepad1.a) {
-            robot.extendAndCollect();
+            if (robot.extension.getState() == ExtensionTele.State.IN || robot.extension.getState() == ExtensionTele.State.RETRACTING)
+                robot.extendAndCollect();
+            else
+                if (robot.collector.getCollectState() == Collector.CollectState.COLLECTING)
+                    robot.resetExtensionAndCollector();
+                else
+                    robot.collector.setCollectState(Collector.CollectState.COLLECTING);
         }
 
         // manual hinge up

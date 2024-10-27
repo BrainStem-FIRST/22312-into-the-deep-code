@@ -28,10 +28,18 @@ public class ExtensionTele extends Extension {
         // checking if collector started hinging up yet (implies has correct block
 
         switch (getState()) {
-            case IN: updateRetracted(); break;
-            case OUT: updateExtended(); break;
-            case EXTENDING: updateExtending(); break;
-            case RETRACTING: updateRetracting(); break;
+            case IN:
+                updateRetracted();
+                break;
+            case OUT:
+                updateExtended();
+                break;
+            case EXTENDING:
+                updateExtending();
+                break;
+            case RETRACTING:
+                updateRetracting();
+                break;
             default: break;
         }
     }
