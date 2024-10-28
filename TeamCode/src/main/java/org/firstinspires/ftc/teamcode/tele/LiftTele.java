@@ -10,48 +10,38 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 
 public class LiftTele extends Lift {
 
-    DcMotorEx liftMotor;
 
-    enum LiftStates {
-        UP, DOWN, STATIC
-    };
-
-    LiftStates liftState;
 
     public LiftTele(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
-
-        liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftState = LiftStates.STATIC;
     }
 
     private void raiseLift() {
-        liftMotor.setPower(0.3);
+        getLiftMotor().setPower(0.3);
     }
     private void dropLift() {
-        liftMotor.setPower(-0.3);
+        getLiftMotor().setPower(-0.3);
     }
     private void holdLift() {
-        liftMotor.setPower(0);
-    }
-
-    private void updateState() {
-        switch(liftState) {
-            case UP:
-                raiseLift();
-                break;
-            case DOWN:
-                dropLift();
-                break;
-            case STATIC:
-                holdLift();
-                break;
-        }
+        getLiftMotor().setPower(0);
     }
 
     public void update() {
-        updateState();
+        if (getGoalState() != null) {
+            // checking if done with transition
+            double dif = getStatePositions().get(getGoalState()) - getStatePositions().get(getState());
+            if (dif > MOTOR_THRESHOLD)
+                raiseLift();
+            else if (dif < -MOTOR_THRESHOLD)
+                dropLift();
+            else {
+                setState(getGoalState());
+                setGoalState(null);
+                holdLift();
+            }
+        }
+        else
+            holdLift();
     }
 }
 

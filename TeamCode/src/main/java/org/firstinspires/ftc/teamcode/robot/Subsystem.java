@@ -10,7 +10,7 @@ public class Subsystem {
 
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
-    private AllianceColor allianceColor;
+    private final AllianceColor allianceColor;
 
     public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         this.hwMap = hwMap;
