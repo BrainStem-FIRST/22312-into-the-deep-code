@@ -50,14 +50,15 @@ public class BrainSTEMRobotTele {
         extension.update();
 
         // lifting system handling
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.COLLECT_TROUGH && liftingSystemTele.getCurStateDone())
-            if(collector.getBlockColor() == Collector.BlockColor.YELLOW)
-                liftingSystemTele.setState(LiftingSystemTele.State.BASKET_DROP);
-            else
-                liftingSystemTele.setState(LiftingSystemTele.State.BLOCK_DROP);
+        if(collector.getBlockColor() == Collector.BlockColor.YELLOW)
+            tryDepositBlock();
+        // TODO: standardize BlockColor enums (we have AllianceColor, BlockColor but only need one)
+        else if(collector.getBlockcolor() == Collector.BlockColor.RED) // assuming you are on red team
+            tryDropBlock();
         liftingSystemTele.update();
     }
 
+    // collecting actions
     public void tryExtendAndCollect() {
         // ensuring collector is ready for extension before extension
         if (collector.getCollectState() == Collector.CollectState.EMPTY && collector.getHingeState() == Collector.HingeState.UP) {
@@ -76,8 +77,28 @@ public class BrainSTEMRobotTele {
 
     }
 
+    // lifting system actions
+    // requires block in trough
     public void tryPickupTrough() {
         if(collector.getCollectState() == Collector.CollectState.FULL_SLOW && extension.getState() == Extension.State.IN) // ensuring trough is full and ready
             liftingSystemTele.setState(LiftingSystemTele.State.COLLECT_TROUGH);
     }
+    public void tryDepositBlock() {
+        if(grabber.hasBlock() && liftingSystemTele.State == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady())
+            liftingSystemTele.setState(LiftingSystemTele.State.BASKET_DROP);
+    }
+    public void tryDropBlock() {
+        if(grabber.hasBlock() && liftingSystemTele.State == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady())
+            liftingSystemTele.setState(LiftingSystemTele.State.BLOCK_DROP);
+    }
+    public void tryRamSpecimen() {
+        if(grabber.hasBlock() && liftingSystemTele.State == LiftingSystemTele.State.SPECIMEN_PICKUP && liftingSystemTele.getCurStateReady())
+            liftingSystemTele.setState(LiftingSystemTele.State.SPECIMEN_RAM);
+    }
+    // requires specimen on wall
+    public void tryPickupSpecimen() {
+        if(!grabber.hasBlock() &&)
+            liftingSystemTele.setState(LiftingSystemTele.State.SPECIMEN_PICKUP);
+    }
 }
+

@@ -8,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Grabber extends LiftSubsystem {
     private final ServoImplEx grabServo;
+    public final int ERROR = 0.05;
+    private boolean hasBlock = false;
 
     public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
@@ -22,7 +24,11 @@ public class Grabber extends LiftSubsystem {
         return grabServo.getPosition() == pos;
     }
 
+    // getters
     public ServoImplEx getGrabServo() {
         return grabServo;
+    }
+    public boolean hasBlock() {
+        return this.hasBlock;
     }
 }

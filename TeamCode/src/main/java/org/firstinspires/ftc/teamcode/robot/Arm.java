@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 public class Arm extends LiftSubsystem {
     private final ServoImplEx armServo;
+    public final double ERROR = 0.1;
 
     public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);

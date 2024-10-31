@@ -15,6 +15,7 @@ public abstract class LiftSubsystem extends Subsystem {
     private static final HashMap<State, Double> execStatePositions = new HashMap<>();
     private State curState = State.TROUGH;
     private State goalState = null; // if null, then not in transition (ready to execute)
+
     public LiftSubsystem(HardwareMap hw, Telemetry telemetry, AllianceColor allianceColor) {
         super(hw, telemetry, allianceColor);
     }
@@ -42,11 +43,8 @@ public abstract class LiftSubsystem extends Subsystem {
         return goalState;
     }
 
-    // returns if desired state is already set or not; going to use in liftingSubsystemTele class to perform checks on each system whilst simultaneously setting states
-    public boolean setGoalState(State goalState) {
-        if(goalState != curState)
-            this.goalState = goalState;
-        return goalState == curState;
+    public void setGoalState(State goalState) {
+        this.goalState = goalState;
     }
     public State getCurState() {
         return curState;
