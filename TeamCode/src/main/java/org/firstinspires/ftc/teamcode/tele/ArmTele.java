@@ -13,8 +13,11 @@ public class ArmTele extends Arm {
 
     public void update() {
         if(getGoalState() != null) {
-            getArmServo().setPosition(getStatePositions().get(getGoalState()));
-            setState(getGoalState());
+            // checking for end of state transition
+            if(getArmServo().getPosition() == getPrepStatePositions().get(getGoalState()))
+                goalStateReached();
+            else
+                getArmServo().setPosition(getPrepStatePositions().get(getGoalState()));
         }
     }
 }

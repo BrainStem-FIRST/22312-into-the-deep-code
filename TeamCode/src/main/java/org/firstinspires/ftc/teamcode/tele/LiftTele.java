@@ -9,9 +9,6 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 
 public class LiftTele extends Lift {
-
-
-
     public LiftTele(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
     }
@@ -29,14 +26,13 @@ public class LiftTele extends Lift {
     public void update() {
         if (getGoalState() != null) {
             // checking if done with transition
-            double dif = getStatePositions().get(getGoalState()) - getStatePositions().get(getState());
-            if (dif > MOTOR_THRESHOLD)
+            double dif = getPrepStatePositions().get(getGoalState()) - getPrepStatePositions().get(getCurState());
+            if (dif > DESTINATION_THRESHOLD)
                 raiseLift();
-            else if (dif < -MOTOR_THRESHOLD)
+            else if (dif < -DESTINATION_THRESHOLD)
                 dropLift();
             else {
-                setState(getGoalState());
-                setGoalState(null);
+                goalStateReached();
                 holdLift();
             }
         }

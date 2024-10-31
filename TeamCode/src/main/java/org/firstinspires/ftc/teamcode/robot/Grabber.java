@@ -6,44 +6,23 @@ import java.util.HashMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Grabber extends Subsystem {
+public class Grabber extends LiftSubsystem {
     private final ServoImplEx grabServo;
-
-    public enum State {
-        CLOSED, OPEN
-    }
-    HashMap<State, Double> statePositions = new HashMap<>();
-    private State state = State.CLOSED;
-    private State goalState = null;
 
     public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
-        initializeStatePositions();
+        setPrepStatePositions(1.0, 0.0, 0.0, 0.0);
+        setExecStatePositions(0.0, 1.0, 1.0, 1.0);
     }
-
-    // TODO: find actual state positions of grabber
-    private void initializeStatePositions() {
-        statePositions.put(State.CLOSED, 0.0);
-        statePositions.put(State.OPEN, 1.0);
+    @Override
+    public boolean executeCurrentState() {
+        double pos = getExecStatePositions().get(getCurState());
+        grabServo.setPosition(pos);
+        return grabServo.getPosition() == pos;
     }
 
     public ServoImplEx getGrabServo() {
         return grabServo;
-    }
-    public State getGoalState() {
-        return goalState;
-    }
-    public void setGoalState(State goalState) {
-        this.goalState = goalState;
-    }
-    public State getState() {
-        return state;
-    }
-    public void setState(State state) {
-        this.state = state;
-    }
-    public HashMap<State, Double> getStatePositions() {
-        return statePositions;
     }
 }

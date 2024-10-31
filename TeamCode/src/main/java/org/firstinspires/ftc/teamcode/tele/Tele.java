@@ -79,7 +79,7 @@ public class Tele extends LinearOpMode {
     private void listenForCollectionInput() {
         if (gamepad1.a) {
             if (robot.extension.getState() == ExtensionTele.State.IN || robot.extension.getState() == ExtensionTele.State.RETRACTING)
-                robot.extendAndCollect();
+                robot.tryExtendAndCollect();
             else
                 if (robot.collector.getCollectState() == Collector.CollectState.COLLECTING)
                     robot.resetExtensionAndCollector();

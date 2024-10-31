@@ -13,12 +13,12 @@ public class GrabberTele extends Grabber {
 
     public void update() {
         // meaning in transition
-        if(getGoalState() != getState())
+        if(getGoalState() != null)
             // checking if done transitioning
-            if(getGrabServo().getPosition() == getStatePositions().get(getGoalState()))
-                setState(getGoalState());
+            if(getGrabServo().getPosition() == getPrepStatePositions().get(getGoalState()))
+                goalStateReached();
             else
                 // technically only need to call this once, but o well
-                getGrabServo().setPosition(getStatePositions().get(getGoalState()));
+                getGrabServo().setPosition(getPrepStatePositions().get(getGoalState()));
     }
 }
