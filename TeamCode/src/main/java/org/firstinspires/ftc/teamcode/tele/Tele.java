@@ -99,10 +99,10 @@ public class Tele extends LinearOpMode {
     private void listenForLiftInput() {
         // pretending y = manual setting for lift deposit
         if(gamepad1.y)
-            if(robot.liftingSystemTele.getState() != LiftingSystemTele.State.BASKET_DROP)
-                robot.prepBasketDeposit();
-            else
-                robot.execBasketDeposit();
+            if(robot.liftingSystemTele.getState() != LiftingSystemTele.State.SPECIMEN_PICKUP)
+                robot.prepSpecimenPickup();
+            else if(robot.liftingSystemTele.getCurStateReady())
+                robot.execSpecimenPickup();
 
     }
 }

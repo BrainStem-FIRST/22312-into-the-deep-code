@@ -1,19 +1,13 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 
-
-import android.graphics.Color;
-import android.text.method.Touch;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 
 // state mechanics: once collector/spit state initiated, will power until time reached, them automatically turn off

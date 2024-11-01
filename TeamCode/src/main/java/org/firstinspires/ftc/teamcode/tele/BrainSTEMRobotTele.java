@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.LiftSubsystem;
 
 public class BrainSTEMRobotTele {
     // Don't touch these
@@ -55,6 +56,9 @@ public class BrainSTEMRobotTele {
 
     // collecting actions
     public void tryExtendAndCollect() {
+        // new code:
+        // collectingSystem.tryExtendAndCollect();
+
         // ensuring collector is ready for extension before extension
         if (collector.getCollectState() == Collector.CollectState.EMPTY && collector.getHingeState() == Collector.HingeState.UP) {
             extension.setState(Extension.State.EXTENDING);
@@ -78,8 +82,11 @@ public class BrainSTEMRobotTele {
             liftingSystemTele.setState(LiftingSystemTele.State.TROUGH);
     }
     public void execTroughPickup() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady()) {}
-            // call liftingSystem trough pickup execution function
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady()) {
+            liftingSystemTele.getArm().setGoalState(LiftSubsystem.State.TROUGH);
+            liftingSystemTele.getGrabber().setGoalState(LiftSubsystem.State.TROUGH);
+        }
+
 
     }
     public void prepBasketDeposit() {

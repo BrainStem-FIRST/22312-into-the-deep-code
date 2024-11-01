@@ -35,12 +35,19 @@ public class LiftingSystemTele {
         grabber = new GrabberTele(hw, telemetry, allianceColor);
     }
 
+    // accounts for delays
     public void updateSubsystemStates(State state) {
         switch(state) {
             case TROUGH:
-                lift.setGoalState(Lift.State.TROUGH);
-                arm.setGoalState(Arm.State.TROUGH);
-                grabber.setGoalState(Grabber.State.TROUGH);
+                if(arm.getCurState() == LiftSubsystem.State.TROUGH)
+                    if(lift.getCurState() == LiftSubsystem.State.TROUGH) {
+                        if (grabber.getCurState() == LiftSubsystem.State.TROUGH) {
+                            finishTransition(State.TROUGH);
+                        }
+                    }
+                    else {
+                        lift.setGoalState(LiftSubsystem.State.TROUGH);
+                    }
                 break;
             case BLOCK_DROP:
 
@@ -68,11 +75,6 @@ public class LiftingSystemTele {
         arm.update();
         grabber.update();
     }
-    public void execCurrentState() {
-        lift.executeCurrentState();
-        arm.executeCurrentState();
-        grabber.executeCurrentState();
-    }
 
     // getters/setters
     public State getState() {
@@ -85,6 +87,10 @@ public class LiftingSystemTele {
     }
     public boolean getCurStateReady() {
         return curStateReady;
+    }
+    private void finishTransition(State state) {
+        curStateReady = true;
+        this.state = state;
     }
     public boolean getCurStateDone() {
         return curStateDone;
