@@ -16,8 +16,8 @@ public class Lift extends LiftSubsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        setPrepStatePositions(0, 5, 10, 4);
-        setExecStatePositions(0, 9, 10, 4);
+        setPrepStatePositions(0, 3, 5, 10, 6);
+        setExecStatePositions(0, 3, 5, 10, 9);
     }
     @Override
     public boolean executeCurrentState() {

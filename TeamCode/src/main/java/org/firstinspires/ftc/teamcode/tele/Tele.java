@@ -47,6 +47,7 @@ public class Tele extends LinearOpMode {
     private void listenForRobotControls() {
         listenForDriveTrainInput();
         listenForCollectionInput();
+        listenForLiftInput();
     }
 
     private void listenForDriveTrainInput() {
@@ -75,7 +76,6 @@ public class Tele extends LinearOpMode {
         } else
             robot.driveTrain.stop();
     }
-
     private void listenForCollectionInput() {
         if (gamepad1.a) {
             if (robot.extension.getState() == ExtensionTele.State.IN || robot.extension.getState() == ExtensionTele.State.RETRACTING)
@@ -95,5 +95,14 @@ public class Tele extends LinearOpMode {
         if (gamepad1.x) {
             robot.collector.reset();
         }
+    }
+    private void listenForLiftInput() {
+        // pretending y = manual setting for lift deposit
+        if(gamepad1.y)
+            if(robot.liftingSystemTele.getState() != LiftingSystemTele.State.BASKET_DROP)
+                robot.prepBasketDeposit();
+            else
+                robot.execBasketDeposit();
+
     }
 }

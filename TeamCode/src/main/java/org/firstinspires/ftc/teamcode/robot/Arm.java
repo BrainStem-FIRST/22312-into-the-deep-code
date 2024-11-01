@@ -15,8 +15,8 @@ public class Arm extends LiftSubsystem {
         super(hwMap, telemetry, allianceColor);
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
 
-        setPrepStatePositions(0.0, 0.25, 0.5, 0.75);
-        setExecStatePositions(0.0, 0.25, 0.5, 0.75);
+        setPrepStatePositions(0.0, 0.25, 0.25, 0.25, 0.75);
+        setExecStatePositions(0.0, 0.25, 0.25, 0.25, 0.75);
     }
     @Override
     public boolean executeCurrentState() {

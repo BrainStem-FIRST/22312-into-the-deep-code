@@ -24,6 +24,7 @@ public class LiftTele extends Lift {
     }
 
     public void update() {
+        // handling transition
         if (getGoalState() != null) {
             // checking if done with transition
             double dif = getPrepStatePositions().get(getGoalState()) - getPrepStatePositions().get(getCurState());

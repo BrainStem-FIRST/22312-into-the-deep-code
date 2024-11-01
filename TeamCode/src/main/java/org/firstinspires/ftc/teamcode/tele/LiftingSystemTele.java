@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftSubsystem;
 
-public class LiftingSystemTele<T> {
+public class LiftingSystemTele {
     private final LiftTele lift;
     private final ArmTele arm;
     private final GrabberTele grabber;
@@ -21,6 +21,7 @@ public class LiftingSystemTele<T> {
     // states can be split into two parts: the transition to the state and the aftermath after the prep (could be at rest)
     private State state = State.TROUGH;
     private boolean curStateReady = false; // true when prep for state is done
+    private boolean curStateExecuting = false;
     private boolean curStateDone = false; // true when state execution is done
 
     public LiftingSystemTele(HardwareMap hw, Telemetry telemetry, AllianceColor allianceColor) {
@@ -32,15 +33,18 @@ public class LiftingSystemTele<T> {
     public LiftSubsystem.State convertState(State state) {
         switch(state) {
             case TROUGH:
-                return LiftingSystem.State.TROUGH;
+                return LiftSubsystem.State.TROUGH;
             case BLOCK_DROP:
-                return LiftingSystem.State.BACK_DROP;
+                return LiftSubsystem.State.BLOCK_DROP;
             case SPECIMEN_PICKUP:
-                return LiftingSystem.State.BACK_DROP;
+                return LiftSubsystem.State.SPECIMEN_PICKUP;
             case SPECIMEN_RAM:
-                return LiftingSystem.State.RAM;
+                return LiftSubsystem.State.SPECIMEN_RAM;
             case BASKET_DROP:
-                return LiftinSystem.State.BASKET;
+                return LiftSubsystem.State.BASKET_DROP;
+            default:
+                System.out.println("WARNING: UNRECOGNIZED STATE [" + state + "] FOR CLASS LiftSubsystem");
+                return LiftSubsystem.State.TROUGH;
         }
     }
 
@@ -59,6 +63,11 @@ public class LiftingSystemTele<T> {
         arm.update();
         grabber.update();
     }
+    public void execCurrentState() {
+        lift.executeCurrentState();
+        arm.executeCurrentState();
+        grabber.executeCurrentState();
+    }
 
     // getters/setters
     public State getState() {
@@ -74,5 +83,20 @@ public class LiftingSystemTele<T> {
     }
     public boolean getCurStateDone() {
         return curStateDone;
+    }
+    public boolean getCurStateExecuting() {
+        return curStateExecuting;
+    }
+    public void setCurStateExecuting(boolean curStateExecuting) {
+        this.curStateExecuting = curStateExecuting;
+    }
+    public LiftTele getLift() {
+        return lift;
+    }
+    public ArmTele getArm() {
+        return arm;
+    }
+    public GrabberTele getGrabber() {
+        return grabber;
     }
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingExtendingTest")
@@ -10,8 +11,8 @@ public class CollectingExtendingTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         waitForStart();
 
-        CollectorTele collector = new CollectorTele(hardwareMap, telemetry);
-        //ExtensionTele extension = new ExtensionTele(hardwareMap, telemetry);
+        CollectorTele collector = new CollectorTele(hardwareMap, telemetry, AllianceColor.BLUE);
+        ExtensionTele extension = new ExtensionTele(hardwareMap, telemetry, AllianceColor.BLUE);
         collector.setCollectState(Collector.CollectState.EMPTY);
         collector.setHingeState(Collector.HingeState.UP);
         collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);

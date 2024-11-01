@@ -8,14 +8,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Grabber extends LiftSubsystem {
     private final ServoImplEx grabServo;
-    public final int ERROR = 0.05;
+    public final double ERROR = 0.05;
     private boolean hasBlock = false;
 
     public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
-        setPrepStatePositions(1.0, 0.0, 0.0, 0.0);
-        setExecStatePositions(0.0, 1.0, 1.0, 1.0);
+        setPrepStatePositions(1.0, 0.0, 1.0, 0.0, 0.0);
+        setExecStatePositions(0.0, 1.0, 0.0, 1.0, 1.0);
     }
     @Override
     public boolean executeCurrentState() {
