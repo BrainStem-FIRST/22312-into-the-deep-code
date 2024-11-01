@@ -78,32 +78,33 @@ public class BrainSTEMRobotTele {
             liftingSystemTele.setState(LiftingSystemTele.State.TROUGH);
     }
     public void execTroughPickup() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady())
-            liftingSystemTele.execCurrentState();
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady()) {}
+            // call liftingSystem trough pickup execution function
+
     }
     public void prepBasketDeposit() {
         if(liftingSystemTele.getGrabber().hasBlock() && liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady())
             liftingSystemTele.setState(LiftingSystemTele.State.BASKET_DROP);
     }
     public void execBasketDeposit() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.BASKET_DROP && liftingSystemTele.getCurStateReady())
-            liftingSystemTele.execCurrentState();
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.BASKET_DROP && liftingSystemTele.getCurStateReady()) {}
+        // call liftingSystem basket drop execution function
     }
     public void prepBlockDrop() {
         if(liftingSystemTele.getGrabber().hasBlock() && liftingSystemTele.getState() == LiftingSystemTele.State.TROUGH && liftingSystemTele.getCurStateReady())
             liftingSystemTele.setState(LiftingSystemTele.State.BLOCK_DROP);
     }
     public void execBlockDrop() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.BLOCK_DROP && liftingSystemTele.getCurStateReady())
-            liftingSystemTele.execCurrentState();
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.BLOCK_DROP && liftingSystemTele.getCurStateReady()) {}
+        // call liftingSystem block drop execution function
     }
     public void prepSpecimenRam() {
         if(liftingSystemTele.getGrabber().hasBlock() && liftingSystemTele.getState() == LiftingSystemTele.State.SPECIMEN_PICKUP && liftingSystemTele.getCurStateReady())
             liftingSystemTele.setState(LiftingSystemTele.State.SPECIMEN_RAM);
     }
     public void execSpecimenRam() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.SPECIMEN_RAM && liftingSystemTele.getCurStateReady())
-            liftingSystemTele.execCurrentState();
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.SPECIMEN_RAM && liftingSystemTele.getCurStateReady()) {}
+        // call liftingSystem ram specimen execution function
     }
 
     // requires specimen on wall
@@ -112,7 +113,7 @@ public class BrainSTEMRobotTele {
             liftingSystemTele.setState(LiftingSystemTele.State.SPECIMEN_PICKUP);
     }
     public void execSpecimenPickup() {
-        if(liftingSystemTele.getState() == LiftingSystemTele.State.SPECIMEN_PICKUP && liftingSystemTele.getCurStateReady())
-            liftingSystemTele.execCurrentState();
+        if(liftingSystemTele.getState() == LiftingSystemTele.State.SPECIMEN_PICKUP && liftingSystemTele.getCurStateReady()) {}
+        // call liftingSystem pickup specimen execution function
     }
 }

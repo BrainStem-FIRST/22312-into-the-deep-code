@@ -14,7 +14,7 @@ public class ArmTele extends Arm {
     public void update() {
         if(getGoalState() != null) {
             // checking for end of state transition
-            if(Math.abs(getArmServo().getPosition() - getPrepStatePositions().get(getGoalState())) <= ERROR)
+            if(Math.abs(getArmServo().getPosition() - getPrepStatePositions().get(getGoalState())) <= DESTINATION_THRESHOLD)
                 goalStateReached();
             else
                 getArmServo().setPosition(getPrepStatePositions().get(getGoalState()));

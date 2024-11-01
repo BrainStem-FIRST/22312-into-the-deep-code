@@ -10,26 +10,30 @@ public abstract class LiftSubsystem extends Subsystem {
 
     // assuming each state represents being "ready", not actually executing the potential action associated with it
     public enum State {
-        TROUGH, BLOCK_DROP, SPECIMEN_PICKUP, SPECIMEN_RAM, BASKET_DROP // assuming backdrop state have same position for dropping block and picking up specimen
+        TROUGH, BLOCK_DROP, SPECIMEN_PICKUP, SPECIMEN_RAM, BASKET_DROP
     }
     private static final HashMap<State, Double> prepStatePositions = new HashMap<>();
     private static final HashMap<State, Double> execStatePositions = new HashMap<>();
     private State curState = State.TROUGH;
     private State goalState = null; // if null, then not in transition (ready to execute)
     private boolean curStateExecuting = false;
+    public final double DESTINATION_THRESHOLD;
 
-    public LiftSubsystem(HardwareMap hw, Telemetry telemetry, AllianceColor allianceColor) {
+    public LiftSubsystem(HardwareMap hw, Telemetry telemetry, AllianceColor allianceColor, double destination_threshold) {
         super(hw, telemetry, allianceColor);
+        DESTINATION_THRESHOLD = destination_threshold;
     }
     public void setPrepStatePositions(double trough, double backdrop, double pickup, double basket, double ram) {
         prepStatePositions.put(State.TROUGH, trough);
         prepStatePositions.put(State.BLOCK_DROP, backdrop);
+        prepStatePositions.put(State.SPECIMEN_PICKUP, pickup);
         prepStatePositions.put(State.BASKET_DROP, basket);
         prepStatePositions.put(State.SPECIMEN_RAM, ram);
     }
     public void setExecStatePositions(double trough, double backdrop, double pickup, double basket, double ram) {
         execStatePositions.put(State.TROUGH, trough);
         execStatePositions.put(State.BLOCK_DROP, backdrop);
+        execStatePositions.put(State.SPECIMEN_PICKUP, pickup);
         execStatePositions.put(State.BASKET_DROP, basket);
         execStatePositions.put(State.SPECIMEN_RAM, ram);
     }
@@ -44,7 +48,6 @@ public abstract class LiftSubsystem extends Subsystem {
     public State getGoalState() {
         return goalState;
     }
-
     public void setGoalState(State goalState) {
         this.goalState = goalState;
     }

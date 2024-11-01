@@ -15,7 +15,7 @@ public class GrabberTele extends Grabber {
         // meaning in transition
         if(getGoalState() != null)
             // checking if done transitioning
-            if(Math.abs(getGrabServo().getPosition() - getPrepStatePositions().get(getGoalState())) < ERROR)
+            if(Math.abs(getGrabServo().getPosition() - getPrepStatePositions().get(getGoalState())) < DESTINATION_THRESHOLD)
                 goalStateReached();
             else
                 // technically only need to call this once, but o well

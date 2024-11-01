@@ -8,10 +8,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Lift extends LiftSubsystem {
     private final DcMotorEx liftMotor;
-    public final int DESTINATION_THRESHOLD = 10;
 
     public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, telemetry, allianceColor);
+        super(hwMap, telemetry, allianceColor, 10);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

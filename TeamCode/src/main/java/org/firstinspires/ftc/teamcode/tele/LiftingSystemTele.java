@@ -10,6 +10,11 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftSubsystem;
 
 public class LiftingSystemTele {
+    // TODO (INFRASTRUCTURE)
+    // define delays in updateSubsystemStates function
+    // finish writing execution functions in LiftSubsystem classes
+    //
+    public static final int LIFT_ARM_RESTRICTION = 10; // if lift is lower than 3 inches, arm has to be perfectly vertical
     private final LiftTele lift;
     private final ArmTele arm;
     private final GrabberTele grabber;
@@ -30,31 +35,31 @@ public class LiftingSystemTele {
         grabber = new GrabberTele(hw, telemetry, allianceColor);
     }
 
-    public LiftSubsystem.State convertState(State state) {
+    public void updateSubsystemStates(State state) {
         switch(state) {
             case TROUGH:
-                return LiftSubsystem.State.TROUGH;
+                lift.setGoalState(Lift.State.TROUGH);
+                arm.setGoalState(Arm.State.TROUGH);
+                grabber.setGoalState(Grabber.State.TROUGH);
+                break;
             case BLOCK_DROP:
-                return LiftSubsystem.State.BLOCK_DROP;
+
+                break;
             case SPECIMEN_PICKUP:
-                return LiftSubsystem.State.SPECIMEN_PICKUP;
+                break;
             case SPECIMEN_RAM:
-                return LiftSubsystem.State.SPECIMEN_RAM;
+                break;
             case BASKET_DROP:
-                return LiftSubsystem.State.BASKET_DROP;
+                break;
             default:
-                System.out.println("WARNING: UNRECOGNIZED STATE [" + state + "] FOR CLASS LiftSubsystem");
-                return LiftSubsystem.State.TROUGH;
+                break;
         }
     }
 
     // should be called continuously
     public void update() {
-        LiftSubsystem.State s = convertState(state);
 
-        lift.setGoalState(s);
-        arm.setGoalState(s);
-        grabber.setGoalState(s);
+        updateSubsystemStates(state);
 
         curStateReady = lift.getGoalState() == null && arm.getGoalState() == null && grabber.getGoalState() == null;
 
