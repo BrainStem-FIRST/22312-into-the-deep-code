@@ -38,9 +38,19 @@ public class Tele extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+        // TODO - idk if this works or not w rev
+        long currentTime = System.currentTimeMillis();
+        long prevTime;
+        double dt;
+
         while (opModeIsActive()) {
+            prevTime = currentTime;
+            currentTime = System.currentTimeMillis();
+            dt = (currentTime - prevTime) / 1000.;
+
             listenForRobotControls();
-            robot.update();
+
+            robot.update(dt);
         }
     }
 
@@ -72,37 +82,18 @@ public class Tele extends LinearOpMode {
 
 
             //Set motor speed variables
-            robot.driveTrain.setDTMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+            robot.getDriveTrain().setDTMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
         } else
-            robot.driveTrain.stop();
+            robot.getDriveTrain().stop();
     }
     private void listenForCollectionInput() {
-        if (gamepad1.a) {
-            if (robot.extension.getState() == ExtensionTele.State.IN || robot.extension.getState() == ExtensionTele.State.RETRACTING)
-                robot.tryExtendAndCollect();
-            else
-                if (robot.collector.getCollectState() == Collector.CollectState.COLLECTING)
-                    robot.resetExtensionAndCollector();
-                else
-                    robot.collector.setCollectState(Collector.CollectState.COLLECTING);
-        }
-
-        // manual hinge up
-        if (gamepad1.b) {
-            robot.collector.setFull();
-        }
-        // manual reset (for now)
-        if (gamepad1.x) {
-            robot.collector.reset();
-        }
+        // TODO - this code is probably very buggy b/c I haven't actually tested it with the robot
+        // extend and retract collector
+        if (gamepad1.a)
+            if (!robot.getCollectingSystemTele().getStateManager().tryEnterState(CollectingSystemTele.StateType.EXTENDING))
+                robot.getCollectingSystemTele().getStateManager().tryEnterState(CollectingSystemTele.StateType.RETRACTING);
     }
     private void listenForLiftInput() {
-        // pretending y = manual setting for lift deposit
-        if(gamepad1.y)
-            if(robot.liftingSystemTele.getState() != LiftingSystemTele.State.SPECIMEN_PICKUP)
-                robot.prepSpecimenPickup();
-            else if(robot.liftingSystemTele.getCurStateReady())
-                robot.execSpecimenPickup();
 
     }
 }

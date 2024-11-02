@@ -21,9 +21,13 @@ public class Subsystem {
         return allianceColor;
     }
 
-    public void setMotorPosition(DcMotorEx motor, int position) {
+    protected void setMotorPosition(DcMotorEx motor, int position) {
         motor.setTargetPosition(position);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setPower(1);
+    }
+    protected void setMotorPower(DcMotorEx motor, double power) {
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(power);
     }
 }

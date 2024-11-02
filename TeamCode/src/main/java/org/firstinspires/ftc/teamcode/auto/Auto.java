@@ -26,7 +26,7 @@ public abstract class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        BrainSTEMRobotAuto robot = new BrainSTEMRobotAuto(hardwareMap, telemetry, allianceColor);
+        BrainSTEMRobotAuto robot = new BrainSTEMRobotAuto(hardwareMap, telemetry, this, allianceColor);
 
         waitForStart();
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -28,19 +29,12 @@ public class Collector extends Subsystem {
     // TODO: FIND SERVO POSITIONS
     public static final double HINGE_UP_POSITION = 1300;
     public static final double HINGE_DOWN_POSITION = 500;
-    // number of frames on REV hub to spit out for
-    public static final int SPITTING_FRAME_TIME = 20;
-    public enum CollectState {
-        COLLECTING, SPITTING, EMPTY, FULL_SLOW, FULL_MAX
-    }
+    public static final double HINGE_THRESHOLD = 0.05;
 
-    public enum HingeState {
-        HINGING_UP,
-        HINGING_DOWN,
-        UP,
-        DOWN
-    }
-    public static enum BlockColor {
+    // number of seconds to spit for
+    // actual variable tracking time is stored in BaseState class and used in SpitState class
+    public static final double SPITTING_TIME = 0.8;
+    public enum BlockColor {
         RED,
         YELLOW,
         BLUE,
@@ -50,10 +44,6 @@ public class Collector extends Subsystem {
     final public static int[] RED_BLOCK_COLOR = { 255, 0, 0 };
     final public static int[] YELLOW_BLOCK_COLOR = { 255, 255, 0 };
     final public static int[] BLUE_BLOCK_COLOR = { 0, 0, 255 };
-    private CollectState collectState;
-    private HingeState hingeState;
-    private int spittingFrames = 0;
-
     private final ServoImplEx hingeServo;
     private final DcMotorEx spindleMotor;
 
@@ -64,7 +54,7 @@ public class Collector extends Subsystem {
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
-        collectState = CollectState.EMPTY;
+
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
@@ -75,29 +65,23 @@ public class Collector extends Subsystem {
         hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_POSITION, HINGE_UP_POSITION));
     }
 
-    public CollectState getCollectState() {
-        return collectState;
-    }
-    public void setCollectState(CollectState collectState) {
-        this.collectState = collectState;
-    }
 
-    public HingeState getHingeState() { return hingeState; }
-    public void setHingeState(HingeState hingeState) { this.hingeState = hingeState; }
-
-    public ServoImplEx getHingeServo() {
-        return hingeServo;
+    public DcMotorEx getSpindleMotor() { return spindleMotor; }
+    public void setSpindleMotorPower(double power) {
+        setMotorPower(spindleMotor, power);
     }
-
+    public ServoImplEx getHingeServo() { return hingeServo; }
     public void setHingeServoPosition(double position) {
         hingeServo.setPosition(position);
-    }
-    public DcMotorEx getSpindleMotor() {
-        return spindleMotor;
     }
 
     public void resetUpdateBlockColor() {
         updatedBlockColor = false;
+    }
+    public boolean hasValidBlockColor() {
+        return getBlockColor() == BlockColor.YELLOW ||
+                getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE
+                || getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED;
     }
     public BlockColor getBlockColor() {
         if (!updatedBlockColor) {
@@ -119,16 +103,6 @@ public class Collector extends Subsystem {
     private boolean hasColor(int[] color) {
         int diff = Math.abs(blockColorSensor.red() - color[0]) + Math.abs(blockColorSensor.green() - color[1]) + Math.abs(blockColorSensor.blue() - color[2]);
         return diff < MAX_COLOR_THRESHOLD;
-    }
-
-    public int getSpittingFrames() {
-        return spittingFrames;
-    }
-    public void resetSpittingFrames() {
-        spittingFrames = 0;
-    }
-    public void incrementSpittingFrames() {
-        spittingFrames++;
     }
 }
 

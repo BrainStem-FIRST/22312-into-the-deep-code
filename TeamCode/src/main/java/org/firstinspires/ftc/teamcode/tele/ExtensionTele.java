@@ -15,50 +15,15 @@ public class ExtensionTele extends Extension {
     final public static int RETRACTED_POSITION = 0;
     final public static double EXTENDING_POWER = 0.2;
     final public static double RETRACTING_POWER = 0.2;
-    private PIDController pidController;
+    final private PIDController pidController;
 
     public ExtensionTele(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         super(hwMap, telemetry, allianceColor);
 
-        setState(State.IN);
-
         // TODO: FINE TUNE PID
         pidController = new PIDController(0.5, 0, 0);
     }
-    public void update() {
-        // checking if collector started hinging up yet (implies has correct block
-
-        switch (getState()) {
-            case IN:
-                updateRetracted();
-                break;
-            case OUT:
-                updateExtended();
-                break;
-            case EXTENDING:
-                updateExtending();
-                break;
-            case RETRACTING:
-                updateRetracting();
-                break;
-            default: break;
-        }
-    }
-
-    private void updateExtending() {
-        setMotorPosition(getExtensionMotor(), EXTENDED_POSITION);
-        if (getExtensionMotor().getCurrentPosition() >= EXTENDED_POSITION) {
-            setState(State.OUT);
-        }
-    }
-    private void updateRetracting() {
-        setMotorPosition(getExtensionMotor(), RETRACTED_POSITION);
-        if (getExtensionMotor().getCurrentPosition() <= RETRACTED_POSITION) {
-            setState(State.IN);
-        }
-    }
-    private void updateExtended() {
-    }
-    private void updateRetracted() {
+    public PIDController getPidController() {
+        return pidController;
     }
 }
