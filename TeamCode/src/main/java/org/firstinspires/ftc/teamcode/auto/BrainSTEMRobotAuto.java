@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -17,16 +18,18 @@ public class BrainSTEMRobotAuto extends BrainSTEMRobot {
 
     public MecanumDrive drive;
     public LiftAuto lift;
-    public CollectorTele collector;
+    public CollectorAuto collector;
 
-    public BrainSTEMRobotAuto(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor) {
+    public BrainSTEMRobotAuto(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor, Gamepad gamepad) {
 
-        super(telemetry, opMode, allianceColor);
-
-        this.hwMap = hwMap;
+        super(hwMap, telemetry, opMode, allianceColor);
 
         drive = new MecanumDrive(hwMap, new Pose2d(0, 0, 0));
-        lift = new LiftAuto(hwMap, telemetry, allianceColor);
-        collector = new CollectorTele(hwMap, telemetry, allianceColor);
+        lift = new LiftAuto(hwMap, telemetry, allianceColor, this, gamepad);
+        collector = new CollectorAuto(hwMap, telemetry, allianceColor, this, gamepad);
+    }
+
+    public void resetAllEncoders() {
+
     }
 }

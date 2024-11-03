@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 
 public abstract class Subsystem {
 
@@ -13,6 +14,7 @@ public abstract class Subsystem {
     protected Telemetry telemetry;
     private final AllianceColor allianceColor;
     private final BrainSTEMRobot robot;
+    private final BrainSTEMRobotAuto robotAuto;
     private final Gamepad gamepad;
 
     public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
@@ -20,6 +22,7 @@ public abstract class Subsystem {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.robot = robot;
+        robotAuto = robot.getClass() == BrainSTEMRobotAuto.class ? (BrainSTEMRobotAuto) robot : null;
         this.gamepad = gamepad;
     }
     public AllianceColor getAllianceColor() {
@@ -27,6 +30,9 @@ public abstract class Subsystem {
     }
     public BrainSTEMRobot getRobot() {
         return robot;
+    }
+    public BrainSTEMRobotAuto getRobotAuto() {
+        return robotAuto;
     }
     public Gamepad getGamepad() {
         return gamepad;

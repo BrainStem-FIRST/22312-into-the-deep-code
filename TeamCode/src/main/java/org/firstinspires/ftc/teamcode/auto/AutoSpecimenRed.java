@@ -8,7 +8,11 @@ public class AutoSpecimenRed extends Auto {
 
     public AutoSpecimenRed() {
         super(AllianceColor.RED);
-        this.beginPose = new Pose2d(0, 0, 0);
+    }
+
+    @Override
+    public Pose2d getBeginPose() {
+        return null;
     }
 
     @Override

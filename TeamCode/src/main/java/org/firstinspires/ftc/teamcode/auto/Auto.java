@@ -9,8 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 
 public abstract class Auto extends LinearOpMode {
 
-    public Pose2d beginPose;
-    private AllianceColor allianceColor;
+    private final AllianceColor allianceColor;
 
     public Auto(AllianceColor allianceColor) {
         this.allianceColor = allianceColor;
@@ -20,13 +19,16 @@ public abstract class Auto extends LinearOpMode {
         return allianceColor;
     }
 
+    public abstract Pose2d getBeginPose();
+
     @Override
     public void runOpMode() throws InterruptedException {
-        BrainSTEMRobotAuto robot = new BrainSTEMRobotAuto(hardwareMap, telemetry, this, allianceColor);
+        BrainSTEMRobotAuto robot = new BrainSTEMRobotAuto(hardwareMap, telemetry, this, allianceColor, this.gamepad1);
 
         waitForStart();
 
-        robot.drive.pose = beginPose;
+        robot.drive.pose = getBeginPose();
+        //robot.resetAllEncoders();
         runAuto();
     }
 
