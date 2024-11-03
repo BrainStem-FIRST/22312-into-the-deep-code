@@ -6,22 +6,26 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
+import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 
 public class BrainSTEMRobotTele extends BrainSTEMRobot {
 
     private final DriveTrainTele driveTrain;
-    private final ExtensionTele extension;
-    private final CollectorTele collector;
-    private final CollectingSystemTele collectingSystemTele;
+    private final Extension extension;
+    private final Collector collector;
+    private final CollectingSystem collectingSystem;
     private final LiftingSystemTele liftingSystemTele;
 
     public BrainSTEMRobotTele(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor) {
         super(telemetry, opMode, allianceColor);
 
+        collectingSystem = new CollectingSystem(this, opMode.gamepad1);
+
         driveTrain = new DriveTrainTele(hwMap, telemetry, allianceColor);
-        collector = new CollectorTele(hwMap, telemetry, allianceColor);
-        extension = new ExtensionTele(hwMap, telemetry, allianceColor);
-        collectingSystemTele = new CollectingSystemTele(this, opMode.gamepad1);
+        collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1, collectingSystem);
+        extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1, collectingSystem);
         liftingSystemTele = new LiftingSystemTele(hwMap, telemetry, allianceColor);
     }
 
@@ -29,16 +33,16 @@ public class BrainSTEMRobotTele extends BrainSTEMRobot {
         return driveTrain;
     }
 
-    public ExtensionTele getExtension() {
+    public Extension getExtension() {
         return extension;
     }
 
-    public CollectorTele getCollector() {
+    public Collector getCollector() {
         return collector;
     }
 
-    public CollectingSystemTele getCollectingSystemTele() {
-        return collectingSystemTele;
+    public CollectingSystem getCollectingSystem() {
+        return collectingSystem;
     }
 
     public LiftingSystemTele getLiftingSystemTele() {
@@ -46,20 +50,13 @@ public class BrainSTEMRobotTele extends BrainSTEMRobot {
     }
 
     public void update(double dt) {
-        // collector only looks at color sensor data once per frame
-        collector.resetUpdateBlockColor();
 
         // update state managers
-        collectingSystemTele.update(dt);
+        collectingSystem.update(dt);
         liftingSystemTele.update();
-    }
 
-    public boolean tryExtendAndCollect() {
-        return collectingSystemTele.getStateManager().tryEnterState(CollectingSystemTele.StateType.EXTENDING);
-    }
-
-    // retract and hinge up (if necessary)
-    public void manualReset() {
-        collectingSystemTele.getStateManager().tryEnterState(CollectingSystemTele.StateType.RETRACTING);
+        // update individual subsystems
+        collector.update(dt);
+        extension.update(dt);
     }
 }

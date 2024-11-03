@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public class StateManager<StateType extends Enum<StateType>> {
 
-    private HashMap<StateType, BaseState<StateType>> stateMap;
-    private StateType defaultStateType;
+    private final HashMap<StateType, BaseState<StateType>> stateMap;
+    private final StateType defaultStateType;
     private StateType activeStateType;
 
     public StateManager(StateType defaultStateType) {

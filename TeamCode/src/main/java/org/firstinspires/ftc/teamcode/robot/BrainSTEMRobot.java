@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.tele.CollectorTele;
-import org.firstinspires.ftc.teamcode.tele.DriveTrainTele;
-import org.firstinspires.ftc.teamcode.tele.ExtensionTele;
-import org.firstinspires.ftc.teamcode.tele.LiftingSystemTele;
 
 public class BrainSTEMRobot {
     public Telemetry telemetry;

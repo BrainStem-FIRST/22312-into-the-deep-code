@@ -1,25 +1,23 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystemStates;
-
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.tele.CollectingSystemTele;
-import org.firstinspires.ftc.teamcode.robotStates.RobotStateTele;
+import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
-public class ExtendingState extends CollectSystemState {
+public class ExtendingState extends RobotState<CollectingSystem.StateType> {
 
     public ExtendingState() {
-        super(CollectingSystemTele.StateType.EXTENDING);
+        super(CollectingSystem.StateType.EXTENDING);
     }
     @Override
     public void execute() {
-        robot.getExtension().setExtensionMotorPosition(Extension.EXTENDED_POSITION);
-        robot.getCollector().setHingeServoPosition(Collector.HINGE_DOWN_POSITION);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.EXTENDING);
     }
 
     @Override
     public boolean canEnter() {
-        return collectingSystemTele.getStateManager().getActiveStateType() == CollectingSystemTele.StateType.IN ||
-                collectingSystemTele.getStateManager().getActiveStateType() == CollectingSystemTele.StateType.RETRACTING;
+        return stateManager.getActiveStateType() == CollectingSystem.StateType.IN;
     }
 
     @Override
@@ -29,11 +27,12 @@ public class ExtendingState extends CollectSystemState {
 
     @Override
     public boolean isDone() {
-        return Math.abs(robot.getExtension().getExtensionMotor().getCurrentPosition() - Extension.EXTENDED_POSITION) < Extension.THRESHOLD;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.OUT &&
+                robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.COLLECTING;
     }
 
     @Override
-    public CollectingSystemTele.StateType getNextStateType() {
-        return CollectingSystemTele.StateType.COLLECTING;
+    public CollectingSystem.StateType getNextStateType() {
+        return CollectingSystem.StateType.OUT;
     }
 }

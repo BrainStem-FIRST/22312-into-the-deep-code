@@ -2,9 +2,16 @@ package org.firstinspires.ftc.teamcode.robot;
 
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robotStates.NothingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectorStates.CollectState;
+import org.firstinspires.ftc.teamcode.robotStates.collectorStates.HingeDownState;
+import org.firstinspires.ftc.teamcode.robotStates.collectorStates.HingeUpState;
+import org.firstinspires.ftc.teamcode.robotStates.collectorStates.SpitState;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -34,6 +41,10 @@ public class Collector extends Subsystem {
     // number of seconds to spit for
     // actual variable tracking time is stored in BaseState class and used in SpitState class
     public static final double SPITTING_TIME = 0.8;
+
+    public enum StateType {
+        NOTHING, HINGE_UP, HINGE_DOWN, COLLECTING, SPITTING
+    }
     public enum BlockColor {
         RED,
         YELLOW,
@@ -44,6 +55,8 @@ public class Collector extends Subsystem {
     final public static int[] RED_BLOCK_COLOR = { 255, 0, 0 };
     final public static int[] YELLOW_BLOCK_COLOR = { 255, 255, 0 };
     final public static int[] BLUE_BLOCK_COLOR = { 0, 0, 255 };
+
+    private final StateManager<StateType> stateManager;
     private final ServoImplEx hingeServo;
     private final DcMotorEx spindleMotor;
 
@@ -52,19 +65,32 @@ public class Collector extends Subsystem {
     private boolean updatedBlockColor;
     private BlockColor blockColor;
 
-    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, telemetry, allianceColor);
+    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotTele robot, Gamepad gamepad, CollectingSystem collectingSystem) {
+        super(hwMap, telemetry, allianceColor, robot, gamepad);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
+        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_POSITION, HINGE_UP_POSITION));
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
+
         blockColorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
         updatedBlockColor = false;
         blockColor = BlockColor.NONE;
 
-        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_POSITION, HINGE_UP_POSITION));
+        stateManager = new StateManager<>(StateType.NOTHING);
+        stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING));
+        stateManager.addState(StateType.COLLECTING, new CollectState());
+        stateManager.addState(StateType.SPITTING, new SpitState());
+        stateManager.addState(StateType.HINGE_UP, new HingeUpState());
+        stateManager.addState(StateType.HINGE_DOWN, new HingeDownState());
+
+        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.tryEnterState(StateType.NOTHING);
     }
 
+    public StateManager<Collector.StateType> getStateManager() {
+        return stateManager;
+    }
 
     public DcMotorEx getSpindleMotor() { return spindleMotor; }
     public void setSpindleMotorPower(double power) {
@@ -77,6 +103,13 @@ public class Collector extends Subsystem {
 
     public void resetUpdateBlockColor() {
         updatedBlockColor = false;
+    }
+
+    public void update(double dt) {
+        resetUpdateBlockColor();
+
+        // TODO: change the active state based on the state of collectSystem
+        stateManager.update(dt);
     }
     public boolean hasValidBlockColor() {
         return getBlockColor() == BlockColor.YELLOW ||

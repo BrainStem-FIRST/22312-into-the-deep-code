@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates;
 
-public class NothingState<StateType extends Enum<StateType>> extends RobotStateTele<StateType> {
+public class NothingState<StateType extends Enum<StateType>> extends RobotState<StateType> {
     public NothingState(StateType stateType) {
         super(stateType);
     }

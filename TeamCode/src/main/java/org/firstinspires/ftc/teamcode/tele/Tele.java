@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.tele;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
-import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.DriveTrain;
-import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpwRoadrunner")
@@ -90,8 +85,8 @@ public class Tele extends LinearOpMode {
         // TODO - this code is probably very buggy b/c I haven't actually tested it with the robot
         // extend and retract collector
         if (gamepad1.a)
-            if (!robot.getCollectingSystemTele().getStateManager().tryEnterState(CollectingSystemTele.StateType.EXTENDING))
-                robot.getCollectingSystemTele().getStateManager().tryEnterState(CollectingSystemTele.StateType.RETRACTING);
+            if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING))
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
     private void listenForLiftInput() {
 
