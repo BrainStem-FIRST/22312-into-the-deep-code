@@ -9,6 +9,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 
 public abstract class Subsystem {
+    public static void setMotorPosition(DcMotorEx motor, int position) {
+        motor.setTargetPosition(position);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setPower(1);
+    }
 
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
@@ -36,12 +41,6 @@ public abstract class Subsystem {
     }
     public Gamepad getGamepad() {
         return gamepad;
-    }
-
-    protected void setMotorPosition(DcMotorEx motor, int position) {
-        motor.setTargetPosition(position);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setPower(1);
     }
     protected void setMotorPower(DcMotorEx motor, double power) {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

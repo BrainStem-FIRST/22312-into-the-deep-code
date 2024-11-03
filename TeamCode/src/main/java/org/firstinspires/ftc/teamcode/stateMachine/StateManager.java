@@ -28,6 +28,9 @@ public class StateManager<StateType extends Enum<StateType>> {
         }
     }
 
+    public BaseState<StateType> getState(StateType stateType) {
+        return stateMap.get(stateType);
+    }
     public BaseState<StateType> getActiveState() {
         return stateMap.get(activeStateType);
     }

@@ -7,7 +7,8 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.armStates.TransitionState;
+import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
+import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Arm extends Subsystem {
@@ -19,8 +20,8 @@ public class Arm extends Subsystem {
         DOWN, LEFT, UP, RIGHT, TRANSITION
     }
     public final StateManager<StateType> stateManager;
+    private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
-    private double armGoalPosition;
 
     public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
         super(hwMap, telemetry, allianceColor, robot, gamepad);
@@ -34,7 +35,9 @@ public class Arm extends Subsystem {
         stateManager.addState(StateType.LEFT, new NothingState<>(StateType.LEFT));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.RIGHT, new NothingState<>(StateType.RIGHT));
-        stateManager.addState(StateType.TRANSITION, new TransitionState());
+
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, DESTINATION_THRESHOLD);
+        stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, gamepad, stateManager);
         stateManager.tryEnterState(StateType.DOWN);
@@ -47,22 +50,10 @@ public class Arm extends Subsystem {
     public StateManager<StateType> getStateManager() {
         return stateManager;
     }
-    public StateType getState(double position) {
-        switch(position) {
-            case LEFT_POS:
-                return StateType.LEFT;
-            case UP_POS:
-                return StateType.UP;
-            case RIGHT_POS:
-                return StateType.RIGHT;
-            case DOWN_POS:
-                return StateType.DOWN;
-            default:
-                System.out.println("unrecognized position for arm: " + position);
-                return StateType.DOWN;
-        }
-    }
     public ServoImplEx getArmServo() {
         return armServo;
+    }
+    public ServoTransitionState<StateType> getTransitionState() {
+        return transitionState;
     }
 }
