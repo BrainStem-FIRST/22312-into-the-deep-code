@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.tele.DriveTrainTele;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class BrainSTEMRobot {
 
@@ -12,7 +14,7 @@ public class BrainSTEMRobot {
     public OpMode opMode;
     private final AllianceColor allianceColor;
 
-    private final DriveTrainTele driveTrain;
+    private final PIDDrivetrain driveTrain;
     private final Extension extension;
     private final Collector collector;
     private final CollectingSystem collectingSystem;
@@ -26,7 +28,7 @@ public class BrainSTEMRobot {
         this.opMode = opMode;
         this.allianceColor = allianceColor;
 
-        driveTrain = new DriveTrainTele(hwMap, telemetry, allianceColor);
+        driveTrain = new PIDDrivetrain(hwMap, telemetry, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
         collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
         extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
@@ -42,7 +44,7 @@ public class BrainSTEMRobot {
     public AllianceColor getAllianceColor() {
         return allianceColor;
     }
-    public DriveTrainTele getDriveTrain() {
+    public PIDDrivetrain getDriveTrain() {
         return driveTrain;
     }
 

@@ -78,7 +78,7 @@ public class Tele extends LinearOpMode {
 
 
             //Set motor speed variables
-            robot.getDriveTrain().setDTMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+            robot.getDriveTrain().setDrivePower((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
         } else
             robot.getDriveTrain().stop();
     }
