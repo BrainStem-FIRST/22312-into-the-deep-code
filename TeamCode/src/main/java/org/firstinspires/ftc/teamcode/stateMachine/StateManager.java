@@ -21,6 +21,7 @@ public class StateManager<StateType extends Enum<StateType>> {
     }
 
     // have to call this function before running any state logic
+    // passes information given to states (used deprecation bc info needed might vary from one state manager to another)
     public void setupStates(Object...args) {
         for (BaseState<StateType> state : stateMap.values()) {
             state.setup(args);

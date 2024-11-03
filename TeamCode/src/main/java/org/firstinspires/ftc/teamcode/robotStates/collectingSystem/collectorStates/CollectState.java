@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.robotStates.collectorStates;
+package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -27,7 +28,8 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getBlockColor() != Collector.BlockColor.NONE;
+        return robot.getCollector().getBlockColor() != Collector.BlockColor.NONE ||
+                robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING;
     }
 
     @Override

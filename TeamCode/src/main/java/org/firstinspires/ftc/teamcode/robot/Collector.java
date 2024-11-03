@@ -6,12 +6,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.collectorStates.CollectState;
-import org.firstinspires.ftc.teamcode.robotStates.collectorStates.HingeDownState;
-import org.firstinspires.ftc.teamcode.robotStates.collectorStates.HingeUpState;
-import org.firstinspires.ftc.teamcode.robotStates.collectorStates.SpitState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeUpState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -65,7 +64,7 @@ public class Collector extends Subsystem {
     private boolean updatedBlockColor;
     private BlockColor blockColor;
 
-    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotTele robot, Gamepad gamepad, CollectingSystem collectingSystem) {
+    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
         super(hwMap, telemetry, allianceColor, robot, gamepad);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
@@ -105,6 +104,7 @@ public class Collector extends Subsystem {
         updatedBlockColor = false;
     }
 
+    @Override
     public void update(double dt) {
         resetUpdateBlockColor();
 
@@ -113,8 +113,8 @@ public class Collector extends Subsystem {
     }
     public boolean hasValidBlockColor() {
         return getBlockColor() == BlockColor.YELLOW ||
-                getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE
-                || getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED;
+                (getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
+                (getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED);
     }
     public BlockColor getBlockColor() {
         if (!updatedBlockColor) {

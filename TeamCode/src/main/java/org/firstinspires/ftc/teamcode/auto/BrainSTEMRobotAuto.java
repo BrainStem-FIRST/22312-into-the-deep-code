@@ -7,9 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
-import org.firstinspires.ftc.teamcode.tele.CollectorTele;
-import org.firstinspires.ftc.teamcode.tele.DriveTrainTele;
-import org.firstinspires.ftc.teamcode.tele.LiftTele;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
 
 public class BrainSTEMRobotAuto extends BrainSTEMRobot {

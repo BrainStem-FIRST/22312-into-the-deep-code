@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotStates.collectingSystemStates;
+package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
@@ -11,7 +11,7 @@ public class ExtendingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_DOWN);
         robot.getExtension().getStateManager().tryEnterState(Extension.StateType.EXTENDING);
     }
 

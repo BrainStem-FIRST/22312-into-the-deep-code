@@ -2,11 +2,10 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystemStates.ExtendingState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystemStates.InState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystemStates.RetractingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.ExtendingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
 
 public class CollectingSystem {
 
@@ -14,10 +13,10 @@ public class CollectingSystem {
         IN, EXTENDING, RETRACTING, OUT
     }
 
-    private final BrainSTEMRobotTele robot;
+    private final BrainSTEMRobot robot;
     private final Gamepad gamepad;
     private final StateManager<StateType> stateManager;
-    public CollectingSystem(BrainSTEMRobotTele robot, Gamepad gamepad) {
+    public CollectingSystem(BrainSTEMRobot robot, Gamepad gamepad) {
         this.robot = robot;
         this.gamepad = gamepad;
 
@@ -30,7 +29,9 @@ public class CollectingSystem {
         stateManager.tryEnterState(StateType.IN);
     }
 
-    public StateManager<StateType> getStateManager() { return stateManager; }
+    public StateManager<StateType> getStateManager() {
+        return stateManager;
+    }
 
     public void update(double dt) {
 
@@ -40,5 +41,8 @@ public class CollectingSystem {
                 stateManager.tryEnterState(StateType.RETRACTING);
 
         stateManager.update(dt);
+    }
+    public BrainSTEMRobot getRobot() {
+        return robot;
     }
 }

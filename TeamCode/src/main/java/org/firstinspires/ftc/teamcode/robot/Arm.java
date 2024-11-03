@@ -1,31 +1,66 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robotStates.NothingState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.armStates.TransitionState;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
-import java.util.HashMap;
-
-public class Arm extends LiftSubsystem {
-    // TODO: find arm servo positions
+public class Arm extends Subsystem {
+    // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
     public static final int MIN_TICK = 0, MAX_TICK = 100;
-    public static final double TROUGH_POSITION = 0, BACKDROP_POSITION = 0.25, PICKUP_POSITION = 0.25, BASKET_POSITION = 0.25, RAM_POSITION = 0.75;
+    public static final double DOWN_POS = 0, LEFT_POS = 0.25, UP_POS = 0.5, RIGHT_POS = 0.75;
+    public static final double DESTINATION_THRESHOLD = 0.1;
+    public enum StateType {
+        DOWN, LEFT, UP, RIGHT, TRANSITION
+    }
+    public final StateManager<StateType> stateManager;
     private final ServoImplEx armServo;
+    private double armGoalPosition;
 
-    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, telemetry, allianceColor, 0.1);
+    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
+        super(hwMap, telemetry, allianceColor, robot, gamepad);
+
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
 
-        setPrepStatePositions(TROUGH_POSITION, BACKDROP_POSITION, PICKUP_POSITION, BASKET_POSITION, RAM_POSITION);
-        setExecStatePositions(TROUGH_POSITION, BACKDROP_POSITION, PICKUP_POSITION, BASKET_POSITION, RAM_POSITION);
+        stateManager = new StateManager<>(Arm.StateType.DOWN);
+
+        stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
+        stateManager.addState(StateType.LEFT, new NothingState<>(StateType.LEFT));
+        stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
+        stateManager.addState(StateType.RIGHT, new NothingState<>(StateType.RIGHT));
+        stateManager.addState(StateType.TRANSITION, new TransitionState());
+
+        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.tryEnterState(StateType.DOWN);
     }
+
     @Override
-    public boolean executeCurrentState() {
-        return true;
-        // shouldn't need this; in no case should arm move during execution of state
+    public void update(double dt) {
+        stateManager.update(dt);
+    }
+    public StateManager<StateType> getStateManager() {
+        return stateManager;
+    }
+    public StateType getState(double position) {
+        switch(position) {
+            case LEFT_POS:
+                return StateType.LEFT;
+            case UP_POS:
+                return StateType.UP;
+            case RIGHT_POS:
+                return StateType.RIGHT;
+            case DOWN_POS:
+                return StateType.DOWN;
+            default:
+                System.out.println("unrecognized position for arm: " + position);
+                return StateType.DOWN;
+        }
     }
     public ServoImplEx getArmServo() {
         return armServo;

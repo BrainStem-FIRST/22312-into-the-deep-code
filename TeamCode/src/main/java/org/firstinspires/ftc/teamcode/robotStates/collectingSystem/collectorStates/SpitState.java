@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.robotStates.collectorStates;
+package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -31,6 +32,8 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        return Collector.StateType.COLLECTING;
+        if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.OUT)
+            return Collector.StateType.COLLECTING;
+        return Collector.StateType.NOTHING;
     }
 }

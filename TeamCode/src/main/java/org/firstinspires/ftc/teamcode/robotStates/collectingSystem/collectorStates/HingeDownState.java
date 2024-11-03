@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotStates.collectorStates;
+package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;

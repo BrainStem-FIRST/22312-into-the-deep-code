@@ -1,38 +1,50 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import java.util.HashMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.grabberStates.*;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
-public class Grabber extends LiftSubsystem {
-    //TODO: find open and close positions for grabber
+public class Grabber extends Subsystem {
+    //TODO: find min tick and max tick positions for servo
     public static final int MIN_TICK = 0, MAX_TICK = 100;
     public static final double CLOSE_POSITION = 0, OPEN_POSITION = 1;
+    public static final double DESTINATION_THRESHOLD = 0.1;
+    public enum StateType {
+        OPEN, OPENING, CLOSED, CLOSING
+    }
+    private final StateManager<StateType> stateManager;
     private final ServoImplEx grabServo;
-    private boolean hasBlock = false;
 
-    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, telemetry, allianceColor, 0.05);
+    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
+        super(hwMap, telemetry, allianceColor, robot, gamepad);
+
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
-        grabServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
-        setPrepStatePositions(OPEN_POSITION, CLOSE_POSITION, OPEN_POSITION, CLOSE_POSITION, CLOSE_POSITION);
-        setExecStatePositions(CLOSE_POSITION, OPEN_POSITION, CLOSE_POSITION, OPEN_POSITION, OPEN_POSITION);
+        grabServo.setPwmRange(new PwmControl.PwmRange(CLOSE_POSITION, OPEN_POSITION));
+
+        stateManager = new StateManager<>(StateType.CLOSED);
+
+        stateManager.addState(StateType.OPEN, new OpenState());
+        stateManager.addState(StateType.OPENING, new OpeningState());
+        stateManager.addState(StateType.CLOSED, new CloseState());
+        stateManager.addState(StateType.CLOSING, new ClosingState());
+
+        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.tryEnterState(StateType.CLOSED);
+    }
+
+    public StateManager<StateType> getStateManager() {
+        return stateManager;
     }
     @Override
-    public boolean executeCurrentState() {
-        double pos = getExecStatePositions().get(getCurState());
-        grabServo.setPosition(pos);
-        return grabServo.getPosition() == pos;
+    public void update(double dt) {
+        stateManager.update(dt);
     }
-
-    // getters
     public ServoImplEx getGrabServo() {
         return grabServo;
-    }
-    public boolean hasBlock() {
-        return this.hasBlock;
     }
 }

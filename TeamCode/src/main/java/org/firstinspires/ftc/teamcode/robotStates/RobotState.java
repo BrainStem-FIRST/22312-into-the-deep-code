@@ -4,11 +4,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.stateMachine.BaseState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.tele.BrainSTEMRobotTele;
+import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 
 public abstract class RobotState<StateType extends Enum<StateType>> extends BaseState<StateType> {
 
-    protected BrainSTEMRobotTele robot;
+    protected BrainSTEMRobot robot;
     protected Gamepad gamepad;
 
     public RobotState(StateType stateType) {
@@ -17,7 +17,7 @@ public abstract class RobotState<StateType extends Enum<StateType>> extends Base
 
     @Override
     public void setup(Object... args) {
-        robot = (BrainSTEMRobotTele) args[0];
+        robot = (BrainSTEMRobot) args[0];
         gamepad = (Gamepad) args[1];
         stateManager = (StateManager<StateType>) args[2];
     }
