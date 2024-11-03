@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PinpointDrive;
 
-public class DriveTrain extends PinpointDrive {
+public class DriveTrain {
     private final AllianceColor allianceColor;
     private int tick;
 
@@ -20,8 +20,8 @@ public class DriveTrain extends PinpointDrive {
     public float backRightPower = 0;
 
     public DriveTrain(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        super(hwMap, new Pose2d(0, 0, 0));
         this.allianceColor = allianceColor;
+
     }
     public AllianceColor getAllianceColor() {
         return allianceColor;
