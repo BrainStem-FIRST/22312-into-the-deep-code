@@ -4,9 +4,9 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 
-public class AutoSpecimenRed extends Auto {
+public class AutoSpecimenRedTeam extends Auto {
 
-    public AutoSpecimenRed() {
+    public AutoSpecimenRedTeam() {
         super(AllianceColor.RED);
     }
 

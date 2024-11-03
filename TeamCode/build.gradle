@@ -19,9 +19,6 @@ android {
     namespace = 'org.firstinspires.ftc.teamcode'
 
     packagingOptions {
-        jniLibs {
-            pickFirsts += ['**/*.so']
-        }
         jniLibs.useLegacyPackaging true
     }
 }
@@ -29,6 +26,9 @@ android {
 repositories {
     maven {
         url = 'https://maven.brott.dev/'
+    }
+    maven {
+        url = 'https://jitpack.io'
     }
 }
 

@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PinpointDrive;
 
-public class DriveTrain extends MecanumDrive {
-    private AllianceColor allianceColor;
+public class DriveTrain extends PinpointDrive {
+    private final AllianceColor allianceColor;
     private int tick;
 
     private double leftStickX, leftStickY, rightStickX;
