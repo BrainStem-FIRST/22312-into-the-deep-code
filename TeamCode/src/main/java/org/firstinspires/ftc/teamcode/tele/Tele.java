@@ -15,7 +15,7 @@ public class Tele extends LinearOpMode {
 
     private BrainSTEMRobot robot;
 
-    private AllianceColor allianceColor;
+    private final AllianceColor allianceColor;
 
     public Tele(AllianceColor allianceColor) {
         this.allianceColor = allianceColor;
@@ -52,10 +52,11 @@ public class Tele extends LinearOpMode {
 
     private void listenForRobotControls() {
         listenForDriveTrainInput();
-        listenForCollectionInput();
-        listenForLiftInput();
+        //listenForCollectionInput();
+        //listenForLiftInput();
     }
 
+    // without roadrunner
     private void listenForDriveTrainInput() {
 
         double leftStickX = gamepad1.left_stick_x;
@@ -82,14 +83,21 @@ public class Tele extends LinearOpMode {
         } else
             robot.getDriveTrain().stop();
     }
+
+    /*
     private void listenForCollectionInput() {
         // TODO - this code is probably very buggy b/c I haven't actually tested it with the robot
         // extend and retract collector
-        if (gamepad1.a)
-            if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING))
+        if (gamepad1.a) {
+            telemetry.addData("a: ", "down");
+            if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING)) {
                 robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+                telemetry.addData("retracting: ", "true");
+            } else
+                telemetry.addData("extending: ", "true");
+        } else
+            telemetry.addData("a: ", "up");
     }
-    private void listenForLiftInput() {
-
-    }
+    private void listenForLiftInput() {}
+    */
 }
