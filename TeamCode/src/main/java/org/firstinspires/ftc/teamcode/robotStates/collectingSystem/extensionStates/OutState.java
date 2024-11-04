@@ -10,7 +10,6 @@ public class OutState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-
     }
 
     @Override

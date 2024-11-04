@@ -13,6 +13,7 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     @Override
     public void execute() {
         robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_UP);
     }
 
     @Override
@@ -22,7 +23,7 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

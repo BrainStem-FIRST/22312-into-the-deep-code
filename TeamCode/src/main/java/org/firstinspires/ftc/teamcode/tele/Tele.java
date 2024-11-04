@@ -89,6 +89,7 @@ public class Tele extends LinearOpMode {
         telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
 
         if (gamepad1.a) {
+            // a serves to both extend and retract, so if robot cannot extend, it tries to retract
             if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING)) {
                 robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
             }

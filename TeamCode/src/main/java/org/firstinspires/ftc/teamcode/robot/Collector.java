@@ -31,15 +31,15 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 1, HOLD_SPIN_POWER = 0.3;
-    private final int HINGE_UP_TICK = 2336, HINGE_DOWN_TICK = 1438;
-    public static final double HINGE_UP_POSITION = 0.99, HINGE_DOWN_POSITION = 0.01, HINGE_THRESHOLD = 0.05;
+    private final int HINGE_DOWN_TICK = 1438, HINGE_UP_TICK = 2336;
+    public static final double HINGE_DOWN_POSITION = 0.01, HINGE_UP_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
 
     // number of seconds to spit for
     // actual variable tracking time is stored in BaseState class and used in SpitState class
     public static final double SPITTING_TIME = 0.8;
 
     public enum StateType {
-        NOTHING, HINGE_UP, HINGE_DOWN, COLLECTING, SPITTING
+        NOTHING, HINGE_DOWN, COLLECTING, SPITTING, HINGE_UP
     }
     public enum BlockColor {
         RED,

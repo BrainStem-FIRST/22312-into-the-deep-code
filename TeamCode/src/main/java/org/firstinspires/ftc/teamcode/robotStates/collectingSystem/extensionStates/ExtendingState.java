@@ -10,18 +10,18 @@ public class ExtendingState extends RobotState<Extension.StateType> {
     }
     @Override
     public void execute() {
+        // TODO: would want to use PID here instead of setting target position
         robot.getExtension().setExtensionMotorPosition(Extension.EXTENDED_POSITION);
     }
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Extension.StateType.IN ||
-                stateManager.getActiveStateType() == Extension.StateType.RETRACTING;
+        return stateManager.getActiveStateType() == Extension.StateType.IN;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

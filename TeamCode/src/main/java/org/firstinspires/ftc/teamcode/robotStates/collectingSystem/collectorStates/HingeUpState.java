@@ -17,12 +17,13 @@ public class HingeUpState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() != Collector.StateType.NOTHING;
+        return stateManager.getActiveStateType() == Collector.StateType.COLLECTING ||
+                stateManager.getActiveStateType() == Collector.StateType.SPITTING;      // if want to hinge up collector while it is not done spitting, while assume that controller overrode spitting bc block already gone
     }
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

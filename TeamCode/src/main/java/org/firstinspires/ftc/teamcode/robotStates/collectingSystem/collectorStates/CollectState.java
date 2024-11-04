@@ -28,8 +28,7 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getBlockColor() != Collector.BlockColor.NONE ||
-                robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING;
+        return robot.getCollector().getBlockColor() != Collector.BlockColor.NONE;
     }
 
     @Override

@@ -16,13 +16,12 @@ public class HingeDownState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Collector.StateType.NOTHING ||
-                stateManager.getActiveStateType() == Collector.StateType.HINGE_UP;
+        return stateManager.getActiveStateType() == Collector.StateType.NOTHING;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

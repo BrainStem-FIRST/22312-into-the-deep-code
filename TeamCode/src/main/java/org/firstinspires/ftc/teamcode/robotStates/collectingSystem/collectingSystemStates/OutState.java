@@ -23,14 +23,14 @@ public class OutState extends RobotState<CollectingSystem.StateType> {
         return true;
     }
 
-    // waits till collector stops collecting/spitting and starts hinging up
+    // should only exit by overriding
     @Override
     public boolean isDone() {
-        return robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_UP;
+        return false;
     }
 
     @Override
     public CollectingSystem.StateType getNextStateType() {
-        return CollectingSystem.StateType.OUT;
+        return CollectingSystem.StateType.RETRACTING;
     }
 }
