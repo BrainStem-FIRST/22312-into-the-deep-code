@@ -40,15 +40,12 @@ public class StateManager<StateType extends Enum<StateType>> {
 
     // sole function used for switching between states
     public boolean tryEnterState(StateType stateType) {
-        System.out.println("try enter " + stateType);
-        // only don't allow transition if active state is not done and cannot be overridden
+        // only allow entering if meet requirements to enter state and either current state is done or current state can be overridden
         if (Objects.requireNonNull(stateMap.get(stateType)).canEnter() && (getActiveState().isDone() || getActiveState().canBeOverridden())) {
-            System.out.println("entering");
             getActiveState().resetTime();
             activeStateType = stateType;
             return true;
         }
-        System.out.println("could not enter");
         return false;
     }
 
@@ -57,51 +54,8 @@ public class StateManager<StateType extends Enum<StateType>> {
         getActiveState().incrementTime(dt);
 
         if (getActiveState().isDone()) {
-            System.out.println(getActiveState() + " is done");
-            boolean canEnterState = tryEnterState(getActiveState().getNextStateType());
-            if (!canEnterState) tryEnterState(defaultStateType);
+            if (!tryEnterState(getActiveState().getNextStateType()))
+                tryEnterState(defaultStateType);
         }
     }
 }
-
-/*
-class thing {
-
-    public static void main() {
-        stateManager.add(StateType.RUN, new State() {
-            @Override
-            public void execute(LiftingSystem liftingSystem) {
-                liftingSystem.getLift().raiseTo(position);
-                if (liftingSysetm.getLift().position() > threshold) {
-                    liftingSystem.getArm().rotateTo(position)
-                }
-            }
-            @Override
-            public void canEnter(LiftingSystem liftingSystem) {
-                return liftingSystem.getArm.getPosition() == position
-            }
-            @Override
-            public boolean canBeOverridden() {
-                return true;
-            }
-            @Override
-            public void isDone(StateManager stateManager, LiftingSystem liftingSystem) {
-                return stateManager.getActiveStateTime() >= 1;
-            }
-            @Override
-            public StateType getNextStateType() {
-                return StateType.NOTHING;
-            }
-        });
-    }
-}
-
-if (gamepad.a) {
-    if (stateManager.getActiveState() == nothing)
-        liftingSystem.getStateManager.tryEnterState(precSpecCollect);
-    else if (stateManager.getActiveState() == waitToCollect)
-        liftingSystem.getStateManager.tryEnterState(collect);
-}
-
-*/
-

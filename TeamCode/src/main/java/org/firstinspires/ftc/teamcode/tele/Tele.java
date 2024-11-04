@@ -8,52 +8,47 @@ import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpwRoadrunner")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class Tele extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
 
     private BrainSTEMRobot robot;
 
-    private final AllianceColor allianceColor;
-
-    public Tele(AllianceColor allianceColor) {
-        this.allianceColor = allianceColor;
-    }
-
-    public AllianceColor getAllianceColor() {
-        return allianceColor;
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, this, allianceColor);
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, this, AllianceColor.BLUE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
         waitForStart();
 
-        // TODO - idk if this works or not w rev
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
+        double interval = 1000/60.;
+        double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
             prevTime = currentTime;
             currentTime = System.currentTimeMillis();
             dt = (currentTime - prevTime) / 1000.;
+            timeSinceLastUpdate += dt;
 
-            listenForRobotControls();
+            //if (timeSinceLastUpdate < interval)
+            //    continue;
+            //timeSinceLastUpdate -= interval;
 
+            listenForCollectionInput();
             robot.update(dt);
+            telemetry.update();
         }
     }
 
     private void listenForRobotControls() {
-        listenForDriveTrainInput();
-        //listenForCollectionInput();
-        //listenForLiftInput();
+        telemetry.addData("inside listen for robot controls", "");
+        //listenForDriveTrainInput();
+        listenForCollectionInput();
     }
 
     // without roadrunner
@@ -84,20 +79,19 @@ public class Tele extends LinearOpMode {
             robot.getDriveTrain().stop();
     }
 
-    /*
+
     private void listenForCollectionInput() {
-        // TODO - this code is probably very buggy b/c I haven't actually tested it with the robot
-        // extend and retract collector
+        // a extends and retracts collector
+        telemetry.addData("a", gamepad1.a);
+        telemetry.addData("collector hinge encoder tick", robot.getCollector().getHingeServo().getPosition());
+        telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
+        telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
+        telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+
         if (gamepad1.a) {
-            telemetry.addData("a: ", "down");
             if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING)) {
                 robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
-                telemetry.addData("retracting: ", "true");
-            } else
-                telemetry.addData("extending: ", "true");
-        } else
-            telemetry.addData("a: ", "up");
+            }
+        }
     }
-    private void listenForLiftInput() {}
-    */
 }

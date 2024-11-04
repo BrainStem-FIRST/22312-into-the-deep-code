@@ -16,15 +16,15 @@ public class BrainSTEMRobot {
 
     private final PIDDrivetrain driveTrain;
 
-    /*
-    private final Extension extension;
+    public final Extension extension;
     private final Collector collector;
     private final CollectingSystem collectingSystem;
+
     private final Grabber grabber;
     private final Arm arm;
     private final Lift lift;
     private final LiftingSystem liftingSystem;
-     */
+
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor) {
         this.telemetry = telemetry;
@@ -33,15 +33,41 @@ public class BrainSTEMRobot {
 
         driveTrain = new PIDDrivetrain(hwMap, telemetry, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
-        //collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        //extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        //collectingSystem = new CollectingSystem(this, opMode.gamepad1);
+        collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
+        extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
+        collectingSystem = new CollectingSystem(this, opMode.gamepad1);
 
-        //grabber = new Grabber(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        //arm = new Arm(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        //lift = new Lift(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        //liftingSystem = new LiftingSystem(this, opMode.gamepad1);
+        grabber = new Grabber(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
+        arm = new Arm(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
+        lift = new Lift(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
+        liftingSystem = new LiftingSystem(this, opMode.gamepad1);
 
+    }
+    public void update(double dt) {
+        telemetry.addData("Extension motor current position", extension.extensionMotor.getCurrentPosition());
+
+
+        collectingSystem.update(dt);
+
+        collector.update(dt);
+        extension.update(dt);
+        /*
+        if (collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
+            if (collector.getBlockColor() == Collector.BlockColor.YELLOW)
+                liftingSystem.getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH);
+        }
+
+        // system managers
+        collectingSystem.update(dt);
+        liftingSystem.update(dt);
+
+        // update individual subsystems
+        collector.update(dt);
+        extension.update(dt);
+
+        grabber.update(dt);
+        */
+        //extension.update(dt);
     }
 
     public AllianceColor getAllianceColor() {
@@ -50,32 +76,7 @@ public class BrainSTEMRobot {
     public PIDDrivetrain getDriveTrain() {
         return driveTrain;
     }
-    public Extension getExtension() {
-        return null;
-    }
 
-    public Collector getCollector() {
-        return null;
-    }
-
-    public CollectingSystem getCollectingSystem() {
-        return null;
-    }
-
-    public Grabber getGrabber() {
-        return null;
-    }
-    public Arm getArm() {
-        return null;
-    }
-
-    public Lift getLift() {
-        return null;
-    }
-    public LiftingSystem getLiftingSystem() {
-        return null;
-    }
-    /*
     public Extension getExtension() {
         return extension;
     }
@@ -100,25 +101,5 @@ public class BrainSTEMRobot {
     }
     public LiftingSystem getLiftingSystem() {
         return liftingSystem;
-    }
-     */
-
-    public void update(double dt) {
-        /*
-        if (collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
-            if (collector.getBlockColor() == Collector.BlockColor.YELLOW)
-                liftingSystem.getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH);
-        }
-
-        // system managers
-        collectingSystem.update(dt);
-        liftingSystem.update(dt);
-
-        // update individual subsystems
-        collector.update(dt);
-        extension.update(dt);
-
-        grabber.update(dt);
-        */
     }
 }

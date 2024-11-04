@@ -30,12 +30,9 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class Collector extends Subsystem {
 
-    public static final double MAX_SPIN_POWER = 1;
-    public static final double HOLD_SPIN_POWER = 0.3;
-    // TODO: FIND SERVO POSITIONS
-    public static final double HINGE_UP_POSITION = 1300;
-    public static final double HINGE_DOWN_POSITION = 500;
-    public static final double HINGE_THRESHOLD = 0.05;
+    public static final double MAX_SPIN_POWER = 1, HOLD_SPIN_POWER = 0.3;
+    private final int HINGE_UP_TICK = 2336, HINGE_DOWN_TICK = 1438;
+    public static final double HINGE_UP_POSITION = 0.99, HINGE_DOWN_POSITION = 0.01, HINGE_THRESHOLD = 0.05;
 
     // number of seconds to spit for
     // actual variable tracking time is stored in BaseState class and used in SpitState class
@@ -68,7 +65,7 @@ public class Collector extends Subsystem {
         super(hwMap, telemetry, allianceColor, robot, gamepad);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
-        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_POSITION, HINGE_UP_POSITION));
+        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_DOWN_TICK, HINGE_UP_TICK));
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
 
@@ -107,8 +104,6 @@ public class Collector extends Subsystem {
     @Override
     public void update(double dt) {
         resetUpdateBlockColor();
-
-        // TODO: change the active state based on the state of collectSystem
         stateManager.update(dt);
     }
     public boolean hasValidBlockColor() {

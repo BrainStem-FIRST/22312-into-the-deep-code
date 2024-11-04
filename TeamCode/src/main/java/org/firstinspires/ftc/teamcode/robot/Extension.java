@@ -16,15 +16,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
-    public static final int THRESHOLD = 30;
+    public static final int THRESHOLD = 50;
     public static final int RETRACTED_POSITION = 0;
-    public static final int EXTENDED_POSITION = 1000;
+    public static final int EXTENDED_POSITION = 1500;
 
     public enum StateType {
         IN, EXTENDING, OUT, RETRACTING
     }
 
-    private final DcMotorEx extensionMotor;
+    public final DcMotorEx extensionMotor;
 
     private final StateManager<StateType> stateManager;
 
@@ -34,6 +34,7 @@ public class Extension extends Subsystem {
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         stateManager = new StateManager<>(StateType.IN);
 

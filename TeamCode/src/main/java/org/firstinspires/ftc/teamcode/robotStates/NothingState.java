@@ -12,12 +12,12 @@ public class NothingState<StateType extends Enum<StateType>> extends RobotState<
 
     @Override
     public boolean canEnter() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override
