@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
+import org.firstinspires.ftc.teamcode.robot.BlockColorSensor;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -14,14 +16,20 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if(robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING &&
-                robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN &&
+        // waiting for grabber to close on block before raising lift
+        if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSING) {
+            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            robot.getLift().getStateManager().tryEnterState(Lift.StateType.TRANSITION);
+        }
+        // waiting for collection system to finish in taking block before grabbing onto it
+        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
                 robot.getCollector().hasValidBlockColor())
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
     }
 
     @Override
     public boolean canEnter() {
+        // lift must properly be lowered and set before entering
         return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH &&
                 robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN &&
                 robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN;
@@ -30,17 +38,17 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     // only can be overridden if grabber is not closing in on block
     @Override
     public boolean canBeOverridden() {
-        return robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN;
+        return robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.CLOSING;
     }
 
     @Override
     public boolean isDone() {
-        return robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // if block is yellow, transition to basket, and if block is alliance color then transition to drop off to human player
-        return robot.getCollector().getBlockColor() == Collector.BlockColor.YELLOW ? LiftingSystem.StateType.TROUGH_TO_BASKET : LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        return robot.getCollector().getColorSensor().getBlockColor() == BlockColorSensor.BlockColor.YELLOW ? LiftingSystem.StateType.TROUGH_TO_BASKET : LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
     }
 }

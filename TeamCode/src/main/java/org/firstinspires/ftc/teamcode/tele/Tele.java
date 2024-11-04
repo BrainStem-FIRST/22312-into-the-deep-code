@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
+import org.firstinspires.ftc.teamcode.robot.Collector;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
@@ -22,6 +23,8 @@ public class Tele extends LinearOpMode {
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
         waitForStart();
+
+        robot.setup();
 
         long currentTime = System.currentTimeMillis();
         long prevTime;
@@ -87,12 +90,14 @@ public class Tele extends LinearOpMode {
         telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
         telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
         telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+        telemetry.addData("hinge servo position", robot.getCollector().getHingeServo().getPosition());
 
         if (gamepad1.a) {
             // a serves to both extend and retract, so if robot cannot extend, it tries to retract
             if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING)) {
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+                //robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
             }
+            //robot.getCollector().getHingeServo().setPosition(Collector.HINGE_DOWN_POSITION);
         }
     }
 }

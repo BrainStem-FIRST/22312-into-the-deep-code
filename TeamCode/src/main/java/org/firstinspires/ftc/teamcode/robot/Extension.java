@@ -16,9 +16,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
-    public static final int THRESHOLD = 50;
+    public static final int THRESHOLD = 50, MAX_POSITION = 1500;
     public static final int RETRACTED_POSITION = 0;
-    public static final int EXTENDED_POSITION = 1500;
+    public static final int EXTENDED_POSITION = 900;
 
     public enum StateType {
         IN, EXTENDING, OUT, RETRACTING
@@ -28,8 +28,8 @@ public class Extension extends Subsystem {
 
     private final StateManager<StateType> stateManager;
 
-    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad);
+    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
+        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,7 +43,7 @@ public class Extension extends Subsystem {
         stateManager.addState(StateType.EXTENDING, new ExtendingState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
-        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 
@@ -60,7 +60,6 @@ public class Extension extends Subsystem {
 
     @Override
     public void update(double dt) {
-        // TODO: set the active state based off the active state of collectSystem
         stateManager.update(dt);
     }
 }

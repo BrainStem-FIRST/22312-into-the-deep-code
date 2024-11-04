@@ -11,9 +11,8 @@ public class ExtendingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        // only want to keep trying to enter state if not already entered
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_DOWN);
         robot.getExtension().getStateManager().tryEnterState(Extension.StateType.EXTENDING);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.READY_TO_HINGE_DOWN);
     }
 
     @Override
@@ -28,9 +27,7 @@ public class ExtendingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        robot.telemetry.addData("collector state: ", robot.getCollector().getStateManager().getActiveStateType());
-        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.OUT &&
-                robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.COLLECTING;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.OUT;
     }
 
     @Override

@@ -11,6 +11,7 @@ public class ExtendingState extends RobotState<Extension.StateType> {
     @Override
     public void execute() {
         // TODO: would want to use PID here instead of setting target position
+        robot.telemetry.addData("running execute function in extending state", "");
         robot.getExtension().setExtensionMotorPosition(Extension.EXTENDED_POSITION);
     }
 

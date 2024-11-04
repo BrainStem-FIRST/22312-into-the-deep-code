@@ -11,6 +11,7 @@ public class OutState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_DOWN);
     }
 
     @Override
@@ -26,7 +27,7 @@ public class OutState extends RobotState<CollectingSystem.StateType> {
     // should only exit by overriding
     @Override
     public boolean isDone() {
-        return false;
+        return robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.DONE_HINGING_UP;
     }
 
     @Override

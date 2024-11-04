@@ -14,21 +14,26 @@ public abstract class Subsystem {
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setPower(1);
     }
+    public static void setMotorPower(DcMotorEx motor, double power) {
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(power);
+    }
 
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
     private final AllianceColor allianceColor;
     private final BrainSTEMRobot robot;
     private final BrainSTEMRobotAuto robotAuto;
-    private final Gamepad gamepad;
+    private final Gamepad gamepad1, gamepad2;
 
-    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
+    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
         this.hwMap = hwMap;
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.robot = robot;
         robotAuto = robot.getClass() == BrainSTEMRobotAuto.class ? (BrainSTEMRobotAuto) robot : null;
-        this.gamepad = gamepad;
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
     }
     public AllianceColor getAllianceColor() {
         return allianceColor;
@@ -39,12 +44,11 @@ public abstract class Subsystem {
     public BrainSTEMRobotAuto getRobotAuto() {
         return robotAuto;
     }
-    public Gamepad getGamepad() {
-        return gamepad;
+    public Gamepad getGamepad1() {
+        return gamepad1;
     }
-    protected void setMotorPower(DcMotorEx motor, double power) {
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor.setPower(power);
+    public Gamepad getGamepad2() {
+        return gamepad2;
     }
     public abstract void update(double dt);
 }

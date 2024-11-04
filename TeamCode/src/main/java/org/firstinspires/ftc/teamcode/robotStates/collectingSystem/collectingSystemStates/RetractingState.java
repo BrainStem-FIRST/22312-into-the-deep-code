@@ -28,8 +28,7 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN &&
-                robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN;
     }
 
     @Override
@@ -37,4 +36,3 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
         return CollectingSystem.StateType.IN;
     }
 }
-

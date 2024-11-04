@@ -15,18 +15,19 @@ public class CollectingSystem {
     }
 
     private final BrainSTEMRobot robot;
-    private final Gamepad gamepad;
+    private final Gamepad gamepad1, gamepad2;
     private final StateManager<StateType> stateManager;
-    public CollectingSystem(BrainSTEMRobot robot, Gamepad gamepad) {
+    public CollectingSystem(BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
         this.robot = robot;
-        this.gamepad = gamepad;
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
 
         stateManager = new StateManager<>(StateType.IN);
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.OUT, new OutState());
         stateManager.addState(StateType.EXTENDING, new ExtendingState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
-        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 

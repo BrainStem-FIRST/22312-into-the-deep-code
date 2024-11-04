@@ -33,16 +33,20 @@ public class BrainSTEMRobot {
 
         driveTrain = new PIDDrivetrain(hwMap, telemetry, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
-        collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        collectingSystem = new CollectingSystem(this, opMode.gamepad1);
+        collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
+        extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
+        collectingSystem = new CollectingSystem(this, opMode.gamepad1, opMode.gamepad2);
 
-        grabber = new Grabber(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        arm = new Arm(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        lift = new Lift(hwMap, telemetry, allianceColor, this, opMode.gamepad1);
-        liftingSystem = new LiftingSystem(this, opMode.gamepad1);
-
+        grabber = new Grabber(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
+        arm = new Arm(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
+        lift = new Lift(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
+        liftingSystem = new LiftingSystem(this, opMode.gamepad1, opMode.gamepad2);
     }
+
+    public void setup() {
+        collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
+    }
+
     public void update(double dt) {
         telemetry.addData("Extension motor current position", extension.extensionMotor.getCurrentPosition());
 

@@ -22,7 +22,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override
@@ -32,9 +32,8 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        // state of collecting system will always be out when this function is called
-        // bc only way it won't be is when extension is retracting, in retracting we override spitting and set state to hinge up
-        // there should be no case where you want to keep spitting during retraction of extension, that would mean the opposing block would just act in way of your movement
-        return Collector.StateType.COLLECTING;
+        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.OUT)
+            return Collector.StateType.COLLECTING;
+        return Collector.StateType.HINGE_UP;
     }
 }

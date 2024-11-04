@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
 
+import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -9,11 +10,14 @@ public class BasketDepositState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
+        if(gamepad.b)
+            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+
     }
 
     @Override
     public boolean canEnter() {
-        return false;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_BASKET;
     }
 
     @Override
@@ -23,11 +27,11 @@ public class BasketDepositState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return false;
+        return robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN;
     }
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
-        return null;
+        return LiftingSystem.StateType.BASKET_TO_TROUGH;
     }
 }

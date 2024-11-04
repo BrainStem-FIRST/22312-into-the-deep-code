@@ -16,7 +16,7 @@ public class HingeDownState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Collector.StateType.NOTHING;
+        return stateManager.getActiveStateType() == Collector.StateType.READY_TO_HINGE_DOWN;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class HingeDownState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        robot.telemetry.addData("inside isDone check for HINGE_DOWN state in collector; hinge servo position", robot.getCollector().getHingeServo().getPosition() + ", goal position: " + Collector.HINGE_DOWN_POSITION);
-        return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_DOWN_POSITION) < Collector.HINGE_THRESHOLD;
+        return time > 1.2;
+        //return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_DOWN_POSITION) < Collector.HINGE_THRESHOLD;
     }
 
     @Override

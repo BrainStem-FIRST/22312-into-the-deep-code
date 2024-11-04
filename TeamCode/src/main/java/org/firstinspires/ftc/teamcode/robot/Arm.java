@@ -23,8 +23,8 @@ public class Arm extends Subsystem {
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
 
-    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad);
+    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
+        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
 
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
@@ -39,7 +39,7 @@ public class Arm extends Subsystem {
         transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-        stateManager.setupStates(robot, gamepad, stateManager);
+        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
         stateManager.tryEnterState(StateType.DOWN);
     }
 
