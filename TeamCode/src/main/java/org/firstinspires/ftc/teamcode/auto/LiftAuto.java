@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 public class LiftAuto extends Lift {
 
     public LiftAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad);
+        super(hwMap, telemetry, allianceColor, robot, gamepad, gamepad);
         getLiftMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }

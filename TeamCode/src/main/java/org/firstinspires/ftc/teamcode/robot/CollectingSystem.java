@@ -2,16 +2,16 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.ExtendingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchAndCollectState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.OutState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class CollectingSystem {
 
     public enum StateType {
-        IN, EXTENDING, RETRACTING, OUT
+        IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING
     }
 
     private final BrainSTEMRobot robot;
@@ -24,8 +24,8 @@ public class CollectingSystem {
 
         stateManager = new StateManager<>(StateType.IN);
         stateManager.addState(StateType.IN, new InState());
-        stateManager.addState(StateType.OUT, new OutState());
-        stateManager.addState(StateType.EXTENDING, new ExtendingState());
+        stateManager.addState(StateType.SEARCH, new SearchingState());
+        stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
         stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
         stateManager.tryEnterState(StateType.IN);

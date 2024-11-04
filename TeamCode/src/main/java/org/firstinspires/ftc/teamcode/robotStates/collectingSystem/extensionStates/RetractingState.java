@@ -16,7 +16,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Extension.StateType.OUT;
+        return stateManager.getActiveStateType() == Extension.StateType.FINDING_BLOCK;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
     @Override
     public boolean isDone() {
         // TODO: incorporate the magnet sensors on back of lift (would say retracting is done when magnet activates AND delta position is less than threshold)
-        return Math.abs(robot.getExtension().getExtensionMotor().getCurrentPosition() - Extension.RETRACTED_POSITION) < Extension.THRESHOLD;
+        return Math.abs(robot.getExtension().getExtensionMotor().getCurrentPosition() - Extension.RETRACTED_POSITION) < Extension.RETRACTED_THRESHOLD;
     }
 
     @Override

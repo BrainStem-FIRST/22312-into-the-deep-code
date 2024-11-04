@@ -4,9 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.ExtendingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlock;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.OutState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
@@ -16,12 +15,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
-    public static final int THRESHOLD = 50, MAX_POSITION = 1500;
+    // max position
+    public static final int MAX_POSITION = 1400;
     public static final int RETRACTED_POSITION = 0;
+    // TODO - implement magnet sensor and encoder reset
+    public static final int RETRACTED_THRESHOLD = 30;
     public static final int EXTENDED_POSITION = 900;
 
     public enum StateType {
-        IN, EXTENDING, OUT, RETRACTING
+        IN, FINDING_BLOCK, RETRACTING
     }
 
     public final DcMotorEx extensionMotor;
@@ -39,8 +41,7 @@ public class Extension extends Subsystem {
         stateManager = new StateManager<>(StateType.IN);
 
         stateManager.addState(StateType.IN, new InState());
-        stateManager.addState(StateType.OUT, new OutState());
-        stateManager.addState(StateType.EXTENDING, new ExtendingState());
+        stateManager.addState(StateType.FINDING_BLOCK, new FindingBlock());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
         stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
@@ -55,11 +56,16 @@ public class Extension extends Subsystem {
         return extensionMotor;
     }
     public void setExtensionMotorPosition(int position) {
-        setMotorPosition(extensionMotor, position);
+        Subsystem.setMotorPosition(extensionMotor, position);
+    }
+    public void setExtensionMotorPower(double power) {
+        Subsystem.setMotorPower(extensionMotor, power);
     }
 
     @Override
     public void update(double dt) {
+
+
         stateManager.update(dt);
     }
 }

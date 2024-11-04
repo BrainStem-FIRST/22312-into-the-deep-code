@@ -27,9 +27,10 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
         telemetry.update();
         waitForStart();
         while(opModeIsActive()) {
+            // TODO - make sure this is the first frame for pressing a
             if(gamepad1.a) {
                 if (robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN)
-                    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.EXTENDING);
+                    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
                 else
                     robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
             }

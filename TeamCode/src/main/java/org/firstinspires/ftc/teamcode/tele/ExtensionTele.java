@@ -29,7 +29,7 @@ public class ExtensionTele extends LinearOpMode {
         while(opModeIsActive()) {
             if(gamepad1.a) {
                 if (robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN)
-                    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.EXTENDING);
+                    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
                 else
                     robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
             }

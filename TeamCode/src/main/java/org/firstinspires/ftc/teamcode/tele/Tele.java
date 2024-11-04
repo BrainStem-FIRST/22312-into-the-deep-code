@@ -93,11 +93,19 @@ public class Tele extends LinearOpMode {
         telemetry.addData("hinge servo position", robot.getCollector().getHingeServo().getPosition());
 
         if (gamepad1.a) {
-            // a serves to both extend and retract, so if robot cannot extend, it tries to retract
-            if (!robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.EXTENDING)) {
-                //robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+            // goes from in to search, then toggles between search and search and collect
+            switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {
+                case IN:
+                case SEARCH_AND_COLLECT:
+                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+                    break;
+                case SEARCH:
+                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
+                    break;
             }
-            //robot.getCollector().getHingeServo().setPosition(Collector.HINGE_DOWN_POSITION);
+        }
+        if (gamepad2.b) {
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
         }
     }
 }
