@@ -22,7 +22,7 @@ public class Tele extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         input = new Input(gamepad1, gamepad2);
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, input, AllianceColor.BLUE);
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, AllianceColor.BLUE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -96,13 +96,15 @@ public class Tele extends LinearOpMode {
 
 
             //Set motor speed variables
-            robot.getDriveTrain().setDrivePower((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+            robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
         } else
-            robot.getDriveTrain().stop();
+            robot.getDriveTrain().stopMotors();
     }
 
 
     private void listenForCollectionInput() {
+
+        // update states
         if (input.getGamepadTracker1().isFirstFrameA()) {
             // goes from in to search, then toggles between search and search and collect
             switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {
@@ -118,5 +120,8 @@ public class Tele extends LinearOpMode {
         if (input.getGamepadTracker1().isFirstFrameB()) {
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
         }
+
+        // update extension target power (how fast it moves)
+        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().left_stick_y);
     }
 }

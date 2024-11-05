@@ -16,14 +16,12 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
-    private final Input input;
     public enum StateType {
         TROUGH, TROUGH_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH
     }
     private final StateManager<StateType> stateManager;
-    public LiftingSystem(BrainSTEMRobot robot, Input input) {
+    public LiftingSystem(BrainSTEMRobot robot) {
         this.robot = robot;
-        this.input = input;
 
         stateManager = new StateManager<>(StateType.TROUGH);
 
@@ -37,7 +35,7 @@ public class LiftingSystem {
         stateManager.addState(StateType.SPECIMEN_RAM, new SpecimenRamState());
         stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);
     }
     public void update(double dt) {

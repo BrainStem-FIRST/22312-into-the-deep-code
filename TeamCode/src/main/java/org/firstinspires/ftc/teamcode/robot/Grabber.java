@@ -23,8 +23,8 @@ public class Grabber extends Subsystem {
     private final StateManager<StateType> stateManager;
     private final ServoImplEx grabServo;
 
-    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
 
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
         grabServo.setPwmRange(new PwmControl.PwmRange(CLOSE_POSITION, OPEN_POSITION));
@@ -36,7 +36,7 @@ public class Grabber extends Subsystem {
         stateManager.addState(StateType.CLOSED, new NothingState<>(StateType.CLOSED));
         stateManager.addState(StateType.CLOSING, new ClosingState());
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.CLOSED);
     }
 

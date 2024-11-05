@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlock;
+import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlockState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -28,14 +28,22 @@ public class Extension extends Subsystem {
         IN, FINDING_BLOCK, RETRACTING
     }
 
-    private final DcMotorEx extensionMotor;
-    private final DigitalChannel magnetResetSwitch;
+    private DcMotorEx extensionMotor;
+    private DigitalChannel magnetResetSwitch;
 
+    private double targetPower;
+    private int targetPosition;
+    private DcMotor.RunMode runMode;
 
-    private final StateManager<StateType> stateManager;
+    private StateManager<StateType> stateManager;
 
-    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
+
+        setup();
+    }
+    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot) {
+        super(hwMap, telemetry, allianceColor, robot);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -48,10 +56,10 @@ public class Extension extends Subsystem {
         stateManager = new StateManager<>(StateType.IN);
 
         stateManager.addState(StateType.IN, new InState());
-        stateManager.addState(StateType.FINDING_BLOCK, new FindingBlock());
+        stateManager.addState(StateType.FINDING_BLOCK, new FindingBlockState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(getRobot(), stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 
@@ -71,6 +79,26 @@ public class Extension extends Subsystem {
     public DigitalChannel getMagnetResetSwitch() {
         return magnetResetSwitch;
     }
+
+    public DcMotor.RunMode getRunMode() {
+        return runMode;
+    }
+    public void setRunMode(DcMotor.RunMode runMode) {
+        this.runMode = runMode;
+    }
+    public double getTargetPower() {
+        return targetPower;
+    }
+    public void setTargetPower(double targetPower) {
+        this.targetPower = targetPower;
+    }
+    public int getTargetPosition() {
+        return targetPosition;
+    }
+    public void setTargetPosition(int targetPosition) {
+        this.targetPosition = targetPosition;
+    }
+
 
     @Override
     public void update(double dt) {

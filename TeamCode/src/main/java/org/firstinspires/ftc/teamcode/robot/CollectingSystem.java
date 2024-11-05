@@ -17,7 +17,7 @@ public class CollectingSystem {
 
     private final BrainSTEMRobot robot;
     private final StateManager<StateType> stateManager;
-    public CollectingSystem(BrainSTEMRobot robot, Input input) {
+    public CollectingSystem(BrainSTEMRobot robot) {
         this.robot = robot;
 
         stateManager = new StateManager<>(StateType.IN);
@@ -26,7 +26,7 @@ public class CollectingSystem {
         stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 

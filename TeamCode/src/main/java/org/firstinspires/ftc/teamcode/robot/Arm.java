@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
@@ -24,8 +25,8 @@ public class Arm extends Subsystem {
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
 
-    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
 
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
@@ -40,7 +41,7 @@ public class Arm extends Subsystem {
         transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.DOWN);
     }
 

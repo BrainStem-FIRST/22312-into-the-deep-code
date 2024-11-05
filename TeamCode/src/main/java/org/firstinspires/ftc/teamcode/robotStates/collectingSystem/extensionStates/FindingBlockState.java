@@ -1,18 +1,23 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
-public class FindingBlock extends RobotState<Extension.StateType> {
+public class FindingBlockState extends RobotState<Extension.StateType> {
 
-    public static final double SPEED_MODIFIER = 0.2;
-    public FindingBlock() {
+    public FindingBlockState() {
         super(Extension.StateType.FINDING_BLOCK);
     }
 
     @Override
     public void execute() {
-        robot.getExtension().setExtensionMotorPower(input.getGamepadTracker1().getGamepad().left_stick_y * 0.2);
+        // move extension
+        if (robot.getExtension().getRunMode() == DcMotor.RunMode.RUN_TO_POSITION)
+            robot.getExtension().setExtensionMotorPosition(robot.getExtension().getTargetPosition());
+        else if (robot.getExtension().getRunMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+            robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
 
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.MAX_POSITION)

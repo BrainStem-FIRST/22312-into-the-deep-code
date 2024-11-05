@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
@@ -46,15 +47,15 @@ public class Collector extends Subsystem {
         READY_TO_HINGE_DOWN, HINGE_DOWN, COLLECTING, SPITTING, HINGE_UP, DONE_HINGING_UP
     }
 
-    private final StateManager<StateType> stateManager;
-    private final ServoImplEx hingeServo;
-    private final DcMotorEx spindleMotor;
+    private StateManager<StateType> stateManager;
+    private ServoImplEx hingeServo;
+    private DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
-    private final BlockColorSensor blockColorSensor;
+    private BlockColorSensor blockColorSensor;
 
-    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
         hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_UP_TICK, HINGE_DOWN_TICK));
@@ -78,7 +79,7 @@ public class Collector extends Subsystem {
         doneHingingUpState.addMotor(spindleMotor);
         stateManager.addState(StateType.DONE_HINGING_UP, doneHingingUpState);
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(getRobot(), stateManager);
         stateManager.tryEnterState(StateType.READY_TO_HINGE_DOWN);
     }
 

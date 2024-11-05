@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class CollectorAuto extends Collector {
 
-    public CollectorAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public CollectorAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot) {
+        super(hwMap, telemetry, allianceColor, robot);
     }
 }

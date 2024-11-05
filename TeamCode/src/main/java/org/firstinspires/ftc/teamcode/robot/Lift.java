@@ -25,8 +25,8 @@ public class Lift extends Subsystem {
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
 
-    public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -64,7 +64,7 @@ public class Lift extends Subsystem {
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
-        stateManager.setupStates(robot, input, stateManager);
+        stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);
     }
 

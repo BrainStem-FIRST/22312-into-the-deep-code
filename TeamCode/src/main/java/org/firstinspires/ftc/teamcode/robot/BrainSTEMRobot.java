@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -7,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.util.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class BrainSTEMRobot {
@@ -14,32 +16,32 @@ public class BrainSTEMRobot {
     public Telemetry telemetry;
     private final AllianceColor allianceColor;
 
-    private final PIDDrivetrain driveTrain;
+    private final MecanumDrive driveTrain;
 
-    public final Extension extension;
-    private final Collector collector;
-    private final CollectingSystem collectingSystem;
+    public Extension extension;
+    private Collector collector;
+    private CollectingSystem collectingSystem;
 
-    private final Grabber grabber;
-    private final Arm arm;
-    private final Lift lift;
-    private final LiftingSystem liftingSystem;
+    private Grabber grabber;
+    private Arm arm;
+    private Lift lift;
+    private LiftingSystem liftingSystem;
 
 
-    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, Input input, AllianceColor allianceColor) {
+    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
 
-        driveTrain = new PIDDrivetrain(hwMap, telemetry, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        driveTrain = new MecanumDrive(hwMap, new Pose2d(0, 0, 0));
 
-        collector = new Collector(hwMap, telemetry, allianceColor, this, input);
-        extension = new Extension(hwMap, telemetry, allianceColor, this, input);
-        collectingSystem = new CollectingSystem(this, input);
+        collector = new Collector(hwMap, telemetry, allianceColor, this);
+        extension = new Extension(hwMap, telemetry, allianceColor, this);
+        collectingSystem = new CollectingSystem(this);
 
-        grabber = new Grabber(hwMap, telemetry, allianceColor, this, input);
-        arm = new Arm(hwMap, telemetry, allianceColor, this, input);
-        lift = new Lift(hwMap, telemetry, allianceColor, this, input);
-        liftingSystem = new LiftingSystem(this, input);
+        grabber = new Grabber(hwMap, telemetry, allianceColor, this);
+        arm = new Arm(hwMap, telemetry, allianceColor, this);
+        lift = new Lift(hwMap, telemetry, allianceColor, this);
+        liftingSystem = new LiftingSystem(this);
     }
 
     public void setup() {
@@ -78,7 +80,7 @@ public class BrainSTEMRobot {
     public AllianceColor getAllianceColor() {
         return allianceColor;
     }
-    public PIDDrivetrain getDriveTrain() {
+    public MecanumDrive getDriveTrain() {
         return driveTrain;
     }
 

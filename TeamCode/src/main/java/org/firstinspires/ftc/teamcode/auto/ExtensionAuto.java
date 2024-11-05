@@ -17,8 +17,8 @@ public class ExtensionAuto extends Extension {
     // TODO - find position for extension to go to (to pickup yellow)
     public static final int AUTO_THRESHOLD = 5;
     public static final int YELLOW_PICKUP_TICK = 1000;
-    public ExtensionAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
-        super(hwMap, telemetry, allianceColor, robot, input);
+    public ExtensionAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+        super(hwMap, telemetry, allianceColor, robot);
     }
 
     public Action extendForYellow() {
