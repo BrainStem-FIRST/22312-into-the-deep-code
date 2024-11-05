@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PinpointDrive;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class BrainSTEMRobot {
@@ -16,7 +17,7 @@ public class BrainSTEMRobot {
     public Telemetry telemetry;
     private final AllianceColor allianceColor;
 
-    private final MecanumDrive driveTrain;
+    private final PinpointDrive driveTrain;
 
     public Extension extension;
     private Collector collector;
@@ -32,7 +33,7 @@ public class BrainSTEMRobot {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
 
-        driveTrain = new MecanumDrive(hwMap, new Pose2d(0, 0, 0));
+        driveTrain = new PinpointDrive(hwMap, new Pose2d(0, 0, 0));
 
         collector = new Collector(hwMap, telemetry, allianceColor, this);
         extension = new Extension(hwMap, telemetry, allianceColor, this);

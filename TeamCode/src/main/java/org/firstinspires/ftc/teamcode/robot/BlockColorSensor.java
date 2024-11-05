@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode.robot;
 import java.util.HashMap;
 import java.util.Objects;
 
-import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.tele.Tele;
 
 public class BlockColorSensor {
     public enum BlockColor {
@@ -26,7 +24,7 @@ public class BlockColorSensor {
     public static final Double[] YELLOW_BLOCK_PERCENTS = { 34.30, 52.7, 12.95 };
     public static final Double YELLOW_BLOCK_THRESHOLD = 2.;
 
-    private Telemetry telemetry;
+    private final Telemetry telemetry;
 
     private final ColorSensor colorSensor;
 
@@ -79,13 +77,15 @@ public class BlockColorSensor {
     }
 
     public boolean hasColor(BlockColor blockColor) {
+        int red = colorSensor.red(), green = colorSensor.green(), blue = colorSensor.blue();
+        int sum = red + green + blue;
+        double rPercent = red * 100. / sum;
+        double gPercent = green * 100. / sum;
+        double bPercent = blue * 100. / sum;
 
-        int sum = colorSensor.red() + colorSensor.green() + colorSensor.blue();
-        double rPercent = colorSensor.red() * 100. / sum;
-        double gPercent = colorSensor.green() * 100. / sum;
-        double bPercent = colorSensor.blue() * 100. / sum;
-
-        telemetry.addData("color percents for " + blockColor, rPercent + " " + gPercent + " " + bPercent);
+        telemetry.addData("red color percent", rPercent);
+        telemetry.addData("green color percent", gPercent);
+        telemetry.addData("blue color percent", bPercent);
 
         return colorPercentInRange(rPercent, Objects.requireNonNull(BLOCK_PERCENTS.get(blockColor))[0], BLOCK_THRESHOLDS.get(blockColor)) &&
                 colorPercentInRange(gPercent, Objects.requireNonNull(BLOCK_PERCENTS.get(blockColor))[1], BLOCK_THRESHOLDS.get(blockColor)) &&
