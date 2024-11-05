@@ -25,11 +25,10 @@ import java.util.Vector;
 public class PIDDrivetrain {
     public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private Pose2D lastPinpointPose, currentPose, targetPose, leadPoint;
-    private double currentVelocity, currentAcceleration, previousVelocity, previousAcceleration,
-            previousForwardPower;
+    private double currentVelocity, currentAcceleration, previousVelocity, previousAcceleration, previousForwardPower;
     private long previousTimestamp;
-    private PIDController forwardPIDControl, strafePIDControl, headPIDControl;
-    private Telemetry telemetry;
+    private final PIDController forwardPIDControl, strafePIDControl, headPIDControl;
+    private final Telemetry telemetry;
 
     private double calculatedLeftFrontPower, calculatedLeftBackPower, calculatedRightFrontPower,
             calculatedRightBackPower;

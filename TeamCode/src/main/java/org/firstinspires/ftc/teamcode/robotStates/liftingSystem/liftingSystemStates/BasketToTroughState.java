@@ -16,7 +16,7 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP) {
             robot.getArm().getTransitionState().setGoalState(Arm.DOWN_POS, Arm.StateType.DOWN);
         }
-        else if(robot.getArm().stateManager.getActiveStateType() == Arm.StateType.DOWN) {
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN) {
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
         }
         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.grabberStates.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
@@ -30,9 +31,9 @@ public class Grabber extends Subsystem {
 
         stateManager = new StateManager<>(StateType.CLOSED);
 
-        stateManager.addState(StateType.OPEN, new OpenState());
+        stateManager.addState(StateType.OPEN, new NothingState<>(StateType.OPEN));
         stateManager.addState(StateType.OPENING, new OpeningState());
-        stateManager.addState(StateType.CLOSED, new CloseState());
+        stateManager.addState(StateType.CLOSED, new NothingState<>(StateType.CLOSED));
         stateManager.addState(StateType.CLOSING, new ClosingState());
 
         stateManager.setupStates(robot, input, stateManager);

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
@@ -21,7 +20,7 @@ public class Lift extends Subsystem {
         BASKET_SAFETY_POS = 23; // position where arm can safely lower without colliding with basket
     public static final int DESTINATION_THRESHOLD = 5;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_OFF, RAM_BEFORE, RAM_AFTER, BASKET, BASKET_SAFETY, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_OFF, RAM_BEFORE, RAM_AFTER, BASKET_SAFETY, BASKET, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -34,16 +33,36 @@ public class Lift extends Subsystem {
 
         stateManager = new StateManager<>(StateType.TROUGH);
 
-        stateManager.addState(StateType.TROUGH, new NothingState<>(StateType.TROUGH));
-        stateManager.addState(StateType.TROUGH_SAFETY, new NothingState<>(StateType.TROUGH_SAFETY));
-        stateManager.addState(StateType.DROP_OFF, new NothingState<>(StateType.DROP_OFF));
-        stateManager.addState(StateType.RAM_BEFORE, new NothingState<>(StateType.RAM_BEFORE));
-        stateManager.addState(StateType.RAM_AFTER, new NothingState<>(StateType.RAM_AFTER));
-        stateManager.addState(StateType.BASKET, new NothingState<>(StateType.BASKET));
-        stateManager.addState(StateType.BASKET_SAFETY, new NothingState<>(StateType.BASKET_SAFETY));
+        NothingState<StateType> troughState = new NothingState<>(StateType.TROUGH);
+        troughState.addMotor(liftMotor);
+        stateManager.addState(StateType.TROUGH, troughState);
 
-        transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
-        stateManager.addState(StateType.TRANSITION, transitionState);
+        NothingState<StateType> troughSafetyState = new NothingState<>(StateType.TROUGH_SAFETY);
+        troughSafetyState.addMotor(liftMotor);
+        stateManager.addState(StateType.TROUGH_SAFETY, troughSafetyState);
+
+        NothingState<StateType> dropOffState = new NothingState<>(StateType.DROP_OFF);
+        dropOffState.addMotor(liftMotor);
+        stateManager.addState(StateType.DROP_OFF, dropOffState);
+
+        NothingState<StateType> ramBeforeState = new NothingState<>(StateType.RAM_BEFORE);
+        ramBeforeState.addMotor(liftMotor);
+        stateManager.addState(StateType.RAM_BEFORE, ramBeforeState);
+
+        NothingState<StateType> ramAfterState = new NothingState<>(StateType.RAM_AFTER);
+        ramAfterState.addMotor(liftMotor);
+        stateManager.addState(StateType.RAM_AFTER, ramAfterState);
+
+        NothingState<StateType> basketSafetyState = new NothingState<>(StateType.BASKET_SAFETY);
+        basketSafetyState.addMotor(liftMotor);
+        stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
+
+        NothingState<StateType> basketState = new NothingState<>(StateType.BASKET);
+        basketState.addMotor(liftMotor);
+        stateManager.addState(StateType.BASKET, basketState);
+
+        this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
+        stateManager.addState(StateType.TRANSITION, this.transitionState);
 
         stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);
@@ -56,9 +75,6 @@ public class Lift extends Subsystem {
 
     public DcMotorEx getLiftMotor() {
         return liftMotor;
-    }
-    public void setLiftPosition(int position) {
-        setMotorPosition(liftMotor, position);
     }
     public StateManager<StateType> getStateManager() {
         return stateManager;

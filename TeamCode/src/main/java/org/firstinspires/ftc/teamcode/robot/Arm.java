@@ -20,7 +20,7 @@ public class Arm extends Subsystem {
     public enum StateType {
         DOWN, LEFT, UP, RIGHT, TRANSITION
     }
-    public final StateManager<StateType> stateManager;
+    private final StateManager<StateType> stateManager;
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
 

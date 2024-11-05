@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemSt
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColorSensor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
-import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;

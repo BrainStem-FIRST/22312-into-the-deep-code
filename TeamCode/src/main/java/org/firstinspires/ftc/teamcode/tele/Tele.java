@@ -37,6 +37,16 @@ public class Tele extends LinearOpMode {
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
+            telemetry.addData("a", gamepad1.a);
+            telemetry.addData("b", gamepad1.b);
+            telemetry.addData("y", gamepad1.y);
+            telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
+            telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
+            telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+            telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
+            telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
+            telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
+            telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
 
             // update dt
             prevTime = currentTime;
@@ -93,14 +103,6 @@ public class Tele extends LinearOpMode {
 
 
     private void listenForCollectionInput() {
-        // a extends and retracts collector
-        telemetry.addData("a", gamepad1.a);
-        telemetry.addData("collector hinge encoder tick", robot.getCollector().getHingeServo().getPosition());
-        telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
-        telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
-        telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-        telemetry.addData("hinge servo position", robot.getCollector().getHingeServo().getPosition());
-
         if (input.getGamepadTracker1().isFirstFrameA()) {
             // goes from in to search, then toggles between search and search and collect
             switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {

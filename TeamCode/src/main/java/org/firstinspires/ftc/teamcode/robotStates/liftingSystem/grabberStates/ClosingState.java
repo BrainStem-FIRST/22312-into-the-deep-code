@@ -14,7 +14,7 @@ public class ClosingState extends RobotState<Grabber.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Grabber.StateType.OPEN || stateManager.getActiveStateType() == Grabber.StateType.OPENING;
+        return stateManager.getActiveStateType() == Grabber.StateType.OPEN;
     }
 
     @Override
