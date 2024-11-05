@@ -40,7 +40,11 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Rob
         return goalStateType;
     }
     public void setGoalState(int goalPosition, StateType goalStateType) {
-        this.goalPosition = goalPosition;
-        this.goalStateType = goalStateType;
+        // only sets goal state the current state in stateManager is not in transition (because don't want to override that transition)
+        if(stateManager.getActiveStateType() != stateType) {
+            this.goalPosition = goalPosition;
+            this.goalStateType = goalStateType;
+            stateManager.tryEnterState(stateType);
+        }
     }
 }

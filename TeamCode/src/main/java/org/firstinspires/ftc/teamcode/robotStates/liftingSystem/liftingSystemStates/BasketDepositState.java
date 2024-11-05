@@ -10,8 +10,10 @@ public class BasketDepositState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if(input.getGamepadTracker1().isBPressed())
+        if(input.getGamepadTracker1().isBPressed()) {
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+            robot.getGrabber().setHasBlock(false);
+        }
     }
 
     @Override
@@ -21,7 +23,7 @@ public class BasketDepositState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.OPENING;
     }
 
     @Override

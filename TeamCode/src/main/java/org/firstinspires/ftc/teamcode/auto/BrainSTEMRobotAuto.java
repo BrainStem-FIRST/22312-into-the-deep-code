@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class BrainSTEMRobotAuto extends BrainSTEMRobot {
 
@@ -20,13 +21,13 @@ public class BrainSTEMRobotAuto extends BrainSTEMRobot {
     public LiftAuto lift;
     public CollectorAuto collector;
 
-    public BrainSTEMRobotAuto(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor, Gamepad gamepad) {
+    public BrainSTEMRobotAuto(HardwareMap hwMap, Telemetry telemetry, Input input, AllianceColor allianceColor, Gamepad gamepad) {
 
-        super(hwMap, telemetry, opMode, allianceColor);
+        super(hwMap, telemetry, input, allianceColor);
 
         drive = new MecanumDrive(hwMap, new Pose2d(0, 0, 0));
-        lift = new LiftAuto(hwMap, telemetry, allianceColor, this, gamepad);
-        collector = new CollectorAuto(hwMap, telemetry, allianceColor, this, gamepad);
+        lift = new LiftAuto(hwMap, telemetry, allianceColor, this, input);
+        collector = new CollectorAuto(hwMap, telemetry, allianceColor, this, input);
     }
 
     public void resetAllEncoders() {

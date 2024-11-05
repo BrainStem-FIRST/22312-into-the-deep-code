@@ -25,6 +25,7 @@ public class CollectingSystem {
         stateManager.addState(StateType.SEARCH, new SearchingState());
         stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
+
         stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }

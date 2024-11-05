@@ -16,15 +16,15 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        // waiting for grabber to close on block before raising lift
-        if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSING) {
-            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-            robot.getLift().getStateManager().tryEnterState(Lift.StateType.TRANSITION);
-        }
         // waiting for collection system to finish in taking block before grabbing onto it
-        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
+        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
                 robot.getCollector().hasValidBlockColor())
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
+        // waiting for grabber to close on block before raising lift
+        else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+            robot.getGrabber().setHasBlock(true);
+            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+        }
     }
 
     @Override

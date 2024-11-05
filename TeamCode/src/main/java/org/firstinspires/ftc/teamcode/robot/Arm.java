@@ -40,7 +40,7 @@ public class Arm extends Subsystem {
         transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.DOWN);
     }
 

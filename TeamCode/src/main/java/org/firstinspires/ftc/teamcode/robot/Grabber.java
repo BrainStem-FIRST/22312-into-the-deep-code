@@ -15,6 +15,7 @@ public class Grabber extends Subsystem {
     public static final int MIN_TICK = 0, MAX_TICK = 100;
     public static final double CLOSE_POSITION = 0, OPEN_POSITION = 1;
     public static final double DESTINATION_THRESHOLD = 0.1;
+    private boolean hasBlock = false, hasSpecimen = false;
     public enum StateType {
         OPEN, OPENING, CLOSED, CLOSING
     }
@@ -47,5 +48,17 @@ public class Grabber extends Subsystem {
     }
     public ServoImplEx getGrabServo() {
         return grabServo;
+    }
+    public boolean getHasBlock() {
+        return hasBlock;
+    }
+    public void setHasBlock(boolean hasBlock) {
+        this.hasBlock = hasBlock;
+    }
+    public boolean getHasSpecimen() {
+        return hasSpecimen;
+    }
+    public void setHasSpecimen(boolean hasSpecimen) {
+        this.hasSpecimen = hasSpecimen;
     }
 }

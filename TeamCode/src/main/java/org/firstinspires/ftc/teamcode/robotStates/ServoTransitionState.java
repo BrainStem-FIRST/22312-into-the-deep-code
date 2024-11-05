@@ -41,5 +41,6 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Rob
     public void setGoalState(double goalPosition, StateType goalStateType) {
         this.goalPosition = goalPosition;
         this.goalStateType = goalStateType;
+        stateManager.tryEnterState(stateType);
     }
 }

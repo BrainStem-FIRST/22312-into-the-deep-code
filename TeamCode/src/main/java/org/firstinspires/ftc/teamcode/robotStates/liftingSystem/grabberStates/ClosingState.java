@@ -19,12 +19,13 @@ public class ClosingState extends RobotState<Grabber.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDone() {
-        return Math.abs(robot.getGrabber().getGrabServo().getPosition() - Grabber.CLOSE_POSITION) < Grabber.DESTINATION_THRESHOLD;
+        return time > 0.5;
+        //return Math.abs(robot.getGrabber().getGrabServo().getPosition() - Grabber.CLOSE_POSITION) < Grabber.DESTINATION_THRESHOLD;
     }
 
     @Override

@@ -44,6 +44,8 @@ public class BrainSTEMRobot {
 
     public void setup() {
         collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
+        grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
+        // WOULD NOT WANT TO SET POSITION OF ARM IN CASE LIFT IS DOWN AND ARM IS NOT
     }
 
     public void update(double dt) {

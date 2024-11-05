@@ -17,10 +17,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class CollectorAuto extends Collector {
 
-    public CollectorAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot, Gamepad gamepad) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad, gamepad);
+    public CollectorAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
     }
 }
