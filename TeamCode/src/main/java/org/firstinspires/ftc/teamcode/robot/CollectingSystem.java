@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSys
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class CollectingSystem {
 
@@ -15,19 +16,16 @@ public class CollectingSystem {
     }
 
     private final BrainSTEMRobot robot;
-    private final Gamepad gamepad1, gamepad2;
     private final StateManager<StateType> stateManager;
-    public CollectingSystem(BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
+    public CollectingSystem(BrainSTEMRobot robot, Input input) {
         this.robot = robot;
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
 
         stateManager = new StateManager<>(StateType.IN);
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.SEARCH, new SearchingState());
         stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 

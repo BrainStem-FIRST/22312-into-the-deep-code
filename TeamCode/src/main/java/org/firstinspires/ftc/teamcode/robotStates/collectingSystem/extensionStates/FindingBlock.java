@@ -12,7 +12,7 @@ public class FindingBlock extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        robot.getExtension().setExtensionMotorPower(gamepad2.left_stick_y * 0.2);
+        robot.getExtension().setExtensionMotorPower(input.getGamepadTracker1().getGamepad().left_stick_y * 0.2);
 
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.MAX_POSITION)

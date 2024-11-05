@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.grabberStates.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Grabber extends Subsystem {
     //TODO: find min tick and max tick positions for servo
@@ -20,8 +21,8 @@ public class Grabber extends Subsystem {
     private final StateManager<StateType> stateManager;
     private final ServoImplEx grabServo;
 
-    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
+    public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
 
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
         grabServo.setPwmRange(new PwmControl.PwmRange(CLOSE_POSITION, OPEN_POSITION));
@@ -33,7 +34,7 @@ public class Grabber extends Subsystem {
         stateManager.addState(StateType.CLOSED, new CloseState());
         stateManager.addState(StateType.CLOSING, new ClosingState());
 
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.CLOSED);
     }
 

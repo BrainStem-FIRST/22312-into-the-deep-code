@@ -26,8 +26,8 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean isDone() {
-        // TODO: incorporate the magnet sensors on back of lift (would say retracting is done when magnet activates AND delta position is less than threshold)
-        return Math.abs(robot.getExtension().getExtensionMotor().getCurrentPosition() - Extension.RETRACTED_POSITION) < Extension.RETRACTED_THRESHOLD;
+        // when the switch state returns false it means it has detected the extension
+        return !robot.getExtension().getMagnetResetSwitch().getState();
     }
 
     @Override

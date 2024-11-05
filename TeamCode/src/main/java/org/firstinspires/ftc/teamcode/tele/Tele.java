@@ -7,10 +7,13 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class Tele extends LinearOpMode {
+
+    private Input input;
 
     private BrainSTEMRobot robot;
 
@@ -18,7 +21,8 @@ public class Tele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, this, AllianceColor.BLUE);
+        input = new Input(gamepad1, gamepad2);
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, input, AllianceColor.BLUE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -33,6 +37,8 @@ public class Tele extends LinearOpMode {
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
+
+            // update dt
             prevTime = currentTime;
             currentTime = System.currentTimeMillis();
             dt = (currentTime - prevTime) / 1000.;
@@ -41,6 +47,9 @@ public class Tele extends LinearOpMode {
             //if (timeSinceLastUpdate < interval)
             //    continue;
             //timeSinceLastUpdate -= interval;
+
+            // update custom input
+            input.update();
 
             listenForCollectionInput();
             robot.update(dt);
@@ -92,7 +101,7 @@ public class Tele extends LinearOpMode {
         telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
         telemetry.addData("hinge servo position", robot.getCollector().getHingeServo().getPosition());
 
-        if (gamepad1.a) {
+        if (input.getGamepadTracker1().isFirstFrameA()) {
             // goes from in to search, then toggles between search and search and collect
             switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {
                 case IN:
@@ -104,7 +113,7 @@ public class Tele extends LinearOpMode {
                     break;
             }
         }
-        if (gamepad2.b) {
+        if (input.getGamepadTracker1().isFirstFrameB()) {
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
         }
     }

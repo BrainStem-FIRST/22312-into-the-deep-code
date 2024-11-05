@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Arm extends Subsystem {
     // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
@@ -23,8 +24,8 @@ public class Arm extends Subsystem {
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
 
-    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
+    public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
 
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));

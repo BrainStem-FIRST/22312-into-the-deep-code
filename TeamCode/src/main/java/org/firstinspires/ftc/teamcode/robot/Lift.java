@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
@@ -25,8 +26,8 @@ public class Lift extends Subsystem {
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
 
-    public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
+    public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -44,7 +45,7 @@ public class Lift extends Subsystem {
         transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);
     }
 

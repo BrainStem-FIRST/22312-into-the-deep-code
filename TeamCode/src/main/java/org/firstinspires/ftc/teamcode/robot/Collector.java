@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeUpState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -52,8 +53,8 @@ public class Collector extends Subsystem {
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private final BlockColorSensor blockColorSensor;
 
-    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
+    public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
         hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_UP_TICK, HINGE_DOWN_TICK));
@@ -77,7 +78,7 @@ public class Collector extends Subsystem {
         doneHingingUpState.addMotor(spindleMotor);
         stateManager.addState(StateType.DONE_HINGING_UP, doneHingingUpState);
 
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.READY_TO_HINGE_DOWN);
     }
 

@@ -5,12 +5,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.stateMachine.BaseState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public abstract class RobotState<StateType extends Enum<StateType>> extends BaseState<StateType> {
 
     protected BrainSTEMRobot robot;
-    protected Gamepad gamepad1;
-    protected Gamepad gamepad2;
+    protected Input input;
 
     public RobotState(StateType stateType) {
         super(stateType);
@@ -19,8 +19,7 @@ public abstract class RobotState<StateType extends Enum<StateType>> extends Base
     @Override
     public void setup(Object... args) {
         robot = (BrainSTEMRobot) args[0];
-        gamepad1 = (Gamepad) args[1];
-        gamepad2 = (Gamepad) args[2];
-        stateManager = (StateManager<StateType>) args[3];
+        input = (Input) args[1];
+        stateManager = (StateManager<StateType>) args[2];
     }
 }

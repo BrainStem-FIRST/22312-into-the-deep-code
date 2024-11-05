@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public abstract class Subsystem {
     public static void setMotorPosition(DcMotorEx motor, int position) {
@@ -24,16 +25,15 @@ public abstract class Subsystem {
     private final AllianceColor allianceColor;
     private final BrainSTEMRobot robot;
     private final BrainSTEMRobotAuto robotAuto;
-    private final Gamepad gamepad1, gamepad2;
+    private final Input input;
 
-    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
+    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
         this.hwMap = hwMap;
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.robot = robot;
         robotAuto = robot.getClass() == BrainSTEMRobotAuto.class ? (BrainSTEMRobotAuto) robot : null;
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+        this.input = input;
     }
     public AllianceColor getAllianceColor() {
         return allianceColor;
@@ -44,11 +44,8 @@ public abstract class Subsystem {
     public BrainSTEMRobotAuto getRobotAuto() {
         return robotAuto;
     }
-    public Gamepad getGamepad1() {
-        return gamepad1;
-    }
-    public Gamepad getGamepad2() {
-        return gamepad2;
+    public Input getInput() {
+        return input;
     }
     public abstract void update(double dt);
 }

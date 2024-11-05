@@ -7,11 +7,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class BrainSTEMRobot {
 
     public Telemetry telemetry;
-    public OpMode opMode;
     private final AllianceColor allianceColor;
 
     private final PIDDrivetrain driveTrain;
@@ -26,21 +26,20 @@ public class BrainSTEMRobot {
     private final LiftingSystem liftingSystem;
 
 
-    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, OpMode opMode, AllianceColor allianceColor) {
+    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, Input input, AllianceColor allianceColor) {
         this.telemetry = telemetry;
-        this.opMode = opMode;
         this.allianceColor = allianceColor;
 
         driveTrain = new PIDDrivetrain(hwMap, telemetry, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
-        collector = new Collector(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
-        extension = new Extension(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
-        collectingSystem = new CollectingSystem(this, opMode.gamepad1, opMode.gamepad2);
+        collector = new Collector(hwMap, telemetry, allianceColor, this, input);
+        extension = new Extension(hwMap, telemetry, allianceColor, this, input);
+        collectingSystem = new CollectingSystem(this, input);
 
-        grabber = new Grabber(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
-        arm = new Arm(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
-        lift = new Lift(hwMap, telemetry, allianceColor, this, opMode.gamepad1, opMode.gamepad2);
-        liftingSystem = new LiftingSystem(this, opMode.gamepad1, opMode.gamepad2);
+        grabber = new Grabber(hwMap, telemetry, allianceColor, this, input);
+        arm = new Arm(hwMap, telemetry, allianceColor, this, input);
+        lift = new Lift(hwMap, telemetry, allianceColor, this, input);
+        liftingSystem = new LiftingSystem(this, input);
     }
 
     public void setup() {
@@ -48,7 +47,7 @@ public class BrainSTEMRobot {
     }
 
     public void update(double dt) {
-        telemetry.addData("Extension motor current position", extension.extensionMotor.getCurrentPosition());
+        telemetry.addData("Extension motor current position", extension.getExtensionMotor().getCurrentPosition());
 
 
         collectingSystem.update(dt);

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -26,17 +28,22 @@ public class Extension extends Subsystem {
         IN, FINDING_BLOCK, RETRACTING
     }
 
-    public final DcMotorEx extensionMotor;
+    private final DcMotorEx extensionMotor;
+    private final DigitalChannel magnetResetSwitch;
+
 
     private final StateManager<StateType> stateManager;
 
-    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Gamepad gamepad1, Gamepad gamepad2) {
-        super(hwMap, telemetry, allianceColor, robot, gamepad1, gamepad2);
+    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, Input input) {
+        super(hwMap, telemetry, allianceColor, robot, input);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
+        magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         stateManager = new StateManager<>(StateType.IN);
 
@@ -44,7 +51,7 @@ public class Extension extends Subsystem {
         stateManager.addState(StateType.FINDING_BLOCK, new FindingBlock());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
-        stateManager.setupStates(robot, gamepad1, gamepad2, stateManager);
+        stateManager.setupStates(robot, input, stateManager);
         stateManager.tryEnterState(StateType.IN);
     }
 
@@ -61,10 +68,15 @@ public class Extension extends Subsystem {
     public void setExtensionMotorPower(double power) {
         Subsystem.setMotorPower(extensionMotor, power);
     }
+    public DigitalChannel getMagnetResetSwitch() {
+        return magnetResetSwitch;
+    }
 
     @Override
     public void update(double dt) {
-
+        // if the magnet switch detects the extension is close enough, it will reset its encoders
+        if (!magnetResetSwitch.getState())
+            extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         stateManager.update(dt);
     }
