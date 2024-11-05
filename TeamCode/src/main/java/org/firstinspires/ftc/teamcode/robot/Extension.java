@@ -39,8 +39,6 @@ public class Extension extends Subsystem {
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
-
-        setup();
     }
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot) {
         super(hwMap, telemetry, allianceColor, robot);

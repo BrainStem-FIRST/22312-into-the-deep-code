@@ -21,7 +21,7 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, this, AllianceColor.BLUE);
+        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.BLUE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();

@@ -30,8 +30,7 @@ public abstract class Auto extends LinearOpMode {
 
         waitForStart();
 
-        robot.
-        //robot.resetAllEncoders();
+        robot.resetAllEncoders();
         runAuto();
     }
 

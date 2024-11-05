@@ -37,16 +37,18 @@ public class Tele extends LinearOpMode {
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
-            telemetry.addData("a", gamepad1.a);
-            telemetry.addData("b", gamepad1.b);
-            telemetry.addData("y", gamepad1.y);
+            telemetry.addData("a: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameA() + " | downFrames " + input.getGamepadTracker1().getAFrameCount());
+            telemetry.addData("b: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameB() + " | downFrames " + input.getGamepadTracker1().getBFrameCount());
+            telemetry.addData("y: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameY() + " | downFrames " + input.getGamepadTracker1().getYFrameCount());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+            /*
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
+            */
 
             // update dt
             prevTime = currentTime;

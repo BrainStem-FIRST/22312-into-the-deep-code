@@ -18,8 +18,11 @@ public abstract class RobotState<StateType extends Enum<StateType>> extends Base
 
     @Override
     public void setup(Object... args) {
+        // Ensure exactly two parameters are passed
+        if (args.length != 2) {
+            throw new IllegalArgumentException("RobotState.setup() requires exactly two arguments.");
+        }
         robot = (BrainSTEMRobot) args[0];
-        input = (Input) args[1];
-        stateManager = (StateManager<StateType>) args[2];
+        stateManager = (StateManager<StateType>) args[1];
     }
 }
