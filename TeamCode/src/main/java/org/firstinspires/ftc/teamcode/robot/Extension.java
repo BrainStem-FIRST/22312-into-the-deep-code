@@ -23,6 +23,7 @@ public class Extension extends Subsystem {
     // TODO - implement magnet sensor and encoder reset
     public static final int RETRACTED_THRESHOLD = 30;
     public static final int EXTENDED_POSITION = 900;
+    public static final double RETRACT_POWER = -0.5;
 
     public enum StateType {
         IN, FINDING_BLOCK, RETRACTING
@@ -35,12 +36,9 @@ public class Extension extends Subsystem {
     private int targetPosition;
     private DcMotor.RunMode runMode;
 
-    private StateManager<StateType> stateManager;
+    private final StateManager<StateType> stateManager;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
-    }
-    public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot) {
         super(hwMap, telemetry, allianceColor, robot);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
@@ -59,6 +57,9 @@ public class Extension extends Subsystem {
 
         stateManager.setupStates(getRobot(), stateManager);
         stateManager.tryEnterState(StateType.IN);
+
+        // this is only for tele
+        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public StateManager<StateType> getStateManager() {
@@ -96,7 +97,6 @@ public class Extension extends Subsystem {
     public void setTargetPosition(int targetPosition) {
         this.targetPosition = targetPosition;
     }
-
 
     @Override
     public void update(double dt) {

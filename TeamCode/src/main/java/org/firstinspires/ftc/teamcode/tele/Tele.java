@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 
@@ -24,6 +25,7 @@ public class Tele extends LinearOpMode {
         input = new Input(gamepad1, gamepad2);
         robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, AllianceColor.BLUE);
 
+
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
         waitForStart();
@@ -40,9 +42,13 @@ public class Tele extends LinearOpMode {
             telemetry.addData("a: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameA() + " | downFrames " + input.getGamepadTracker1().getAFrameCount());
             telemetry.addData("b: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameB() + " | downFrames " + input.getGamepadTracker1().getBFrameCount());
             telemetry.addData("y: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameY() + " | downFrames " + input.getGamepadTracker1().getYFrameCount());
+            telemetry.addData("left stick y", gamepad1.left_stick_y);
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+            telemetry.addData("block color frame", ((CollectState) robot.getCollector().getStateManager().getState(Collector.StateType.COLLECTING)).blockColorFrame);
+            telemetry.addData("block sensor color", robot.getCollector().getBlockColorSensor().getBlockColor());
+
             /*
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
@@ -63,7 +69,7 @@ public class Tele extends LinearOpMode {
             // update custom input
             input.update();
 
-            listenForCollectionInput();
+            listenForRobotControls();
             robot.update(dt);
             telemetry.update();
         }
@@ -71,7 +77,7 @@ public class Tele extends LinearOpMode {
 
     private void listenForRobotControls() {
         telemetry.addData("inside listen for robot controls", "");
-        //listenForDriveTrainInput();
+        listenForDriveTrainInput();
         listenForCollectionInput();
     }
 
@@ -83,11 +89,12 @@ public class Tele extends LinearOpMode {
         double rightStickX;
         double threshold = 0.1F;
         if (Math.abs(gamepad1.right_stick_x) > threshold) {
-            if (gamepad1.right_stick_x < 0) {
+            /*if (gamepad1.right_stick_x < 0) {
                 rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * -1 * (4.0 / 5.0) - (1.0 / 5.0));
             } else {
                 rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * (4.0 / 5.0) + (1.0 / 5.0));
-            }
+            }*/
+            rightStickX = 0;
         } else {
             rightStickX = 0;
         }
@@ -111,19 +118,26 @@ public class Tele extends LinearOpMode {
             // goes from in to search, then toggles between search and search and collect
             switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {
                 case IN:
-                case SEARCH_AND_COLLECT:
                     robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
                     break;
                 case SEARCH:
                     robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
                     break;
+                case SEARCH_AND_COLLECT:
+                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+                    break;
             }
         }
         if (input.getGamepadTracker1().isFirstFrameB()) {
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+            // if the collector is collecting, spit
+            if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+                robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
+            // if the collector is doing nothing, retract
+            else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
         }
 
         // update extension target power (how fast it moves)
-        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().left_stick_y);
+        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().right_stick_y * 0.3);
     }
 }

@@ -35,13 +35,13 @@ public class Collector extends Subsystem {
 
     // store the absolute bounds for the servo (just in case)
     public static final int MAX_TICK = 2500, MIN_TICK = 100;
-    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1236;
+    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1336;
 
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
 
     // number of seconds to spit for
     // actual variable tracking time is stored in BaseState class and used in SpitState class
-    public static final double SPITTING_TIME = 0.8;
+    public static final double SPITTING_TIME = 3;
 
     public enum StateType {
         READY_TO_HINGE_DOWN, HINGE_DOWN, COLLECTING, SPITTING, HINGE_UP, DONE_HINGING_UP
@@ -52,7 +52,7 @@ public class Collector extends Subsystem {
     private DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
-    private BlockColorSensor blockColorSensor;
+    private final BlockColorSensor blockColorSensor;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -87,7 +87,7 @@ public class Collector extends Subsystem {
         return stateManager;
     }
 
-    public BlockColorSensor getColorSensor() {
+    public BlockColorSensor getBlockColorSensor() {
         return blockColorSensor;
     }
     public DcMotorEx getSpindleMotor() { return spindleMotor; }

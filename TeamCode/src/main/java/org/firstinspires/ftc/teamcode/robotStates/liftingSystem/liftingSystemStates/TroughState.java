@@ -47,6 +47,6 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // if block is yellow, transition to basket, and if block is alliance color then transition to drop off to human player
-        return robot.getCollector().getColorSensor().getBlockColor() == BlockColorSensor.BlockColor.YELLOW ? LiftingSystem.StateType.TROUGH_TO_BASKET : LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColorSensor.BlockColor.YELLOW ? LiftingSystem.StateType.TROUGH_TO_BASKET : LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
     }
 }

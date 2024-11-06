@@ -11,6 +11,7 @@ public abstract class RobotState<StateType extends Enum<StateType>> extends Base
 
     protected BrainSTEMRobot robot;
     protected Input input;
+    protected StateManager<StateType> stateManager;
 
     public RobotState(StateType stateType) {
         super(stateType);

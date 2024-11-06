@@ -7,13 +7,24 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class CollectState extends RobotState<Collector.StateType> {
 
+    public static int BLOCK_COLOR_VALIDATION_FRAMES = 30;
+
+    // how many frames the collector has had the block with the same color (to reduce noise)
+    public int blockColorFrame;
     public CollectState() {
+
         super(Collector.StateType.COLLECTING);
+        blockColorFrame = 0;
     }
 
     @Override
     public void execute() {
         robot.getCollector().setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+
+        if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColorSensor.BlockColor.NONE)
+            blockColorFrame = 0;
+        else
+            blockColorFrame++;
     }
 
     @Override
@@ -30,15 +41,14 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return time > 5;
-        //return robot.getCollector().getColorSensor().getBlockColor() != BlockColorSensor.BlockColor.NONE;
+        return robot.getCollector().getBlockColorSensor().getBlockColor() != BlockColorSensor.BlockColor.NONE &&
+                blockColorFrame >= BLOCK_COLOR_VALIDATION_FRAMES;
     }
 
     @Override
     public Collector.StateType getNextStateType() {
-        //if (robot.getCollector().hasValidBlockColor())
-        //    return Collector.StateType.HINGE_UP;
-        //return Collector.StateType.SPITTING;
-        return Collector.StateType.HINGE_UP;
+        if (robot.getCollector().hasValidBlockColor())
+            return Collector.StateType.HINGE_UP;
+        return Collector.StateType.SPITTING;
     }
 }

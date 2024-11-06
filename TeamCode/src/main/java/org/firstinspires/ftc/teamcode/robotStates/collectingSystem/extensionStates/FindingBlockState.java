@@ -13,6 +13,8 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
+        robot.telemetry.addData("extension run mode", robot.getExtension().getRunMode());
+        robot.telemetry.addData("extension target power", robot.getExtension().getTargetPower());
         // move extension
         if (robot.getExtension().getRunMode() == DcMotor.RunMode.RUN_TO_POSITION)
             robot.getExtension().setExtensionMotorPosition(robot.getExtension().getTargetPosition());

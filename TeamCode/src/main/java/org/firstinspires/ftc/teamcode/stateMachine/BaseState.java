@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 public abstract class BaseState<StateType extends Enum<StateType>> implements State<StateType> {
 
     protected StateType stateType;
-    protected StateManager<StateType> stateManager;
     protected double time;
 
     public BaseState(StateType stateType) {

@@ -10,7 +10,7 @@ public class InState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-
+        robot.getExtension().setExtensionMotorPower(0);
     }
 
     @Override

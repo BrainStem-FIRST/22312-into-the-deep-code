@@ -11,7 +11,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        robot.getExtension().setExtensionMotorPosition(Extension.RETRACTED_POSITION);
+        robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER);
     }
 
     @Override

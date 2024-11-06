@@ -20,13 +20,13 @@ public class BrainSTEMRobot {
     private final PinpointDrive driveTrain;
 
     public Extension extension;
-    private Collector collector;
-    private CollectingSystem collectingSystem;
+    private final Collector collector;
+    private final CollectingSystem collectingSystem;
 
-    private Grabber grabber;
-    private Arm arm;
-    private Lift lift;
-    private LiftingSystem liftingSystem;
+    private final Grabber grabber;
+    private final Arm arm;
+    private final Lift lift;
+    private final LiftingSystem liftingSystem;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {

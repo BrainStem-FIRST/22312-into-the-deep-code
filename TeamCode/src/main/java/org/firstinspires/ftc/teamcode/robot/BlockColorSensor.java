@@ -20,7 +20,7 @@ public class BlockColorSensor {
     public static final Double[] RED_BLOCK_PERCENTS = { 54.7, 28.45, 16.8 };
     public static final Double RED_BLOCK_THRESHOLD = 6.;
     public static final Double[] BLUE_BLOCK_PERCENTS = { 9.58, 23.00, 67.45 };
-    public static final Double BLUE_BLOCK_THRESHOLD = 0.24;
+    public static final Double BLUE_BLOCK_THRESHOLD = 2.;
     public static final Double[] YELLOW_BLOCK_PERCENTS = { 34.30, 52.7, 12.95 };
     public static final Double YELLOW_BLOCK_THRESHOLD = 2.;
 
@@ -83,15 +83,15 @@ public class BlockColorSensor {
         double gPercent = green * 100. / sum;
         double bPercent = blue * 100. / sum;
 
-        telemetry.addData("red color percent", rPercent);
-        telemetry.addData("green color percent", gPercent);
-        telemetry.addData("blue color percent", bPercent);
+        //telemetry.addData("red color percent", rPercent);
+        //telemetry.addData("green color percent", gPercent);
+        //telemetry.addData("blue color percent", bPercent);
 
         return colorPercentInRange(rPercent, Objects.requireNonNull(BLOCK_PERCENTS.get(blockColor))[0], BLOCK_THRESHOLDS.get(blockColor)) &&
                 colorPercentInRange(gPercent, Objects.requireNonNull(BLOCK_PERCENTS.get(blockColor))[1], BLOCK_THRESHOLDS.get(blockColor)) &&
                 colorPercentInRange(bPercent, Objects.requireNonNull(BLOCK_PERCENTS.get(blockColor))[2], BLOCK_THRESHOLDS.get(blockColor));
     }
-    private boolean colorPercentInRange(double percent, double target, double threshold) {
-        return Math.abs(target - percent) > threshold;
+    private boolean colorPercentInRange(double value, double target, double threshold) {
+        return Math.abs(target - value) < threshold;
     }
 }
