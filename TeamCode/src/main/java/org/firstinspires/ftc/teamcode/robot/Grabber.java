@@ -17,7 +17,6 @@ public class Grabber extends Subsystem {
     public static final double CLOSE_POSITION = 0, OPEN_POSITION = 1;
     public static final double DESTINATION_THRESHOLD = 0.1;
     private boolean hasBlock = false, hasSpecimen = false;
-    private BlockColor blockColorHeld = BlockColor.NONE;
     public enum StateType {
         OPEN, OPENING, CLOSED, CLOSING
     }
@@ -62,11 +61,5 @@ public class Grabber extends Subsystem {
     }
     public void setHasSpecimen(boolean hasSpecimen) {
         this.hasSpecimen = hasSpecimen;
-    }
-    public void setBlockColorHeld(BlockColor blockColor) {
-        this.blockColorHeld = blockColor;
-    }
-    public BlockColor getBlockColorHeld() {
-        return blockColorHeld;
     }
 }

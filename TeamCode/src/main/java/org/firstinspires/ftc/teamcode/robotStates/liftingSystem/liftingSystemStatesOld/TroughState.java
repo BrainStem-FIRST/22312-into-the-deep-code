@@ -25,6 +25,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // waiting for grabber to close on block before raising lift
         else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
             robot.getGrabber().setHasBlock(true); 
+            //TODO: fix this, not sure if collector actually has block color correctly
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
     }
@@ -32,7 +33,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean canEnter() {
         // lift must properly be lowered and set before entering
-        return robot.getLiftingSystem.getStateManager.getActiveStateType == LiftingSystem.StateType.TO_TROUGH_TRANSITION;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH &&
+                robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN &&
+                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN;
     }
 
     // only can be overridden if grabber is not closing in on block
