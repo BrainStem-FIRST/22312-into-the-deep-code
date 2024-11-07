@@ -14,20 +14,29 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class ExtensionAuto extends Extension {
 
-    // TODO - find position for extension to go to (to pickup yellow)
-    public static final int AUTO_THRESHOLD = 5;
-    public static final int YELLOW_PICKUP_TICK = 1000;
     public ExtensionAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
     }
 
-    public Action extendForYellow() {
+    public Action extendAction(int targetPosition) {
         return new Action() {
-
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setExtensionMotorPosition(YELLOW_PICKUP_TICK);
-                return Math.abs(getExtensionMotor().getCurrentPosition() - YELLOW_PICKUP_TICK) < AUTO_THRESHOLD;
+                setExtensionMotorPosition(targetPosition);
+                return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > Extension.RETRACTED_THRESHOLD;
+            }
+        };
+    }
+    public Action retractAction() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setExtensionMotorPower(Extension.RETRACT_POWER);
+                if (!magnetResetSwitch.getState()) {
+                    setExtensionMotorPower(0);
+                    return false;
+                }
+                return true;
             }
         };
     }

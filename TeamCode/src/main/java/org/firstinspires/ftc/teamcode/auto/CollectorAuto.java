@@ -24,4 +24,14 @@ public class CollectorAuto extends Collector {
     public CollectorAuto(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobotAuto robot) {
         super(hwMap, telemetry, allianceColor, robot);
     }
+
+    public Action hingeAction(int hingeTick) {
+        return new Action() {
+            @Override
+            public boolean run() {
+                setHingeServoPosition(Collector.HINGE_UP_POSITION);
+                return Math.abs(getHingeServo().getPosition() - Collector.HINGE_UP_POSITION) < Collector.HINGE_THRESHOLD;
+            }
+        };
+    }
 }
