@@ -26,7 +26,7 @@ public class Lift extends Subsystem {
 
     public static final int DESTINATION_THRESHOLD = 50;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_AREA, LOW_RAM_BEFORE, LOW_RAM_AFTER, HIGH_RAM_BEFORE, HIGH_RAM_AFTER, LOW_BASKET, HIGH_BASKET, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -48,32 +48,20 @@ public class Lift extends Subsystem {
         stateManager.addState(StateType.TROUGH_SAFETY, troughSafetyState);
 
         NothingState<StateType> dropAreaState = new NothingState<>(StateType.DROP_AREA);
-        dropOffState.addMotor(liftMotor);
+        dropAreaState.addMotor(liftMotor);
         stateManager.addState(StateType.DROP_AREA, dropAreaState);
 
-        NothingState<StateType> lowRamBeforeState = new NothingState<>(StateType.LOW_RAM_BEFORE);
+        NothingState<StateType> ramBeforeState = new NothingState<>(StateType.RAM_BEFORE);
         ramBeforeState.addMotor(liftMotor);
-        stateManager.addState(StateType.LOW_RAM_BEFORE, lowRamBeforeState);
+        stateManager.addState(StateType.RAM_BEFORE, ramBeforeState);
 
-        NothingState<StateType> lowRamAfterState = new NothingState<>(StateType.LOW_RAM_AFTER);
+        NothingState<StateType> ramAfterState = new NothingState<>(StateType.RAM_AFTER);
         ramAfterState.addMotor(liftMotor);
-        stateManager.addState(StateType.LOW_RAM_AFTER, lowRamAfterState);
-        
-        NothingState<StateType> highRamBeforeState = new NothingState<>(StateType.HIGH_RAM_BEFORE);
-        ramBeforeState.addMotor(liftMotor);
-        stateManager.addState(StateType.HIGH_RAM_BEFORE, highRamBeforeState);
+        stateManager.addState(StateType.RAM_AFTER, ramAfterState);
 
-        NothingState<StateType> highRamAfterState = new NothingState<>(StateType.HIGH_RAM_AFTER);
-        ramAfterState.addMotor(liftMotor);
-        stateManager.addState(StateType.HIGH_RAM_AFTER, highRamAfterState);
-
-        NothingState<StateType> lowBasketState = new NothingState<>(StateType.LOW_BASKET);
+        NothingState<StateType> basketState = new NothingState<>(StateType.BASKET_DEPOSIT);
         basketState.addMotor(liftMotor);
-        stateManager.addState(StateType.LOW_BASKET, lowBasketState);
-
-        NothingState<StateType> highBasketState = new NothingState<>(StateType.HIGH_BASKET);
-        basketState.addMotor(liftMotor);
-        stateManager.addState(StateType.HIGH_BASKET, highBasketState);
+        stateManager.addState(StateType.BASKET_DEPOSIT, basketState);
 
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, this.transitionState);

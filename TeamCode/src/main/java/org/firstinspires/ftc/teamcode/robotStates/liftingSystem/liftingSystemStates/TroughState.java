@@ -32,7 +32,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean canEnter() {
         // lift must properly be lowered and set before entering
-        return robot.getLiftingSystem.getStateManager.getActiveStateType == LiftingSystem.StateType.TO_TROUGH_TRANSITION;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TO_TROUGH_TRANSITION;
     }
 
     // only can be overridden if grabber is not closing in on block
@@ -49,8 +49,8 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // if block is yellow, transition to basket, and if block is alliance color then transition to drop off to human player
-        if(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
-            return LiftingSystem.StateType.TROUGH_TO_BASKET;
+        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+            return LiftingSystem.StateType.TO_BASKET_TRANSITION;
         else
             return LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
     }

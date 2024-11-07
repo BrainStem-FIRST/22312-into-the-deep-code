@@ -11,7 +11,6 @@ public class BrainSTEMRobot {
 
     public Telemetry telemetry;
     private final AllianceColor allianceColor;
-
     private final PinpointDrive driveTrain;
 
     public Extension extension;
@@ -22,6 +21,9 @@ public class BrainSTEMRobot {
     private final Arm arm;
     private final Lift lift;
     private final LiftingSystem liftingSystem;
+    private BlockColor blockColorHeld;
+    private boolean isHighDeposit = true;
+    private boolean isHighRam = true;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -38,6 +40,8 @@ public class BrainSTEMRobot {
         arm = new Arm(hwMap, telemetry, allianceColor, this);
         lift = new Lift(hwMap, telemetry, allianceColor, this);
         liftingSystem = new LiftingSystem(this);
+
+        blockColorHeld = BlockColor.NONE;
     }
 
     public void setup() {
@@ -102,5 +106,24 @@ public class BrainSTEMRobot {
     }
     public LiftingSystem getLiftingSystem() {
         return liftingSystem;
+    }
+
+    public BlockColor getBlockColorHeld() {
+        return blockColorHeld;
+    }
+    public void setBlockColorHeld(BlockColor blockColorHeld) {
+        this.blockColorHeld = blockColorHeld;
+    }
+    public boolean isHighDeposit() {
+        return isHighDeposit;
+    }
+    public void setIsHighDeposit(boolean isHighDeposit) {
+        this.isHighDeposit = isHighDeposit;
+    }
+    public boolean isHighRam() {
+        return isHighRam;
+    }
+    public void setIsHighRam(boolean isHighRam) {
+        this.isHighRam = isHighRam;
     }
 }

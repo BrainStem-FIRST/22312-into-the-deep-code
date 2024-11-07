@@ -4,15 +4,11 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.robot.Lift;
 
-public class ServoTransitionState<StateType extends Enum<StateType>> extends RobotState<StateType> {
-    private double goalPosition;
-    private StateType goalStateType;
+public class ServoTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final ServoImplEx servo;
-    public final double DESTINATION_THRESHOLD;
-    public ServoTransitionState(StateType transition, ServoImplEx servo, double DESTINATION_THRESHOLD) {
-        super(transition);
+    public ServoTransitionState(StateType stateType, ServoImplEx servo, double DESTINATION_THRESHOLD) {
+        super(stateType, DESTINATION_THRESHOLD);
         this.servo = servo;
-        this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
     }
     @Override
     public void execute() {
@@ -37,10 +33,5 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Rob
     @Override
     public StateType getNextStateType() {
         return goalStateType;
-    }
-    public void setGoalState(double goalPosition, StateType goalStateType) {
-        this.goalPosition = goalPosition;
-        this.goalStateType = goalStateType;
-        stateManager.tryEnterState(stateType);
     }
 }

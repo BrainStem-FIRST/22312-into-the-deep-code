@@ -17,6 +17,9 @@ public abstract class BaseState<StateType extends Enum<StateType>> implements St
         return "BaseState(" + stateType + " | " + "time:" + time + ")";
     }
 
+    public double getTime() {
+        return time;
+    }
     public void resetTime() {
         time = 0;
     }

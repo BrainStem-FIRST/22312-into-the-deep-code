@@ -31,11 +31,11 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class Collector extends Subsystem {
 
-    public static final double MAX_SPIN_POWER = 0.8;
+    public static final double MAX_SPIN_POWER = 1;
 
     // store the absolute bounds for the servo (just in case)
     public static final int MAX_TICK = 2500, MIN_TICK = 100;
-    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1636;
+    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1726;
 
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
 

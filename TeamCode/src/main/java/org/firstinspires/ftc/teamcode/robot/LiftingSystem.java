@@ -1,25 +1,15 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.BasketDepositState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.BasketToTroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.DropAreaState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.DropAreaToRamState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.RamToTroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.SpecimenRamState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.TroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.TroughToBasketState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.TroughToDropAreaState;
+import org.firstinspires.ftc.teamcode.robotStates.NothingState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
-        TROUGH, TO_TROUGH_TRANSITION, 
-        BASKET_DEPOSIT, TO_BASKET_TRANSITION, // depositing block in basket
-        TROUGH_TO_DROP_AREA, DROP_AREA, TO_RAM_TRANSITION, SPECIMEN_RAM // ramming specimen on bar
+        TROUGH,
+        TROUGH_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
+        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
     private final StateManager<StateType> stateManager;
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -28,7 +18,14 @@ public class LiftingSystem {
         stateManager = new StateManager<>(StateType.TROUGH);
 
         stateManager.addState(StateType.TROUGH, new TroughState());
-        stateManager.addState(StateType.TO_TROUGH_TRANSITION, new ToTroughTransitionState());
+        stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState(Lift.DESTINATION_THRESHOLD));
+        stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
+        stateManager.addState(StateType.BASKET_TO_TROUGH, new BasketToTroughState());
+        stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
+        stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
+        stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
+        stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
+        stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState<>());
 
         stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);

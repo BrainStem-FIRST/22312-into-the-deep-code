@@ -10,9 +10,15 @@ public class SpitState extends RobotState<Collector.StateType> {
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_TIME = 1;
     private double startTime;
+    private boolean useSafety;
     public SpitState() {
         super(Collector.StateType.SPITTING);
         startTime = 0;
+        useSafety = true;
+    }
+
+    public void useSafety(boolean hasSafety) {
+        useSafety = hasSafety;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return time - startTime >= SAFETY_TIME;
+        return time - startTime >= SAFETY_TIME || !useSafety && startTime != 0;
     }
 
     @Override

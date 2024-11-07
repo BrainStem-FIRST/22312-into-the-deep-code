@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
+import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
@@ -84,11 +85,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-            telemetry.addData("hinge servo target position", robot.getCollector().getHingeServo().getPosition());
-            telemetry.addData("color frame", ((CollectState) robot.getCollector().getStateManager().getState(Collector.StateType.COLLECTING)).blockColorFrame);
-            telemetry.addData("color", robot.getCollector().getBlockColorSensor().getBlockColor() + "| valid: " + robot.getCollector().hasValidBlockColor());hasHingedDown = robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_DOWN;
-            telemetry.addData("has hinged down", hasHingedDown);
-            telemetry.addData("has hinged up", hasHingedUp);
+            telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
             telemetry.update();
         }
     }
@@ -97,6 +94,7 @@ public class Tele extends LinearOpMode {
         telemetry.addData("inside listen for robot controls", "");
         listenForDriveTrainInput();
         listenForCollectionInput();
+        listenForLiftingInput();
     }
 
     // without roadrunner
@@ -107,12 +105,12 @@ public class Tele extends LinearOpMode {
         double rightStickX;
         double threshold = 0.1F;
         if (Math.abs(gamepad1.right_stick_x) > threshold) {
-            /*if (gamepad1.right_stick_x < 0) {
+            if (gamepad1.right_stick_x < 0) {
                 rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * -1 * (4.0 / 5.0) - (1.0 / 5.0));
-            } else {
+            }
+            else {
                 rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * (4.0 / 5.0) + (1.0 / 5.0));
-            }*/
-            rightStickX = 0;
+            }
         } else {
             rightStickX = 0;
         }
@@ -157,21 +155,57 @@ public class Tele extends LinearOpMode {
 
             // hinge up and stop collecting
             else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
         }
+
+        // left trigger retracts
+        if (input.getGamepadTracker1().isFirstFrameLeftTrigger())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+
+        // force spit in case block gets stuck
+        if (input.getGamepadTracker2().isDpadDownPressed())
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
+
+        // force retraction for emergencies
+        if (input.getGamepadTracker2().isDpadUpPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
 
     private void listenForLiftingInput() {
+        // checking changes in basket/bar heights
+        if(input.getGamepadTracker2().isLeftBumperPressed())
+            robot.setIsHighDeposit(true);
+        if(input.getGamepadTracker2().isLeftTriggerPressed())
+            robot.setIsHighDeposit(false);
+        if(input.getGamepadTracker2().isRightBumperPressed())
+            robot.setIsHighRam(true);
+        if(input.getGamepadTracker2().isLeftBumperPressed())
+            robot.setIsHighRam(false);
+
         if(input.getGamepadTracker1().isFirstFrameA()) {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getBlockColorHeld() == BlockColor.YELLOW)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                     else if(robot.getBlockColorHeld() == BlockColor.BLUE)
-                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA);
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
-                case LOW_BASKET:
+                case BASKET_DEPOSIT:
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                    break;
+                case DROP_AREA:
+                    if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+                        robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                        robot.getGrabber().setHasBlock(false);
+                    }
+                    else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+                        robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
+                        robot.getGrabber().setHasSpecimen(true);
+                    }
+                    break;
+                case SPECIMEN_RAM:
+                    robot.getLift().getStateManager().tryEnterState(Lift.StateType.RAM_AFTER);
+                    break;
             }
         }
     }

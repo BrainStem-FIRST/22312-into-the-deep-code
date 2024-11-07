@@ -1,0 +1,51 @@
+package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
+
+import org.firstinspires.ftc.teamcode.robot.Arm;
+import org.firstinspires.ftc.teamcode.robot.Lift;
+import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robotStates.TransitionState;
+
+// should only be called when lift is in trough position
+public class TroughToBasketState extends TransitionState<LiftingSystem.StateType> {
+    public TroughToBasketState(int DESTINATION_THRESHOLD) {
+        super(LiftingSystem.StateType.TROUGH_TO_BASKET, DESTINATION_THRESHOLD);
+    }
+    @Override
+    public void execute() {
+        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN)
+            robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);
+
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP)
+
+            // only want to set lift state to be in transition if in trough
+            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+                if(robot.isHighDeposit())
+                    robot.getLift().getTransitionState().setGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+                else
+                    robot.getLift().getTransitionState().setGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+
+            // moving arm down after lift reach desired basket height
+            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
+                robot.getArm().getTransitionState().setGoalState(Arm.LEFT_POS, Arm.StateType.LEFT);
+    }
+
+    @Override
+    public boolean canEnter() {
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH;
+    }
+
+    @Override
+    public boolean canBeOverridden() {
+        return false;
+    }
+
+    @Override
+    public boolean isDone() {
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT;
+    }
+
+    @Override
+    public LiftingSystem.StateType getNextStateType() {
+        return LiftingSystem.StateType.BASKET_DEPOSIT;
+    }
+}

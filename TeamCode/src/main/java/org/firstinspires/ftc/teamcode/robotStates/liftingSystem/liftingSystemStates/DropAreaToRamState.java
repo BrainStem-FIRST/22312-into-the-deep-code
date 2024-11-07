@@ -9,15 +9,20 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
     public DropAreaToRamState() {
         super(LiftingSystem.StateType.DROP_AREA_TO_RAM);
     }
+
     @Override
     public void execute() {
-        robot.getArm().getTransitionState().setGoalState(Arm.RIGHT_POS, Arm.StateType.RIGHT);
-        robot.getLift().getTransitionState().setGoalState(Lift.RAM_BEFORE_POS, Lift.StateType.RAM_BEFORE);
+        robot.getArm().getStateManager().tryEnterState(Arm.StateType.RIGHT);
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA)
+            if(robot.isHighRam())
+                robot.getLift().getTransitionState().setGoalState(Lift.HIGH_RAM_BEFORE_POS, Lift.StateType.RAM_BEFORE);
+            else
+                robot.getLift().getTransitionState().setGoalState(Lift.LOW_RAM_BEFORE_POS, Lift.StateType.RAM_BEFORE);
     }
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA;
+        return false;
     }
 
     @Override
@@ -27,13 +32,11 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        // done when arm along hard stop and lift in position below bar
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.RIGHT &&
-                robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE;
+        return false;
     }
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
-        return LiftingSystem.StateType.SPECIMEN_RAM;
+        return null;
     }
 }

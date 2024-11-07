@@ -11,8 +11,14 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getArm().getTransitionState().setGoalState(Arm.LEFT_POS, Arm.StateType.LEFT);
-        robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_OFF);
+        // if lift in safety pos
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+            // moving arm from down to left
+            if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN)
+                robot.getArm().getTransitionState().setGoalState(Arm.LEFT_POS, Arm.StateType.LEFT);
+            // moving lift to drop area once arm is done
+            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
+                robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.TROUGH);
     }
 
     @Override
@@ -27,8 +33,8 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT &&
-                robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_OFF;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH &&
+                robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT;
     }
 
     @Override
