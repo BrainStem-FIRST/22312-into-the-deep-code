@@ -38,6 +38,7 @@ public class Collector extends Subsystem {
     public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1726;
 
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
+    public static double HINGE_DOWN_TIME = 0.7, HINGE_UP_TIME = 0.85;
 
     // number of seconds to spit for
     public static final double SPITTING_TIME = 1;

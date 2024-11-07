@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.robotAuto;
 
 import com.acmerobotics.roadrunner.Action;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;

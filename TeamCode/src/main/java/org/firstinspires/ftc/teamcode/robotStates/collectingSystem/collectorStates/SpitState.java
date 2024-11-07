@@ -23,9 +23,16 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
+
+        // if the color sensor detects the wrong block color, there will be a safety
+        // if the user forces spitting, there the controls in tele will override this, meaning there will be no safety
+        if (isFirstTime())
+            useSafety(true);
+
+        // spit
         robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
 
-        // get the starting time
+        // get the starting time to track safety
         if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)
             startTime = time;
     }

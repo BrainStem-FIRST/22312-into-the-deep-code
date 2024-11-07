@@ -5,7 +5,6 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class HingeDownState extends RobotState<Collector.StateType> {
 
-    public static double HINGE_DOWN_TIME = 1;
     public HingeDownState() {
         super(Collector.StateType.HINGE_DOWN);
     }
@@ -28,7 +27,7 @@ public class HingeDownState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return time > HINGE_DOWN_TIME;
+        return time > Collector.HINGE_DOWN_TIME;
         //return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_DOWN_POSITION) < Collector.HINGE_THRESHOLD;
     }
 

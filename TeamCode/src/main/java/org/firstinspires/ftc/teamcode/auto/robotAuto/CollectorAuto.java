@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.robotAuto;
 
 import androidx.annotation.NonNull;
 
@@ -25,12 +25,21 @@ public class CollectorAuto extends Collector {
         super(hwMap, telemetry, allianceColor, robot);
     }
 
-    public Action hingeAction(int hingeTick) {
-        return new Action() {
+    public Action hingeUpAction() {
+        return new TimedAction() {
             @Override
             public boolean run() {
                 setHingeServoPosition(Collector.HINGE_UP_POSITION);
-                return Math.abs(getHingeServo().getPosition() - Collector.HINGE_UP_POSITION) < Collector.HINGE_THRESHOLD;
+                return getTime() >= Collector.HINGE_UP_TIME;
+            }
+        };
+    }
+    public Action hingeDownAction() {
+        return new TimedAction() {
+            @Override
+            public boolean run() {
+                setHingeServoPosition(Collector.HINGE_DOWN_POSITION);
+                return getTime() >= Collector.HINGE_DOWN_TIME;
             }
         };
     }

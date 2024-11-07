@@ -163,8 +163,10 @@ public class Tele extends LinearOpMode {
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck
-        if (input.getGamepadTracker2().isDpadDownPressed())
+        if (input.getGamepadTracker2().isDpadDownPressed()) {
+            robot.getCollector.getStateManager().getActiveState(Collector.SPITTING).useSafety(false);
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
+        }
 
         // force retraction for emergencies
         if (input.getGamepadTracker2().isDpadUpPressed())
