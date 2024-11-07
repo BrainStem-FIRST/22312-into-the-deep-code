@@ -11,11 +11,16 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
-    public static final int TROUGH_POS = 5,
-        DROP_AREA_POS = 10,
-        RAM_BEFORE_POS = 15,
-        RAM_AFTER_POS = 20,
-        BASKET_POS = 25,
+    // TODO: find actual encoder positions for each state
+    public static final int MAX_POS = 3050,
+        TROUGH_POS = 0,
+        DROP_AREA_POS = 0,
+        LOW_RAM_BEFORE_POS = 320,
+        LOW_RAM_AFTER_POS = 565,
+        HIGH_RAM_BEFORE_POS = 1500,
+        HIGH_RAM_AFTER_POS = 1700,
+        LOW_BASKET_POS = 1700,
+        HIGH_BASKET_POS = 3040,
         TROUGH_SAFETY_POS = 7, // position where arm can safely raise without colliding with collector
         BASKET_SAFETY_POS = 23; // position where arm can safely lower without colliding with basket
     public static final int DESTINATION_THRESHOLD = 5;

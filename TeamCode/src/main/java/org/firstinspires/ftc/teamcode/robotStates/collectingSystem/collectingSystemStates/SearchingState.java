@@ -17,8 +17,7 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == CollectingSystem.StateType.IN ||
-                stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT;
+        return stateManager.getActiveStateType() == CollectingSystem.StateType.IN;
     }
 
     @Override

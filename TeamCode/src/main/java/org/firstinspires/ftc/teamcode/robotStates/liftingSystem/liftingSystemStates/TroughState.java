@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BlockColorSensor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -8,7 +9,10 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
+import kotlin.contracts.Returns;
+
 public class TroughState extends RobotState<LiftingSystem.StateType> {
+    BlockColor colorAtStart = BlockColor.NONE;
     public TroughState() {
         super(LiftingSystem.StateType.TROUGH);
     }
@@ -16,8 +20,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         // waiting for collection system to finish in taking block before grabbing onto it
         if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
-                robot.getCollector().hasValidBlockColor())
+                robot.getCollector().hasValidBlockColor()) {
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
+            colorAtStart = robot.getCollector().getBlockColorSensor().getBlockColor();
+        }
         // waiting for grabber to close on block before raising lift
         else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
             robot.getGrabber().setHasBlock(true);
@@ -47,6 +53,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // if block is yellow, transition to basket, and if block is alliance color then transition to drop off to human player
-        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColorSensor.BlockColor.YELLOW ? LiftingSystem.StateType.TROUGH_TO_BASKET : LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        if(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
+            return LiftingSystem.StateType.TROUGH_TO_BASKET;
+        else
+            return LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
     }
 }

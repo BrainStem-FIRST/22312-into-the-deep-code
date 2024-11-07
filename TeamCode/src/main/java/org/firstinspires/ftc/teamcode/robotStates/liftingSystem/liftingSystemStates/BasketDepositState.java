@@ -9,12 +9,7 @@ public class BasketDepositState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.BASKET_DEPOSIT);
     }
     @Override
-    public void execute() {
-        if(input.getGamepadTracker1().isBPressed()) {
-            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
-            robot.getGrabber().setHasBlock(false);
-        }
-    }
+    public void execute() {}
 
     @Override
     public boolean canEnter() {

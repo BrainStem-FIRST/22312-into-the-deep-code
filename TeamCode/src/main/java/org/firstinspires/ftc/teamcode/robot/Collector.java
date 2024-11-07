@@ -31,20 +31,24 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class Collector extends Subsystem {
 
-    public static final double MAX_SPIN_POWER = 1, HOLD_SPIN_POWER = 0.3;
+    public static final double MAX_SPIN_POWER = 0.8;
 
     // store the absolute bounds for the servo (just in case)
     public static final int MAX_TICK = 2500, MIN_TICK = 100;
-    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1336;
+    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1636;
 
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
 
     // number of seconds to spit for
-    // actual variable tracking time is stored in BaseState class and used in SpitState class
-    public static final double SPITTING_TIME = 3;
+    public static final double SPITTING_TIME = 1;
 
     public enum StateType {
-        READY_TO_HINGE_DOWN, HINGE_DOWN, COLLECTING, SPITTING, HINGE_UP, DONE_HINGING_UP
+        READY_TO_HINGE_DOWN,
+        HINGE_DOWN,
+        COLLECTING,
+        SPITTING,
+        HINGE_UP,
+        DONE_HINGING_UP
     }
 
     private StateManager<StateType> stateManager;
@@ -105,9 +109,9 @@ public class Collector extends Subsystem {
         stateManager.update(dt);
     }
     public boolean hasValidBlockColor() {
-        return blockColorSensor.getBlockColor() == BlockColorSensor.BlockColor.YELLOW ||
-                (blockColorSensor.getBlockColor() == BlockColorSensor.BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
-                (blockColorSensor.getBlockColor() == BlockColorSensor.BlockColor.RED && getAllianceColor() == AllianceColor.RED);
+        return blockColorSensor.getBlockColor() == BlockColor.YELLOW ||
+                (blockColorSensor.getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
+                (blockColorSensor.getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED);
     }
 }
 

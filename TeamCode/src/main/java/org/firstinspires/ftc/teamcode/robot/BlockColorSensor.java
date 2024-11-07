@@ -9,12 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class BlockColorSensor {
-    public enum BlockColor {
-        RED,
-        YELLOW,
-        BLUE,
-        NONE
-    }
+
     public static final HashMap<BlockColor, Double[]> BLOCK_PERCENTS = new HashMap<>();
     public static final HashMap<BlockColor, Double> BLOCK_THRESHOLDS = new HashMap<>();
     public static final Double[] RED_BLOCK_PERCENTS = { 54.7, 28.45, 16.8 };

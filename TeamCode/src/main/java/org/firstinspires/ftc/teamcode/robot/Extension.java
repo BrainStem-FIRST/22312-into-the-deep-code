@@ -19,11 +19,9 @@ public class Extension extends Subsystem {
     // TODO: find extension encoder ticks for these 3
     // max position
     public static final int MAX_POSITION = 1400;
-    public static final int RETRACTED_POSITION = 0;
     // TODO - implement magnet sensor and encoder reset
-    public static final int RETRACTED_THRESHOLD = 30;
-    public static final int EXTENDED_POSITION = 900;
-    public static final double RETRACT_POWER = -0.5;
+    public static final double SEARCH_POWER = 0.55;
+    public static final double RETRACT_POWER = -0.9;
 
     public enum StateType {
         IN, FINDING_BLOCK, RETRACTING
@@ -102,8 +100,13 @@ public class Extension extends Subsystem {
     @Override
     public void update(double dt) {
         // if the magnet switch detects the extension is close enough, it will reset its encoders
-        if (!magnetResetSwitch.getState())
+        if (!magnetResetSwitch.getState()) {
+            Subsystem.setMotorPower(extensionMotor, 0);
             extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        if (extensionMotor.getCurrentPosition() >= MAX_POSITION)
+            Subsystem.setMotorPower(extensionMotor, 0);
 
         stateManager.update(dt);
     }

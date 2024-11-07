@@ -50,12 +50,12 @@ public class StateManager<StateType extends Enum<StateType>> {
     }
 
     public void update(double dt) {
-        getActiveState().execute();
-        getActiveState().incrementTime(dt);
-
         if (getActiveState().isDone()) {
             if (!tryEnterState(getActiveState().getNextStateType()))
                 tryEnterState(defaultStateType);
         }
+
+        getActiveState().execute();
+        getActiveState().incrementTime(dt);
     }
 }

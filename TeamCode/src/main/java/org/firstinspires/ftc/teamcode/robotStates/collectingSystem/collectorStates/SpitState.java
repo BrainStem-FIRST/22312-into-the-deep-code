@@ -32,8 +32,8 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING)
-            return Collector.StateType.HINGE_UP;
+        //if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING)
+        //    return Collector.StateType.HINGE_UP;
         return Collector.StateType.COLLECTING;
     }
 }

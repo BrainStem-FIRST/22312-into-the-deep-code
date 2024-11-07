@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorSta
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 public class HingeUpState extends RobotState<Collector.StateType> {
+
+    public static double HINGE_UP_TIME = 1;
     public HingeUpState() {
         super(Collector.StateType.HINGE_UP);
     }
@@ -21,12 +23,12 @@ public class HingeUpState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isDone() {
-        return time > 1.2;
+        return time > HINGE_UP_TIME;
         //return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_UP_POSITION) < Collector.HINGE_THRESHOLD;
     }
 

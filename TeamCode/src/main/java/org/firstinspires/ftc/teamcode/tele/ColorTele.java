@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.tele;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BlockColorSensor;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleBlockColor")
@@ -34,7 +36,7 @@ public class ColorTele extends LinearOpMode {
             telemetry.addData("ideal red block g percent", BlockColorSensor.RED_BLOCK_PERCENTS[1]);
             telemetry.addData("ideal red block b percent", BlockColorSensor.RED_BLOCK_PERCENTS[2]);
 
-            telemetry.addData("has red color", blockColorSensor.hasColor(BlockColorSensor.BlockColor.RED));
+            telemetry.addData("has red color", blockColorSensor.hasColor(BlockColor.RED));
             telemetry.update();
         }
     }

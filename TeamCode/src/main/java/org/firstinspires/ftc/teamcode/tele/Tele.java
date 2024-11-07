@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Grabber;
+import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
@@ -16,7 +20,8 @@ public class Tele extends LinearOpMode {
 
     private BrainSTEMRobot robot;
 
-
+    private boolean hasHingedDown = false;
+    private boolean hasHingedUp = false;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -37,15 +42,6 @@ public class Tele extends LinearOpMode {
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
-            telemetry.addData("a: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameA() + " | downFrames " + input.getGamepadTracker1().getAFrameCount());
-            telemetry.addData("b: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameB() + " | downFrames " + input.getGamepadTracker1().getBFrameCount());
-            telemetry.addData("y: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameY() + " | downFrames " + input.getGamepadTracker1().getYFrameCount());
-            telemetry.addData("left stick y", gamepad1.left_stick_y);
-            telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
-            telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
-            telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-            telemetry.addData("block color frame", ((CollectState) robot.getCollector().getStateManager().getState(Collector.StateType.COLLECTING)).blockColorFrame);
-            telemetry.addData("block sensor color", robot.getCollector().getBlockColorSensor().getBlockColor());
 
             /*
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
@@ -69,6 +65,29 @@ public class Tele extends LinearOpMode {
 
             listenForRobotControls();
             robot.update(dt);
+
+            if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_UP)
+                hasHingedUp = true;
+            if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_DOWN)
+                hasHingedDown = true;
+
+            if (gamepad1.right_trigger > 0.1) {
+                hasHingedDown = false;
+                hasHingedUp = false;
+            }
+
+            telemetry.addData("a: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameA() + " | downFrames " + input.getGamepadTracker1().getAFrameCount());
+            telemetry.addData("b: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameB() + " | downFrames " + input.getGamepadTracker1().getBFrameCount());
+            telemetry.addData("y: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameY() + " | downFrames " + input.getGamepadTracker1().getYFrameCount());
+            telemetry.addData("left stick y", gamepad1.left_stick_y);
+            telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
+            telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
+            telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+            telemetry.addData("hinge servo target position", robot.getCollector().getHingeServo().getPosition());
+            telemetry.addData("color frame", ((CollectState) robot.getCollector().getStateManager().getState(Collector.StateType.COLLECTING)).blockColorFrame);
+            telemetry.addData("color", robot.getCollector().getBlockColorSensor().getBlockColor() + "| valid: " + robot.getCollector().hasValidBlockColor());hasHingedDown = robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_DOWN;
+            telemetry.addData("has hinged down", hasHingedDown);
+            telemetry.addData("has hinged up", hasHingedUp);
             telemetry.update();
         }
     }
@@ -108,8 +127,56 @@ public class Tele extends LinearOpMode {
             robot.getDriveTrain().stopMotors();
     }
 
-
     private void listenForCollectionInput() {
+
+        // left and right bumpers move extension
+        if (input.getGamepadTracker1().isRightBumperPressed()) {
+
+            // enter search state if not already
+            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+
+            // move extension out
+            robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
+        }
+        // move extension in
+        else if (input.getGamepadTracker1().isLeftBumperPressed()) {
+            robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
+        }
+        else {
+            robot.getExtension().setTargetPower(0);
+        }
+
+        // right triggers toggle between (hinging down and collecting) and (hinging up and doing nothing)
+        if (input.getGamepadTracker1().isFirstFrameRightTrigger()) {
+
+            // hinge down and collect
+            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
+
+            // hinge up and stop collecting
+            else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+        }
+    }
+
+    private void listenForLiftingInput() {
+        if(input.getGamepadTracker1().isFirstFrameA()) {
+            switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
+                case TROUGH:
+                    if(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
+                    else if(robot.getGrabber().getBlockColorHeld() == BlockColor.BLUE)
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA);
+                    break;
+                case BASKET_DEPOSIT:
+                    robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+            }
+        }
+    }
+
+
+    private void listenForCollectionInputOld() {
 
         // update states
         if (input.getGamepadTracker1().isFirstFrameA()) {
@@ -136,6 +203,6 @@ public class Tele extends LinearOpMode {
         }
 
         // update extension target power (how fast it moves)
-        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().right_stick_y * 0.3);
+        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().right_stick_y * -0.6);
     }
 }

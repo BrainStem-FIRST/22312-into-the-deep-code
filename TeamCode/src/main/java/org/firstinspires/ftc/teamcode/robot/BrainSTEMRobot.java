@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.util.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PinpointDrive;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
-]//
 public class BrainSTEMRobot {
 
     public Telemetry telemetry;
@@ -53,8 +47,6 @@ public class BrainSTEMRobot {
     }
 
     public void update(double dt) {
-        telemetry.addData("Extension motor current position", extension.getExtensionMotor().getCurrentPosition());
-
 
         collectingSystem.update(dt);
 
