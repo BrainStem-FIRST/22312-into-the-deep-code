@@ -64,6 +64,7 @@ public class Tele extends LinearOpMode {
             input.update();
 
             listenForRobotControls();
+
             robot.update(dt);
 
             if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_UP)

@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
+    public static final int MIN_POSITION = 10;
     // max position
     public static final int MAX_POSITION = 1400;
     // TODO - implement magnet sensor and encoder reset
@@ -97,11 +98,16 @@ public class Extension extends Subsystem {
         this.targetPosition = targetPosition;
     }
 
+    public boolean hitRetractHardStop() {
+        return !magnetResetSwitch.getState() || extensionMotor.getCurrentPosition() < MIN_POSITION;
+    }
+
     @Override
     public void update(double dt) {
         // if the magnet switch detects the extension is close enough, it will reset its encoders
-        if (!magnetResetSwitch.getState()) {
+        if (hitRetractHardStop()) {
             Subsystem.setMotorPower(extensionMotor, 0);
+            stateManager.tryEnterState(StateType.IN);
             extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 

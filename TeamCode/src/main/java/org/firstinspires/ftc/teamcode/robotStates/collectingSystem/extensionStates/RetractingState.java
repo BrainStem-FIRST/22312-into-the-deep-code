@@ -26,8 +26,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean isDone() {
-        // when the switch state returns false it means it has detected the extension
-        return !robot.getExtension().getMagnetResetSwitch().getState();
+        return robot.getExtension().hitRetractHardStop();
     }
 
     @Override
