@@ -165,12 +165,12 @@ public class Tele extends LinearOpMode {
         if(input.getGamepadTracker1().isFirstFrameA()) {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
-                    if(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
+                    if(robot.getBlockColorHeld() == BlockColor.YELLOW)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                    else if(robot.getGrabber().getBlockColorHeld() == BlockColor.BLUE)
+                    else if(robot.getBlockColorHeld() == BlockColor.BLUE)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA);
                     break;
-                case BASKET_DEPOSIT:
+                case LOW_BASKET:
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
             }
         }

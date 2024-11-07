@@ -11,21 +11,22 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
-    // TODO: find actual encoder positions for each state
     public static final int MAX_POS = 3050,
         TROUGH_POS = 0,
+        TROUGH_SAFETY_POS = 7, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
+
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 565,
         HIGH_RAM_BEFORE_POS = 1500,
         HIGH_RAM_AFTER_POS = 1700,
+
         LOW_BASKET_POS = 1700,
-        HIGH_BASKET_POS = 3040,
-        TROUGH_SAFETY_POS = 7, // position where arm can safely raise without colliding with collector
-        BASKET_SAFETY_POS = 23; // position where arm can safely lower without colliding with basket
-    public static final int DESTINATION_THRESHOLD = 5;
+        HIGH_BASKET_POS = 3040;
+
+    public static final int DESTINATION_THRESHOLD = 50;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_OFF, RAM_BEFORE, RAM_AFTER, BASKET_SAFETY, BASKET, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_AREA, LOW_RAM_BEFORE, LOW_RAM_AFTER, HIGH_RAM_BEFORE, HIGH_RAM_AFTER, LOW_BASKET, HIGH_BASKET, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -46,25 +47,33 @@ public class Lift extends Subsystem {
         troughSafetyState.addMotor(liftMotor);
         stateManager.addState(StateType.TROUGH_SAFETY, troughSafetyState);
 
-        NothingState<StateType> dropOffState = new NothingState<>(StateType.DROP_OFF);
+        NothingState<StateType> dropAreaState = new NothingState<>(StateType.DROP_AREA);
         dropOffState.addMotor(liftMotor);
-        stateManager.addState(StateType.DROP_OFF, dropOffState);
+        stateManager.addState(StateType.DROP_AREA, dropAreaState);
 
-        NothingState<StateType> ramBeforeState = new NothingState<>(StateType.RAM_BEFORE);
+        NothingState<StateType> lowRamBeforeState = new NothingState<>(StateType.LOW_RAM_BEFORE);
         ramBeforeState.addMotor(liftMotor);
-        stateManager.addState(StateType.RAM_BEFORE, ramBeforeState);
+        stateManager.addState(StateType.LOW_RAM_BEFORE, lowRamBeforeState);
 
-        NothingState<StateType> ramAfterState = new NothingState<>(StateType.RAM_AFTER);
+        NothingState<StateType> lowRamAfterState = new NothingState<>(StateType.LOW_RAM_AFTER);
         ramAfterState.addMotor(liftMotor);
-        stateManager.addState(StateType.RAM_AFTER, ramAfterState);
+        stateManager.addState(StateType.LOW_RAM_AFTER, lowRamAfterState);
+        
+        NothingState<StateType> highRamBeforeState = new NothingState<>(StateType.HIGH_RAM_BEFORE);
+        ramBeforeState.addMotor(liftMotor);
+        stateManager.addState(StateType.HIGH_RAM_BEFORE, highRamBeforeState);
 
-        NothingState<StateType> basketSafetyState = new NothingState<>(StateType.BASKET_SAFETY);
-        basketSafetyState.addMotor(liftMotor);
-        stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
+        NothingState<StateType> highRamAfterState = new NothingState<>(StateType.HIGH_RAM_AFTER);
+        ramAfterState.addMotor(liftMotor);
+        stateManager.addState(StateType.HIGH_RAM_AFTER, highRamAfterState);
 
-        NothingState<StateType> basketState = new NothingState<>(StateType.BASKET);
+        NothingState<StateType> lowBasketState = new NothingState<>(StateType.LOW_BASKET);
         basketState.addMotor(liftMotor);
-        stateManager.addState(StateType.BASKET, basketState);
+        stateManager.addState(StateType.LOW_BASKET, lowBasketState);
+
+        NothingState<StateType> highBasketState = new NothingState<>(StateType.HIGH_BASKET);
+        basketState.addMotor(liftMotor);
+        stateManager.addState(StateType.HIGH_BASKET, highBasketState);
 
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
@@ -88,4 +97,3 @@ public class Lift extends Subsystem {
         return transitionState;
     }
 }
-
