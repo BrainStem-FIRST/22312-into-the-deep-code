@@ -8,8 +8,8 @@ public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
         TROUGH,
-        TROUGH_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
-        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
+        TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
+        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_RAM, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
     private final StateManager<StateType> stateManager;
     public LiftingSystem(BrainSTEMRobot robot) {

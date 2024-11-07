@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
+import kotlin.OptIn;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class Tele extends LinearOpMode {
@@ -65,6 +67,7 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
+            telemetry.addData("gamepad1 a down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
@@ -162,16 +165,29 @@ public class Tele extends LinearOpMode {
 
     private void listenForLiftingInput() {
         // checking changes in basket/bar heights
-        if(input.getGamepadTracker2().isLeftBumperPressed())
+        // TODO: make so if arm is already dropped then raise back up and drop back drop (USE LiftingSystem.BASKET_TO_BASKET state)
+        if(input.getGamepadTracker2().isLeftBumperPressed()) {
+            if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.LOW_BASKET_POS) // will be true during transition to that position as well as when is already at position
+                robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS);
             robot.setIsHighDeposit(true);
-        if(input.getGamepadTracker2().isLeftTriggerPressed())
+        }
+
+        if(input.getGamepadTracker2().isLeftTriggerPressed()) {
+            if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.HIGH_BASKET_POS)
+                robot.getLift().getTransitionState().overrideGoalState(Lift.LOW_BASKET_POS);
             robot.setIsHighDeposit(false);
+
+        }
+
+
+
         if(input.getGamepadTracker2().isRightBumperPressed())
             robot.setIsHighRam(true);
         if(input.getGamepadTracker2().isLeftBumperPressed())
             robot.setIsHighRam(false);
 
-        if(input.getGamepadTracker1().isFirstFrameA()) {
+        // button for "progressing" a state
+        if(input.getGamepadTracker1().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getBlockColorHeld() == BlockColor.YELLOW)
@@ -198,7 +214,13 @@ public class Tele extends LinearOpMode {
                         robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
                     break;
             }
-        }
+
+        // button for "going back" a state
+        else if(input.getGamepadTracker1().isFirstFrameB())
+            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA)
+                // toggling grabber
+                if(!robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING))
+                    robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
     }
 
 
