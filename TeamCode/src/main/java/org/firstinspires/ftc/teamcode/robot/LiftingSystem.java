@@ -25,13 +25,39 @@ public class LiftingSystem {
         stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
-        stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState<>());
+        stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
         stateManager.setupStates(robot, stateManager);
         stateManager.tryEnterState(StateType.TROUGH);
     }
     public void update(double dt) {
         stateManager.update(dt);
+
+        // transitioning states if one state is done (bc I have non-transition states as NothingStates)
+
+        // resetting lifting system once grabber releases block
+        if(stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
+                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
+            stateManager.tryEnterState(StateType.BASKET_TO_TROUGH);
+
+        // transitioning arm to setup for ram once specimen is picked up
+        else if(stateManager.getActiveStateType() == StateType.DROP_AREA &&
+                robot.getGrabber().getHasSpecimen() &&
+                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
+            stateManager.tryEnterState(StateType.DROP_AREA_TO_RAM);
+
+        // once lift is done ramming
+        else if(stateManager.getActiveStateType() == StateType.SPECIMEN_RAM &&
+                robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)
+            // opening grabber once ram is done
+            if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+                robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                robot.getGrabber().setHasSpecimen(false);
+            }
+            // resetting lifting system once block is released
+            else if(!robot.getGrabber().getHasSpecimen())
+                stateManager.tryEnterState(StateType.RAM_TO_TROUGH);
+
     }
     public BrainSTEMRobot getRobot() {
         return robot;

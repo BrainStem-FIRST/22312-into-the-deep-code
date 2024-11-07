@@ -4,14 +4,12 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeUpState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -102,6 +100,10 @@ public class Collector extends Subsystem {
     public ServoImplEx getHingeServo() { return hingeServo; }
     public void setHingeServoPosition(double position) {
         hingeServo.setPosition(position);
+    }
+
+    public void useSpittingSafety(boolean hasSafety) {
+        ((SpitState) stateManager.getState(StateType.SPITTING)).useSafety(hasSafety);
     }
 
     @Override

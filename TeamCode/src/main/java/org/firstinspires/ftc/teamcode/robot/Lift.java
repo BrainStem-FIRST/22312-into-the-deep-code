@@ -84,4 +84,10 @@ public class Lift extends Subsystem {
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
     }
+    public int getRamBeforePos() {
+        return getRobot().isHighRam() ? LOW_RAM_BEFORE_POS : HIGH_RAM_BEFORE_POS;
+    }
+    public int getRamAfterPos() {
+        return getRobot().isHighRam() ? HIGH_RAM_BEFORE_POS : HIGH_RAM_AFTER_POS;
+    }
 }

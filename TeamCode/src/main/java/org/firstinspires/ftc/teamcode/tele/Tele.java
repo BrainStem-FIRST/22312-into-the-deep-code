@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 
@@ -21,8 +20,6 @@ public class Tele extends LinearOpMode {
 
     private BrainSTEMRobot robot;
 
-    private boolean hasHingedDown = false;
-    private boolean hasHingedUp = false;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -68,30 +65,20 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
-            if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_UP)
-                hasHingedUp = true;
-            if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.HINGE_DOWN)
-                hasHingedDown = true;
-
-            if (gamepad1.right_trigger > 0.1) {
-                hasHingedDown = false;
-                hasHingedUp = false;
-            }
-
-            telemetry.addData("a: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameA() + " | downFrames " + input.getGamepadTracker1().getAFrameCount());
-            telemetry.addData("b: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameB() + " | downFrames " + input.getGamepadTracker1().getBFrameCount());
-            telemetry.addData("y: ", "firstFrame " + input.getGamepadTracker1().isFirstFrameY() + " | downFrames " + input.getGamepadTracker1().getYFrameCount());
-            telemetry.addData("left stick y", gamepad1.left_stick_y);
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
+
+            telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
+            telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
+            telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
+            telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.update();
         }
     }
 
     private void listenForRobotControls() {
-        telemetry.addData("inside listen for robot controls", "");
         listenForDriveTrainInput();
         listenForCollectionInput();
         listenForLiftingInput();
@@ -164,7 +151,7 @@ public class Tele extends LinearOpMode {
 
         // force spit in case block gets stuck
         if (input.getGamepadTracker2().isDpadDownPressed()) {
-            robot.getCollector.getStateManager().getActiveState(Collector.SPITTING).useSafety(false);
+            robot.getCollector().useSpittingSafety(false);
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
         }
 
@@ -194,6 +181,7 @@ public class Tele extends LinearOpMode {
                     break;
                 case BASKET_DEPOSIT:
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                    robot.getGrabber().setHasBlock(false);
                     break;
                 case DROP_AREA:
                     if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
@@ -206,7 +194,8 @@ public class Tele extends LinearOpMode {
                     }
                     break;
                 case SPECIMEN_RAM:
-                    robot.getLift().getStateManager().tryEnterState(Lift.StateType.RAM_AFTER);
+                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
+                        robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
                     break;
             }
         }

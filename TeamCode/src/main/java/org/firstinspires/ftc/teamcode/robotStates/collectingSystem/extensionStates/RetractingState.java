@@ -18,8 +18,8 @@ public class RetractingState extends RobotState<Extension.StateType> {
     public void execute() {
         if(isFirstTime())
             startPos = robot.getExtension().getExtensionMotor().getCurrentPosition();
-        speedPercent *= robot.getExtension().getExtensionMotor().getCurrentPosition();
-        robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER * speedPercent);
+        //speedPercent = robot.getExtension().getExtensionMotor().getCurrentPosition() * 1.0 / startPos;
+        robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER);
     }
 
     @Override
