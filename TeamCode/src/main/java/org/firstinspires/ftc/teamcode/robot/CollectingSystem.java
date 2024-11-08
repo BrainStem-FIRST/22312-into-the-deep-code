@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchAndCollectState;
@@ -39,5 +41,15 @@ public class CollectingSystem {
     }
     public BrainSTEMRobot getRobot() {
         return robot;
+    }
+
+    public Action extendAndCollectAction(int extendMotorTick) {
+        return new SequentialAction(
+                getRobot().getExtension().extendAction(extendMotorTick),
+                getRobot().getCollector().hingeDownAction(),
+                getRobot().getCollector().collectAction(),
+                getRobot().getCollector().hingeUpAction(),
+                getRobot().getExtension().retractAction()
+        );
     }
 }

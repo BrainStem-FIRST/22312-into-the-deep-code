@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.autoOpModes;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.roadrunner.Pose2d;
 

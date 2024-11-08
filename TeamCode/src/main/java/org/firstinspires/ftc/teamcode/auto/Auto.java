@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.autoOpModes;
+package org.firstinspires.ftc.teamcode.auto;
 
 
 import com.acmerobotics.roadrunner.Pose2d;
@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
+import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 
 public abstract class Auto extends LinearOpMode {
 
     private final AllianceColor allianceColor;
 
-    protected BrainSTEMRobotAuto robot;
+    protected BrainSTEMRobot robot;
 
     public Auto(AllianceColor allianceColor) {
         this.allianceColor = allianceColor;
@@ -26,11 +26,10 @@ public abstract class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new BrainSTEMRobotAuto(hardwareMap, telemetry, allianceColor);
+        robot = new BrainSTEMRobot(hardwareMap, telemetry, allianceColor);
+        robot.setup();
 
         waitForStart();
-
-        robot.resetAllEncoders();
         runAuto();
     }
 

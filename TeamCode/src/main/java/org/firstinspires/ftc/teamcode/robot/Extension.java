@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -18,6 +22,10 @@ public class Extension extends Subsystem {
     public static final int MIN_POSITION = 10;
     // max position
     public static final int MAX_POSITION = 1400;
+
+    // threshold whenever extension is going to a target position
+    public static int GO_TO_THRESHOLD = 10;
+
     // TODO - implement magnet sensor and encoder reset
     public static final double SEARCH_POWER = 0.55;
     public static final double RETRACT_POWER = -0.9;
@@ -113,5 +121,28 @@ public class Extension extends Subsystem {
             Subsystem.setMotorPower(extensionMotor, 0);
 
         stateManager.update(dt);
+    }
+
+    public Action extendAction(int targetPosition) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setExtensionMotorPosition(targetPosition);
+                return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
+            }
+        };
+    }
+    public Action retractAction() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setExtensionMotorPower(Extension.RETRACT_POWER);
+                if (!getMagnetResetSwitch().getState()) {
+                    setExtensionMotorPower(0);
+                    return false;
+                }
+                return true;
+            }
+        };
     }
 }

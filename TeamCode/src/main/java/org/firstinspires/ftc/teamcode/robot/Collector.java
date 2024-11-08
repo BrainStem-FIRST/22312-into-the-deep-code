@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
@@ -115,6 +120,34 @@ public class Collector extends Subsystem {
         return blockColorSensor.getBlockColor() == BlockColor.YELLOW ||
                 (blockColorSensor.getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
                 (blockColorSensor.getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED);
+    }
+
+    public Action hingeUpAction() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setHingeServoPosition(Collector.HINGE_UP_POSITION);
+                return getTime() >= Collector.HINGE_UP_TIME;
+            }
+        };
+    }
+    public Action hingeDownAction() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setHingeServoPosition(Collector.HINGE_DOWN_POSITION);
+                return getTime() >= Collector.HINGE_DOWN_TIME;
+            }
+        };
+    }
+    public Action collectAction() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+                return hasValidBlockColor();
+            }
+        };
     }
 }
 
