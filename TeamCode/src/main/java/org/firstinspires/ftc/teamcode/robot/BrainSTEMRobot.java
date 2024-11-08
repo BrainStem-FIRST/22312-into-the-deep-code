@@ -75,9 +75,6 @@ public class BrainSTEMRobot {
         //extension.update(dt);
     }
 
-    public AllianceColor getAllianceColor() {
-        return allianceColor;
-    }
     public MecanumDrive getDriveTrain() {
         return driveTrain;
     }
@@ -108,6 +105,9 @@ public class BrainSTEMRobot {
         return liftingSystem;
     }
 
+    public BlockColor getColorFromAlliance() {
+        return allianceColor == AllianceColor.BLUE ? BlockColor.BLUE : BlockColor.RED;
+    }
     public BlockColor getBlockColorHeld() {
         return blockColorHeld;
     }

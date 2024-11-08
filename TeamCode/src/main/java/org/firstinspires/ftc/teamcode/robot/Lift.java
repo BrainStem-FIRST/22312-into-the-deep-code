@@ -22,11 +22,13 @@ public class Lift extends Subsystem {
         HIGH_RAM_AFTER_POS = 1700,
 
         LOW_BASKET_POS = 1700,
-        HIGH_BASKET_POS = 3040;
+        LOW_BASKET_SAFETY_POS = 1500,
+        HIGH_BASKET_POS = 3040,
+        HIGH_BASKET_SAFETY_POS = 2840;
 
     public static final int DESTINATION_THRESHOLD = 50;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -63,6 +65,10 @@ public class Lift extends Subsystem {
         basketState.addMotor(liftMotor);
         stateManager.addState(StateType.BASKET_DEPOSIT, basketState);
 
+        NothingState<StateType> basketSafetyState = new NothingState<>(StateType.BASKET_SAFETY);
+        basketSafetyState.addMotor(liftMotor);
+        stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
+
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
@@ -85,9 +91,17 @@ public class Lift extends Subsystem {
         return transitionState;
     }
     public int getRamBeforePos() {
-        return getRobot().isHighRam() ? LOW_RAM_BEFORE_POS : HIGH_RAM_BEFORE_POS;
+        return getRobot().isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
     }
     public int getRamAfterPos() {
-        return getRobot().isHighRam() ? HIGH_RAM_BEFORE_POS : HIGH_RAM_AFTER_POS;
+        return getRobot().isHighRam() ? HIGH_RAM_AFTER_POS : LOW_RAM_AFTER_POS;
+    }
+    public boolean atHighBasket() {
+        return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
+                getTransitionState().getGoalStatePosition() == HIGH_BASKET_POS;
+    }
+    public boolean atLowBasket() {
+        return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
+                getTransitionState().getGoalStatePosition() == LOW_BASKET_POS;
     }
 }

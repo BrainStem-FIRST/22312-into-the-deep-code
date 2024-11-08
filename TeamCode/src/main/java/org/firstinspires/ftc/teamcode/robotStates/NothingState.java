@@ -41,6 +41,7 @@ public class NothingState<StateType extends Enum<StateType>> extends RobotState<
         return false;
     }
 
+    // should never be called bc nothing state will never be done; is meant to be overridden
     @Override
     public StateType getNextStateType() {
         return null;

@@ -18,7 +18,8 @@ public class LiftingSystem {
         stateManager = new StateManager<>(StateType.TROUGH);
 
         stateManager.addState(StateType.TROUGH, new TroughState());
-        stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState(Lift.DESTINATION_THRESHOLD));
+        stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState());
+        stateManager.addState(StateType.BASKET_TO_BASKET, new BasketToBasketState());
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
         stateManager.addState(StateType.BASKET_TO_TROUGH, new BasketToTroughState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
@@ -53,6 +54,7 @@ public class LiftingSystem {
             if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                 robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
                 robot.getGrabber().setHasSpecimen(false);
+                robot.setBlockColorHeld(BlockColor.NONE);
             }
             // resetting lifting system once block is released
             else if(!robot.getGrabber().getHasSpecimen())

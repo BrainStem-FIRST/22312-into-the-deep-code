@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemSt
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
-import org.firstinspires.ftc.teamcode.robotStates.TransitionState;
+import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 // should only be called when lift is in trough position
-public class TroughToBasketState extends TransitionState<LiftingSystem.StateType> {
-    public TroughToBasketState(int DESTINATION_THRESHOLD) {
-        super(LiftingSystem.StateType.TROUGH_TO_BASKET, DESTINATION_THRESHOLD);
+public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
+    public TroughToBasketState() {
+        super(LiftingSystem.StateType.TROUGH_TO_BASKET);
     }
     @Override
     public void execute() {
@@ -23,6 +23,14 @@ public class TroughToBasketState extends TransitionState<LiftingSystem.StateType
                     robot.getLift().getTransitionState().setGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
                 else
                     robot.getLift().getTransitionState().setGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+
+            // TODO: else if below needs serious testing; not sure if it works
+            // checking if when lift is in transition gamepad2 switches deposit state
+            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
+                if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS)
+                    robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS);
+                else if(!robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS)
+                    robot.getLift().getTransitionState().overrideGoalState(Lift.LOW_BASKET_POS);
 
             // moving arm down after lift reach desired basket height
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)

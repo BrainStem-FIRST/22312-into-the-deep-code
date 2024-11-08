@@ -34,8 +34,8 @@ public class Extension extends Subsystem {
         IN, FINDING_BLOCK, RETRACTING
     }
 
-    private DcMotorEx extensionMotor;
-    private DigitalChannel magnetResetSwitch;
+    private final DcMotorEx extensionMotor;
+    private final DigitalChannel magnetResetSwitch;
 
     private double targetPower;
     private int targetPosition;

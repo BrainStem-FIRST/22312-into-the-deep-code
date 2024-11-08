@@ -179,8 +179,6 @@ public class Tele extends LinearOpMode {
 
         }
 
-
-
         if(input.getGamepadTracker2().isRightBumperPressed())
             robot.setIsHighRam(true);
         if(input.getGamepadTracker2().isLeftBumperPressed())
@@ -192,17 +190,19 @@ public class Tele extends LinearOpMode {
                 case TROUGH:
                     if(robot.getBlockColorHeld() == BlockColor.YELLOW)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                    else if(robot.getBlockColorHeld() == BlockColor.BLUE)
+                    else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
                 case BASKET_DEPOSIT:
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
                     robot.getGrabber().setHasBlock(false);
+                    robot.setBlockColorHeld(BlockColor.NONE);
                     break;
                 case DROP_AREA:
                     if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
                         robot.getGrabber().setHasBlock(false);
+                        // technically should set robot.blockColorHeld to false, but it will immediately be set to true when specimen is picked up, so no point of changing value
                     }
                     else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
