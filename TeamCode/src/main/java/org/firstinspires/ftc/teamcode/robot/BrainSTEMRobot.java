@@ -44,24 +44,24 @@ public class BrainSTEMRobot {
         blockColorHeld = BlockColor.NONE;
     }
 
-    public void setup() {
+    public boolean setup() {
+        telemetry.addData("motor position", lift.getLiftMotor().getCurrentPosition());
         collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
-        // WOULD NOT WANT TO SET POSITION OF ARM IN CASE LIFT IS DOWN AND ARM IS NOT
+
+        if(Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD ||
+                Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) <= Lift.DESTINATION_THRESHOLD) {
+            arm.getArmServo().setPosition(Arm.DOWN_POS);
+            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_POS);
+        }
+        else
+            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
+
+        return Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD &&
+                Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_POS) <= Lift.DESTINATION_THRESHOLD;
     }
 
     public void update(double dt) {
-
-        collectingSystem.update(dt);
-
-        collector.update(dt);
-        extension.update(dt);
-        /*
-        if (collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
-            if (collector.getBlockColor() == Collector.BlockColor.YELLOW)
-                liftingSystem.getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH);
-        }
-
         // system managers
         collectingSystem.update(dt);
         liftingSystem.update(dt);
@@ -71,8 +71,9 @@ public class BrainSTEMRobot {
         extension.update(dt);
 
         grabber.update(dt);
-        */
-        //extension.update(dt);
+        arm.update(dt);
+        lift.update(dt);
+
     }
 
     public MecanumDrive getDriveTrain() {

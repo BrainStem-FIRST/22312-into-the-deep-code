@@ -13,7 +13,7 @@ public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     public static final int MAX_POS = 3050,
         TROUGH_POS = 0,
-        TROUGH_SAFETY_POS = 7, // position where arm can safely raise without colliding with collector
+        TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
 
         LOW_RAM_BEFORE_POS = 320,
@@ -26,7 +26,7 @@ public class Lift extends Subsystem {
         HIGH_BASKET_POS = 3040,
         HIGH_BASKET_SAFETY_POS = 2840;
 
-    public static final int DESTINATION_THRESHOLD = 50;
+    public static final int DESTINATION_THRESHOLD = 30;
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
     }
@@ -73,7 +73,6 @@ public class Lift extends Subsystem {
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
         stateManager.setupStates(robot, stateManager);
-        stateManager.tryEnterState(StateType.TROUGH);
     }
 
     @Override

@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 public abstract class RobotState<StateType extends Enum<StateType>> extends BaseState<StateType> {
 
     protected BrainSTEMRobot robot;
-    protected Input input;
     protected StateManager<StateType> stateManager;
 
     public RobotState(StateType stateType) {

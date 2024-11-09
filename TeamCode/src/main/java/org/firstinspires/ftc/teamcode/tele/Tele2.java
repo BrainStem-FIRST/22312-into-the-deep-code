@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
+import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
 
@@ -25,34 +27,41 @@ public class Tele2 extends LinearOpMode {
 
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        while (opModeIsActive()) {
-            if (Math.abs(gamepad1.left_stick_y) > 0.2) {
-                Subsystem.setMotorPower(motor, gamepad1.left_stick_y * -0.5);
-            }
-            else {
-                motor.setPower(0);
-            }
-            telemetry.addData("motor power", motor.getPower());
-            telemetry.addData("motor encoder: ", motor.getCurrentPosition());
-            telemetry.update();
-        }
-        /*
-        ServoImplEx servo = hardwareMap.get(ServoImplEx.class, "CollectHingeServo");
-        servo.setPwmRange(new PwmControl.PwmRange(Collector.HINGE_DOWN_TICK, Collector.HINGE_UP_TICK));
+
+        ServoImplEx armServo = hardwareMap.get(ServoImplEx.class, "LiftArmServo");
+        armServo.setPwmRange(new PwmControl.PwmRange(Arm.MIN_TICK, Arm.MAX_TICK));
+
+        ServoImplEx grabberServo = hardwareMap.get(ServoImplEx.class, "LiftGrabServo");
+        grabberServo.setPwmRange(new PwmControl.PwmRange(Grabber.MIN_TICK, Grabber.MAX_TICK));
         while(opModeIsActive()) {
-            if(gamepad1.a) {
-                servo.setPosition(0.01);
-            }
-            else if(gamepad1.b) {
-                servo.setPosition(0.99);
-            }
+            if(gamepad1.a)
+                grabberServo.setPosition(0.99);
+            else if(gamepad1.b)
+                grabberServo.setPosition(0.01);
+
+            if(gamepad1.dpad_left)
+                armServo.setPosition(Arm.DOWN_POS);
+            else if(gamepad1.dpad_right)
+                armServo.setPosition(Arm.RIGHT_POS);
+
+            if(gamepad1.dpad_down)
+                Subsystem.setMotorPower(motor, -0.3);
+            else if(gamepad1.dpad_up)
+                Subsystem.setMotorPower(motor, 0.3);
+            else
+                Subsystem.setMotorPower(motor, 0);
+
             telemetry.addData("a", gamepad1.a);
-            telemetry.addData("b",gamepad1.b);
-            telemetry.addData("servo range", servo.getPwmRange());
-            telemetry.addData("servo position", servo.getPosition());
+            telemetry.addData("dpad left", gamepad1.dpad_left);
+            telemetry.addData("dpad right", gamepad1.dpad_right);
+            telemetry.addData("dpad up", gamepad1.dpad_up);
+            telemetry.addData("dpad down", gamepad1.dpad_down);
+            telemetry.addData("arm servo current pwm", armServo.getPosition());
+            telemetry.addData("grabber servo current pwm", grabberServo.getPosition());
+            telemetry.addData("motor current encoder: ", motor.getCurrentPosition());
             telemetry.update();
 
 
-        } */
+        }
     }
 }

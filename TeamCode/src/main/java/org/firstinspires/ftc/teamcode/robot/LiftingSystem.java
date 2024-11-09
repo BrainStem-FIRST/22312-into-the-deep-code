@@ -12,6 +12,7 @@ public class LiftingSystem {
         TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_RAM, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
     private final StateManager<StateType> stateManager;
+
     public LiftingSystem(BrainSTEMRobot robot) {
         this.robot = robot;
 
@@ -29,8 +30,8 @@ public class LiftingSystem {
         stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
         stateManager.setupStates(robot, stateManager);
-        stateManager.tryEnterState(StateType.TROUGH);
     }
+
     public void update(double dt) {
         stateManager.update(dt);
 

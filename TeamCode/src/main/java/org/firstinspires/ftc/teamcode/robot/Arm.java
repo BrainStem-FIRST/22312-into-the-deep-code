@@ -1,23 +1,19 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.BrainSTEMRobotAuto;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Arm extends Subsystem {
     // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
-    public static final int MIN_TICK = 0, MAX_TICK = 100;
-    public static final double DOWN_POS = 0, LEFT_POS = 0.25, UP_POS = 0.5, RIGHT_POS = 0.75;
-    public static final double DESTINATION_THRESHOLD = 0.1;
+    public static final int MIN_TICK = 550, LEFT_TICK = 1160, UP_TICK = 1550, MAX_TICK = 2045;
+    public static final double DOWN_POS = 0.001, LEFT_POS = 0.408, UP_POS = 0.669, RIGHT_POS = 0.999;
+    public static final double DESTINATION_THRESHOLD = 0.05;
     public enum StateType {
         DOWN, LEFT, UP, RIGHT, TRANSITION
     }
@@ -42,7 +38,6 @@ public class Arm extends Subsystem {
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
-        stateManager.tryEnterState(StateType.DOWN);
     }
 
     @Override

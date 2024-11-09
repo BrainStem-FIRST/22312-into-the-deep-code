@@ -55,9 +55,9 @@ public class Collector extends Subsystem {
         DONE_HINGING_UP
     }
 
-    private StateManager<StateType> stateManager;
-    private ServoImplEx hingeServo;
-    private DcMotorEx spindleMotor;
+    private final StateManager<StateType> stateManager;
+    private final ServoImplEx hingeServo;
+    private final DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private final BlockColorSensor blockColorSensor;

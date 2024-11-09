@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Grabber extends Subsystem {
     //TODO: find min tick and max tick positions for servo
-    public static final int MIN_TICK = 0, MAX_TICK = 100;
-    public static final double CLOSE_POSITION = 0, OPEN_POSITION = 1;
+    public static final int MIN_TICK = 1170, MAX_TICK = 2430;
+    public static final double CLOSE_POSITION = 0.05, OPEN_POSITION = 0.95;
     public static final double DESTINATION_THRESHOLD = 0.1;
     private boolean hasBlock = false, hasSpecimen = false;
     public enum StateType {
@@ -27,9 +27,9 @@ public class Grabber extends Subsystem {
         super(hwMap, telemetry, allianceColor, robot);
 
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
-        grabServo.setPwmRange(new PwmControl.PwmRange(CLOSE_POSITION, OPEN_POSITION));
+        grabServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
 
-        stateManager = new StateManager<>(StateType.CLOSED);
+        stateManager = new StateManager<>(StateType.OPEN);
 
         stateManager.addState(StateType.OPEN, new NothingState<>(StateType.OPEN));
         stateManager.addState(StateType.OPENING, new OpeningState());
@@ -37,7 +37,6 @@ public class Grabber extends Subsystem {
         stateManager.addState(StateType.CLOSING, new ClosingState());
 
         stateManager.setupStates(robot, stateManager);
-        stateManager.tryEnterState(StateType.CLOSED);
     }
 
     public StateManager<StateType> getStateManager() {
