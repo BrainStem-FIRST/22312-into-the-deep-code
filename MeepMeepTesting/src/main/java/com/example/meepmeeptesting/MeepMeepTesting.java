@@ -14,7 +14,7 @@ public class MeepMeepTesting {
         // With a field size of 800 pixels
         MeepMeep meepMeep = new MeepMeep(800);
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+        /*RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Required: Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 // Option: Set theme. Default = ColorSchemeRedDark()
@@ -25,7 +25,7 @@ public class MeepMeepTesting {
                                 .turn(Math.toRadians(90))
                                 .forward(30)
                                 .addDisplacementMarker(() -> {
-                                    /* Everything in the marker callback should be commented out */
+                                    // Everything in the marker callback should be commented out
 
                                     // bot.shooter.shoot()
                                     // bot.wobbleArm.lower()
@@ -43,5 +43,6 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
                 .start();
+        */
     }
 }
