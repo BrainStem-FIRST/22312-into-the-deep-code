@@ -11,9 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
-
-import kotlin.OptIn;
+import org.firstinspires.ftc.teamcode.util.Input;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
@@ -80,7 +78,11 @@ public class Tele extends LinearOpMode {
             //telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             //telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             //telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
+            telemetry.addData("in depositing mode", robot.getInDepositingMode());
             telemetry.addData("high basket", robot.isHighDeposit());
+            telemetry.addData("high ram", robot.isHighRam());
+            telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
+            telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
@@ -162,7 +164,7 @@ public class Tele extends LinearOpMode {
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck
-        // spits as long as gamepad is down
+        // spits as long as game pad is down
         if (input.getGamepadTracker2().isDpadDownPressed()) {
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
@@ -174,6 +176,10 @@ public class Tele extends LinearOpMode {
     }
 
     private void listenForLiftingInput() {
+        // TODO: get rid of conditional below once lifting system and collecting system can work together
+        if(input.getGamepadTracker1().isFirstFrameX())
+            robot.setInDepositingMode(!robot.getInDepositingMode());
+
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
@@ -187,18 +193,22 @@ public class Tele extends LinearOpMode {
 
         if(input.getGamepadTracker2().isRightBumperPressed())
             robot.setIsHighRam(true);
-        if(input.getGamepadTracker2().isLeftBumperPressed())
-            robot.setIsHighRam(false);
 
+        // TODO: enable low ram setting input once figure out how to ram on low bar
+        //if(input.getGamepadTracker2().isRightTriggerPressed())
+            //robot.setIsHighRam(false);
+
+        // TODO: change conditionals inside TROUGH case by uncommenting the commented ones and deleting current ones when collecting system and lifting system can work together
         // button for "progressing" a state
         if(input.getGamepadTracker1().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                         //if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-                        if(true)
+                        if(robot.getInDepositingMode())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
+                        else
+                        //else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
                 case BASKET_DEPOSIT:

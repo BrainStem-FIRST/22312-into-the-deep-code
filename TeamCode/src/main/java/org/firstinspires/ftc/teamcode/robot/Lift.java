@@ -7,7 +7,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
@@ -18,8 +17,8 @@ public class Lift extends Subsystem {
 
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 565,
-        HIGH_RAM_BEFORE_POS = 1500,
-        HIGH_RAM_AFTER_POS = 1700,
+        HIGH_RAM_BEFORE_POS = 1000,
+        HIGH_RAM_AFTER_POS = 1800,
 
         LOW_BASKET_POS = 1700,
         HIGH_BASKET_POS = 3040;

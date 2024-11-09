@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.util.gamepadInput;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import java.util.function.*;
 
 public class GamepadTracker {

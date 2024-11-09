@@ -4,8 +4,8 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.util.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.PinpointDrive;
+import org.firstinspires.ftc.teamcode.driveTrain.MecanumDrive;
+import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 
 public class BrainSTEMRobot {
 
@@ -25,6 +25,7 @@ public class BrainSTEMRobot {
     private BlockColor blockColorHeld;
     private boolean isHighDeposit = true;
     private boolean isHighRam = true;
+    private boolean inDepositingMode = true;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -47,7 +48,7 @@ public class BrainSTEMRobot {
     }
 
     public boolean setup() {
-        telemetry.addData("motor position", lift.getLiftMotor().getCurrentPosition());
+        // TODO: MAKE ARM GO TO DOWN POSITION FIRST, THEN MAKE LIFT LOWER
         setupCollectingSystem();
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
 
@@ -59,8 +60,7 @@ public class BrainSTEMRobot {
         else
             Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
 
-        return Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD &&
-                Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_POS) <= Lift.DESTINATION_THRESHOLD;
+        return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_POS) <= Lift.DESTINATION_THRESHOLD;
     }
 
     public void setupCollectingSystem() {
@@ -133,5 +133,11 @@ public class BrainSTEMRobot {
     }
     public void setIsHighRam(boolean isHighRam) {
         this.isHighRam = isHighRam;
+    }
+    public boolean getInDepositingMode() {
+        return inDepositingMode;
+    }
+    public void setInDepositingMode(boolean inDepositingMode) {
+        this.inDepositingMode = inDepositingMode;
     }
 }

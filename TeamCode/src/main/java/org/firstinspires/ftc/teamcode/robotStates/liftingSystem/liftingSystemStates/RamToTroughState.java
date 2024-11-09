@@ -11,18 +11,16 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT) {
+        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.RIGHT) {
             robot.getArm().getTransitionState().setGoalState(Arm.DOWN_POS, Arm.StateType.DOWN);
-            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN &&
-                robot.getLift().getStateManager().tryEnterState(Lift.StateType.TROUGH_SAFETY))
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN)
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
     }
 
     @Override
     public boolean canEnter() {
-        return false;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.SPECIMEN_RAM;
     }
 
     @Override
@@ -32,11 +30,11 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return false;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH;
     }
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
-        return null;
+        return LiftingSystem.StateType.TROUGH;
     }
 }

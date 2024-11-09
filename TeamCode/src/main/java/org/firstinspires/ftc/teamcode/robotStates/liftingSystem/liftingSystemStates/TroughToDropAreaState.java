@@ -18,7 +18,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
                 robot.getArm().getTransitionState().setGoalState(Arm.LEFT_POS, Arm.StateType.LEFT);
             // moving lift to drop area once arm is done
             else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
-                robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.TROUGH);
+                robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH &&
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA &&
                 robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT;
     }
 

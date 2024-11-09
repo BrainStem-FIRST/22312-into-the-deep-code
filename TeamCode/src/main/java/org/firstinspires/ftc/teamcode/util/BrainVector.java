@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
 public class BrainVector {
     private double x, y;
 
