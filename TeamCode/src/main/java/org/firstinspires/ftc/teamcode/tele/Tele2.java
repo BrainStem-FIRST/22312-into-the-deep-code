@@ -49,7 +49,7 @@ public class Tele2 extends LinearOpMode {
             else if(gamepad1.dpad_up)
                 Subsystem.setMotorPower(motor, 0.3);
             else
-                Subsystem.setMotorPower(motor, 0);
+                Subsystem.setMotorPower(motor, 0.05);
 
             telemetry.addData("a", gamepad1.a);
             telemetry.addData("dpad left", gamepad1.dpad_left);

@@ -11,7 +11,6 @@ public class HingeDownState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        robot.telemetry.addData("inside execute function in hinge_down state; time running", time);
         robot.getCollector().setHingeServoPosition(Collector.HINGE_DOWN_POSITION);
     }
 
@@ -28,7 +27,6 @@ public class HingeDownState extends RobotState<Collector.StateType> {
     @Override
     public boolean isDone() {
         return time > Collector.HINGE_DOWN_TIME;
-        //return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_DOWN_POSITION) < Collector.HINGE_THRESHOLD;
     }
 
     @Override

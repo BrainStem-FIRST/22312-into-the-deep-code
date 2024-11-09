@@ -44,8 +44,6 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING)
-            return Collector.StateType.HINGE_UP;
         return Collector.StateType.COLLECTING;
     }
 }
