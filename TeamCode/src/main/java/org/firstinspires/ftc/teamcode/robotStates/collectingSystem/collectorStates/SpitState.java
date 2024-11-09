@@ -39,13 +39,12 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return time - startTime >= SAFETY_TIME;
+        //return time - startTime >= SAFETY_TIME;
+        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE;
     }
 
     @Override
     public Collector.StateType getNextStateType() {
-        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING)
-            return Collector.StateType.HINGE_UP;
         return Collector.StateType.COLLECTING;
     }
 }

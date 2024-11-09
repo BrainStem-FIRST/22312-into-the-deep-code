@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import kotlin.OptIn;
@@ -76,7 +77,6 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
             telemetry.addData("successfully entered spit", successfulSpitEnter);
-            telemetry.addData("using safety while spitting", ((SpitState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING)).isUsingSafety());
             telemetry.update();
         }
     }
@@ -153,8 +153,8 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
 
         // force spit in case block gets stuck
         if (input.getGamepadTracker2().isDpadDownPressed()) {
-            robot.getCollector().useSpittingSafety(false);
-            successfulSpitEnter = robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
+            ((SpitTempState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
 
         // force retraction for emergencies

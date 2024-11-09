@@ -27,7 +27,6 @@ public class HingeUpState extends RobotState<Collector.StateType> {
     @Override
     public boolean isDone() {
         return time > Collector.HINGE_UP_TIME;
-        //return Math.abs(robot.getCollector().getHingeServo().getPosition() - Collector.HINGE_UP_POSITION) < Collector.HINGE_THRESHOLD;
     }
 
     @Override
