@@ -5,21 +5,15 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeUpState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 
 // state mechanics: once collector/spit state initiated, will power until time reached, them automatically turn off
@@ -39,10 +33,6 @@ public class Collector extends Subsystem {
 
     // store the absolute bounds for the servo (just in case)
     public static final int MAX_TICK = 2500, MIN_TICK = 100;
-    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1726;
-
-    public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
-    public static double HINGE_DOWN_TIME = 0.7, HINGE_UP_TIME = 0.85;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
 
@@ -50,17 +40,14 @@ public class Collector extends Subsystem {
     public static final double SPITTING_TIME = 1;
 
     public enum StateType {
-        READY_TO_HINGE_DOWN,
-        HINGE_DOWN,
+        NOTHING,
         COLLECTING,
         SPITTING, // only stops when block color sensor detects nothing + safety time
         SPITTING_TEMP, // stops next frame unless called continuously
-        HINGE_UP,
-        DONE_HINGING_UP
+        VALID_BLOCK
     }
 
     private final StateManager<StateType> stateManager;
-    private final ServoImplEx hingeServo;
     private final DcMotorEx spindleMotor;
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
@@ -69,31 +56,20 @@ public class Collector extends Subsystem {
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
 
-        hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
-        hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_UP_TICK, HINGE_DOWN_TICK));
-
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
 
         blockColorSensor = new BlockColorSensor(hwMap, telemetry);
 
-        stateManager = new StateManager<>(StateType.READY_TO_HINGE_DOWN);
+        stateManager = new StateManager<>(StateType.NOTHING);
 
-        NothingState<StateType> readyToHingeDownState = new NothingState<>(StateType.READY_TO_HINGE_DOWN);
-        readyToHingeDownState.addMotor(spindleMotor);
-        stateManager.addState(StateType.READY_TO_HINGE_DOWN, readyToHingeDownState);
-
+        stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING));
         stateManager.addState(StateType.COLLECTING, new CollectState());
         stateManager.addState(StateType.SPITTING, new SpitState());
         stateManager.addState(StateType.SPITTING_TEMP, new SpitTempState());
-        stateManager.addState(StateType.HINGE_UP, new HingeUpState());
-        stateManager.addState(StateType.HINGE_DOWN, new HingeDownState());
-
-        NothingState<StateType> doneHingingUpState = new NothingState<>(StateType.DONE_HINGING_UP);
-        doneHingingUpState.addMotor(spindleMotor);
-        stateManager.addState(StateType.DONE_HINGING_UP, doneHingingUpState);
+        stateManager.addState(StateType.VALID_BLOCK, new NothingState<>(StateType.VALID_BLOCK));
 
         stateManager.setupStates(getRobot(), stateManager);
-        stateManager.tryEnterState(StateType.READY_TO_HINGE_DOWN);
+        stateManager.tryEnterState(StateType.NOTHING);
     }
 
     public StateManager<Collector.StateType> getStateManager() {
@@ -107,10 +83,6 @@ public class Collector extends Subsystem {
     public void setSpindleMotorPower(double power) {
         Subsystem.setMotorPower(spindleMotor, power);
     }
-    public ServoImplEx getHingeServo() { return hingeServo; }
-    public void setHingeServoPosition(double position) {
-        hingeServo.setPosition(position);
-    }
 
     @Override
     public void update(double dt) {
@@ -121,25 +93,6 @@ public class Collector extends Subsystem {
         return blockColorSensor.getBlockColor() == BlockColor.YELLOW ||
                 (blockColorSensor.getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
                 (blockColorSensor.getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED);
-    }
-
-    public Action hingeUpAction() {
-        return new TimedAction() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setHingeServoPosition(Collector.HINGE_UP_POSITION);
-                return getTime() >= Collector.HINGE_UP_TIME;
-            }
-        };
-    }
-    public Action hingeDownAction() {
-        return new TimedAction() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setHingeServoPosition(Collector.HINGE_DOWN_POSITION);
-                return getTime() >= Collector.HINGE_DOWN_TIME;
-            }
-        };
     }
     public Action collectAction() {
         return new Action() {

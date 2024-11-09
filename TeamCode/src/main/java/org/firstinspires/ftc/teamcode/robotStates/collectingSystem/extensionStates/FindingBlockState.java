@@ -13,17 +13,14 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        robot.telemetry.addData("extension run mode", robot.getExtension().getRunMode());
-        robot.telemetry.addData("extension target power", robot.getExtension().getTargetPower());
         // move extension
-        if (robot.getExtension().getRunMode() == DcMotor.RunMode.RUN_TO_POSITION)
-            robot.getExtension().setExtensionMotorPosition(robot.getExtension().getTargetPosition());
-        else if (robot.getExtension().getRunMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)
-            robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
+        robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
 
         // hard stop
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.MAX_POSITION)
-            robot.getExtension().setExtensionMotorPosition(0);
+        if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
+            robot.getExtension().setExtensionMotorPosition(Extension.MAX_POSITION);
+        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_POSITION)
+            robot.getExtension().setExtensionMotorPosition(Extension.MIN_POSITION);
     }
 
     @Override
@@ -44,6 +41,6 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public Extension.StateType getNextStateType() {
-        return null;
+        return Extension.StateType.FINDING_BLOCK;
     }
 }

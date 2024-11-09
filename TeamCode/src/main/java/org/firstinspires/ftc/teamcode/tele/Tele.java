@@ -175,18 +175,14 @@ public class Tele extends LinearOpMode {
 
     private void listenForLiftingInput() {
         // checking changes in basket/bar heights
-        // TODO: make so if arm is already dropped then raise back up and drop back drop (USE LiftingSystem.BASKET_TO_BASKET state)
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
-            if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.LOW_BASKET_POS) // will be true during transition to that position as well as when is already at position
-                robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(true);
         }
 
         if(input.getGamepadTracker2().isLeftTriggerPressed()) {
-            if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.HIGH_BASKET_POS)
-                robot.getLift().getTransitionState().overrideGoalState(Lift.LOW_BASKET_POS);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(false);
-
         }
 
         if(input.getGamepadTracker2().isRightBumperPressed())
@@ -199,7 +195,8 @@ public class Tele extends LinearOpMode {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+                        //if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+                        if(true)
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                         else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);

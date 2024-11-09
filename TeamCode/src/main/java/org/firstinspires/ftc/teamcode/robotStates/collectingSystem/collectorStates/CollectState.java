@@ -36,8 +36,9 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Collector.StateType.HINGE_DOWN ||
-                stateManager.getActiveStateType() == Collector.StateType.SPITTING;
+        return true;
+        //return stateManager.getActiveStateType() == Collector.StateType.HINGE_DOWN ||
+        //        stateManager.getActiveStateType() == Collector.StateType.SPITTING;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class CollectState extends RobotState<Collector.StateType> {
     @Override
     public Collector.StateType getNextStateType() {
         if (robot.getCollector().hasValidBlockColor())
-            return Collector.StateType.HINGE_UP;
+            return Collector.StateType.VALID_BLOCK;
         return Collector.StateType.SPITTING;
     }
 }

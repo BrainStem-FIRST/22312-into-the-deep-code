@@ -11,6 +11,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
+        robot.telemetry.addData("inside execute of basket to basket state of lifting system", "");
         // accounting switching baskets after arm is already down
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
             robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);

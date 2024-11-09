@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSy
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class SearchingState extends RobotState<CollectingSystem.StateType> {
 
@@ -11,8 +13,18 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.READY_TO_HINGE_DOWN);
+        StateManager<Extension.StateType> extensionManager = robot.getExtension().getStateManager();
+        StateManager<Hinge.StateType> hingeManager = robot.getHinge().getStateManager();
+        StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
+        if (isFirstTime()) {
+            extensionManager.tryEnterState(Extension.StateType.FINDING_BLOCK);
+
+            // if previous state was search and collect, this will hinge up and stop collector
+            if (hingeManager.getActiveStateType() == Hinge.StateType.DOWN)
+                hingeManager.tryEnterState(Hinge.StateType.HINGING_UP);
+            if (collectorManager.getActiveStateType() == Collector.StateType.COLLECTING)
+                collectorManager.tryEnterState(Collector.StateType.NOTHING);
+        }
     }
 
     @Override

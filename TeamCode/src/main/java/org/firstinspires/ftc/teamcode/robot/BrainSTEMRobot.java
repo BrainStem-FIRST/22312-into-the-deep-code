@@ -13,7 +13,8 @@ public class BrainSTEMRobot {
     private final AllianceColor allianceColor;
     private final PinpointDrive driveTrain;
 
-    public Extension extension;
+    private final Extension extension;
+    private final Hinge hinge;
     private final Collector collector;
     private final CollectingSystem collectingSystem;
 
@@ -34,6 +35,7 @@ public class BrainSTEMRobot {
 
         collector = new Collector(hwMap, telemetry, allianceColor, this);
         extension = new Extension(hwMap, telemetry, allianceColor, this);
+        hinge = new Hinge(hwMap, telemetry, allianceColor, this);
         collectingSystem = new CollectingSystem(this);
 
         grabber = new Grabber(hwMap, telemetry, allianceColor, this);
@@ -62,7 +64,7 @@ public class BrainSTEMRobot {
     }
 
     public void setupCollectingSystem() {
-        collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
+        hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
     }
 
     public void update(double dt) {
@@ -87,6 +89,7 @@ public class BrainSTEMRobot {
     public Extension getExtension() {
         return extension;
     }
+    public Hinge getHinge() { return hinge; }
 
     public Collector getCollector() {
         return collector;

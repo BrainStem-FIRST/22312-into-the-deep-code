@@ -12,12 +12,12 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_UP);
+        //robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_UP);
 
-        // wait for hinging to finish before retracting extension
-        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.READY_TO_HINGE_DOWN ||
-                robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.DONE_HINGING_UP)
-            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
+        //wait for hinging to finish before retracting extension
+        //if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.READY_TO_HINGE_DOWN ||
+        //        robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.DONE_HINGING_UP)
+        //    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
     }
 
     @Override

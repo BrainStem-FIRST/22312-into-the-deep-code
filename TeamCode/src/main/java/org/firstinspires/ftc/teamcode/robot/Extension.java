@@ -36,10 +36,7 @@ public class Extension extends Subsystem {
 
     private final DcMotorEx extensionMotor;
     private final DigitalChannel magnetResetSwitch;
-
     private double targetPower;
-    private int targetPosition;
-    private DcMotor.RunMode runMode;
 
     private final StateManager<StateType> stateManager;
 
@@ -63,9 +60,6 @@ public class Extension extends Subsystem {
 
         stateManager.setupStates(getRobot(), stateManager);
         stateManager.tryEnterState(StateType.IN);
-
-        // this is only for tele
-        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public StateManager<StateType> getStateManager() {
@@ -84,24 +78,11 @@ public class Extension extends Subsystem {
     public DigitalChannel getMagnetResetSwitch() {
         return magnetResetSwitch;
     }
-
-    public DcMotor.RunMode getRunMode() {
-        return runMode;
-    }
-    public void setRunMode(DcMotor.RunMode runMode) {
-        this.runMode = runMode;
-    }
     public double getTargetPower() {
         return targetPower;
     }
     public void setTargetPower(double targetPower) {
         this.targetPower = targetPower;
-    }
-    public int getTargetPosition() {
-        return targetPosition;
-    }
-    public void setTargetPosition(int targetPosition) {
-        this.targetPosition = targetPosition;
     }
 
     public boolean hitRetractHardStop() {

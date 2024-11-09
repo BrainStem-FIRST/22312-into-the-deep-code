@@ -12,19 +12,19 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
+import org.firstinspires.ftc.teamcode.stateMachine.State;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import kotlin.OptIn;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingSystemTele")
 public class CollectingSystemExtensionTele extends LinearOpMode {
 
     private Input input;
 
     private BrainSTEMRobot robot;
-
-    private boolean successfulSpitEnter = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -77,7 +77,6 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
-            telemetry.addData("successfully entered spit", successfulSpitEnter);
             telemetry.update();
         }
     }
@@ -115,51 +114,48 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
         } else
             robot.getDriveTrain().stopMotors();
     }
-
     private void listenForCollectionInput() {
-
-        // left and right bumpers move extension
-        if (input.getGamepadTracker1().isRightBumperPressed()) {
-
-            // enter search state if not already
-            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
-
-            // move extension out
-            robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-        }
-        // move extension in
-        else if (input.getGamepadTracker1().isLeftBumperPressed()) {
-            robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
-        }
-        else {
-            robot.getExtension().setTargetPower(0);
-        }
+        StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
+        StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
 
         // right triggers toggle between (hinging down and collecting) and (hinging up and doing nothing)
         if (input.getGamepadTracker1().isFirstFrameRightTrigger()) {
 
-            // hinge down and collect
-            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
+            // go to search and collect mode
+            if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
+                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
 
-                // hinge up and stop collecting
-            else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+                // go to search mode
+            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN ||
+                    collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
         }
+
+        // left and right bumpers move extension
+        if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
+                collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+            // move extension out
+            if (input.getGamepadTracker1().isRightBumperPressed())
+                    robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
+            // move extension in
+            else if (input.getGamepadTracker1().isLeftBumperPressed())
+                robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
+            else
+                robot.getExtension().setTargetPower(0);
 
         // left trigger retracts
         if (input.getGamepadTracker1().isFirstFrameLeftTrigger())
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+            collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck
-        if (input.getGamepadTracker2().isDpadDownPressed()) {
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
-            ((SpitTempState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
+        // spits as long as gamepad is down
+        if (input.getGamepadTracker2().isDpadUpPressed()) {
+            collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
+            ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
 
         // force retraction for emergencies
-        if (input.getGamepadTracker2().isDpadUpPressed())
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+        if (input.getGamepadTracker2().isDpadDownPressed())
+            collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
 }

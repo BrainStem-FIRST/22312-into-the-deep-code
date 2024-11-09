@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSy
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SearchAndCollectState extends RobotState<CollectingSystem.StateType> {
@@ -11,8 +12,16 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     }
     @Override
     public void execute() {
-        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_DOWN);
+        if (isFirstTime()) {
+            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
+            robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.HINGING_DOWN);
+        }
+        // collect once hinging is finished
+        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
+
+        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.VALID_BLOCK)
+            robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.HINGING_UP);
     }
 
     @Override
@@ -27,7 +36,7 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.DONE_HINGING_UP;
+        return robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP;
     }
 
     @Override

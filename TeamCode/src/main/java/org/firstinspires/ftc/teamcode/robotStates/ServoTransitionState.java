@@ -27,7 +27,7 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-        return Math.abs(servo.getPosition() - goalPosition) < DESTINATION_THRESHOLD;
+        return time > 0.5;
     }
 
     @Override

@@ -39,7 +39,6 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        //return time - startTime >= SAFETY_TIME;
         return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE;
     }
 

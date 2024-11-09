@@ -22,9 +22,7 @@ public class Lift extends Subsystem {
         HIGH_RAM_AFTER_POS = 1700,
 
         LOW_BASKET_POS = 1700,
-        LOW_BASKET_SAFETY_POS = 1500,
-        HIGH_BASKET_POS = 3040,
-        HIGH_BASKET_SAFETY_POS = 2840;
+        HIGH_BASKET_POS = 3040;
 
     public static final int DESTINATION_THRESHOLD = 30;
     public enum StateType {

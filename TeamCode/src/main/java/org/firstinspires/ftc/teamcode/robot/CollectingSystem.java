@@ -43,9 +43,9 @@ public class CollectingSystem {
     public Action extendAndCollectAction(int extendMotorTick) {
         return new SequentialAction(
                 getRobot().getExtension().extendAction(extendMotorTick),
-                getRobot().getCollector().hingeDownAction(),
+                getRobot().getHinge().hingeDownAction(),
                 getRobot().getCollector().collectAction(),
-                getRobot().getCollector().hingeUpAction(),
+                getRobot().getHinge().hingeUpAction(),
                 getRobot().getExtension().retractAction()
         );
     }

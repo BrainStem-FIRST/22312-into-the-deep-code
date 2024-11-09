@@ -19,15 +19,9 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
             if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
                 robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);
                 // moving lift down once arm is up
-            else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP)
-                if (robot.getLift().atHighBasket())
-                    robot.getLift().getTransitionState().setGoalState(Lift.HIGH_BASKET_SAFETY_POS, Lift.StateType.BASKET_SAFETY);
-                else if (robot.getLift().atLowBasket())
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-                else
-                    robot.telemetry.addData("LOGIC ERROR in BasketToTroughState", "lift not at high nor low basket");
+            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP)
+                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
-
         // once lift reach safety threshold
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.telemetry.addData("lift state recognized as trough safety inside basketToTrough execute function", "");
