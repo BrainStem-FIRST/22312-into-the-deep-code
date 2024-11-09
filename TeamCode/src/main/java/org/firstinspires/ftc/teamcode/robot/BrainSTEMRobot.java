@@ -46,7 +46,7 @@ public class BrainSTEMRobot {
 
     public boolean setup() {
         telemetry.addData("motor position", lift.getLiftMotor().getCurrentPosition());
-        collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
+        setupCollectingSystem();
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
 
         if(Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD ||
@@ -59,6 +59,10 @@ public class BrainSTEMRobot {
 
         return Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD &&
                 Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_POS) <= Lift.DESTINATION_THRESHOLD;
+    }
+
+    public void setupCollectingSystem() {
+        collector.setHingeServoPosition(Collector.HINGE_UP_POSITION);
     }
 
     public void update(double dt) {

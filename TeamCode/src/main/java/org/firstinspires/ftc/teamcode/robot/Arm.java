@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Arm extends Subsystem {
     // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
-    public static final int MIN_TICK = 550, LEFT_TICK = 1160, UP_TICK = 1550, MAX_TICK = 2045;
-    public static final double DOWN_POS = 0.001, LEFT_POS = 0.408, UP_POS = 0.669, RIGHT_POS = 0.999;
+    public static final int MIN_TICK = 560, LEFT_TICK = 1160, UP_TICK = 1550, MAX_TICK = 2045;
+    public static final double DOWN_POS = 0.01, LEFT_POS = 0.408, UP_POS = 0.669, RIGHT_POS = 0.99;
     public static final double DESTINATION_THRESHOLD = 0.05;
     public enum StateType {
         DOWN, LEFT, UP, RIGHT, TRANSITION

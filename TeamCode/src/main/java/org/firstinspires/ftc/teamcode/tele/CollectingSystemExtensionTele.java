@@ -37,7 +37,8 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        robot.setup();
+        //robot.setup();
+        robot.setupCollectingSystem();
 
         long currentTime = System.currentTimeMillis();
         long prevTime;
