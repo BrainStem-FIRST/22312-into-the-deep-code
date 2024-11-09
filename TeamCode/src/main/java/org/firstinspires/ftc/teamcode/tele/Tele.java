@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.util.gamepadInput.Input;
 
 import kotlin.OptIn;
@@ -161,9 +162,10 @@ public class Tele extends LinearOpMode {
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck
+        // spits as long as gamepad is down
         if (input.getGamepadTracker2().isDpadDownPressed()) {
-            robot.getCollector().useSpittingSafety(false);
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
+            ((SpitTempState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
 
         // force retraction for emergencies

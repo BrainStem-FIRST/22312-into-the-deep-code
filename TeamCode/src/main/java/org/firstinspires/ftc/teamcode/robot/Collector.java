@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeDownState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.HingeUpState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -43,6 +44,8 @@ public class Collector extends Subsystem {
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
     public static double HINGE_DOWN_TIME = 0.7, HINGE_UP_TIME = 0.85;
 
+    // after the block color sensor stops detecting the block, still spit for 1 second
+
     // number of seconds to spit for
     public static final double SPITTING_TIME = 1;
 
@@ -50,7 +53,8 @@ public class Collector extends Subsystem {
         READY_TO_HINGE_DOWN,
         HINGE_DOWN,
         COLLECTING,
-        SPITTING,
+        SPITTING, // only stops when block color sensor detects nothing + safety time
+        SPITTING_TEMP, // stops next frame unless called continuously
         HINGE_UP,
         DONE_HINGING_UP
     }
@@ -80,6 +84,7 @@ public class Collector extends Subsystem {
 
         stateManager.addState(StateType.COLLECTING, new CollectState());
         stateManager.addState(StateType.SPITTING, new SpitState());
+        stateManager.addState(StateType.SPITTING_TEMP, new SpitTempState());
         stateManager.addState(StateType.HINGE_UP, new HingeUpState());
         stateManager.addState(StateType.HINGE_DOWN, new HingeDownState());
 
@@ -105,10 +110,6 @@ public class Collector extends Subsystem {
     public ServoImplEx getHingeServo() { return hingeServo; }
     public void setHingeServoPosition(double position) {
         hingeServo.setPosition(position);
-    }
-
-    public void useSpittingSafety(boolean hasSafety) {
-        ((SpitState) stateManager.getState(StateType.SPITTING)).useSafety(hasSafety);
     }
 
     @Override
