@@ -18,9 +18,9 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
-            robot.getExtension().setExtensionMotorPosition(Extension.MAX_POSITION);
+            robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_POSITION)
-            robot.getExtension().setExtensionMotorPosition(Extension.MIN_POSITION);
+            robot.getExtension().setTargetPower(Math.max(0, robot.getExtension().getTargetPower()));
     }
 
     @Override

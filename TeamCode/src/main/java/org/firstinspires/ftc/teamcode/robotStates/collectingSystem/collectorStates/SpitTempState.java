@@ -23,7 +23,7 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
+        robot.getCollector().setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
         framesRunning++;
     }
 

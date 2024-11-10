@@ -30,9 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 1;
-
-    // store the absolute bounds for the servo (just in case)
-    public static final int MAX_TICK = 2500, MIN_TICK = 100;
+    public static final double SPIT_TEMP_POWER = 0.5;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
 
@@ -61,15 +59,14 @@ public class Collector extends Subsystem {
         blockColorSensor = new BlockColorSensor(hwMap, telemetry);
 
         stateManager = new StateManager<>(StateType.NOTHING);
-
-        stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING));
+        NothingState<StateType> nothingState = new NothingState<>(StateType.NOTHING);
+        nothingState.addMotor(spindleMotor);
+        stateManager.addState(StateType.NOTHING, nothingState);
         stateManager.addState(StateType.COLLECTING, new CollectState());
         stateManager.addState(StateType.SPITTING, new SpitState());
         stateManager.addState(StateType.SPITTING_TEMP, new SpitTempState());
         stateManager.addState(StateType.VALID_BLOCK, new NothingState<>(StateType.VALID_BLOCK));
-
         stateManager.setupStates(getRobot(), stateManager);
-        stateManager.tryEnterState(StateType.NOTHING);
     }
 
     public StateManager<Collector.StateType> getStateManager() {

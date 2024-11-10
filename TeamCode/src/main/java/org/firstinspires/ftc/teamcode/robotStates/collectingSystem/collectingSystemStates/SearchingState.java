@@ -16,20 +16,20 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
         StateManager<Extension.StateType> extensionManager = robot.getExtension().getStateManager();
         StateManager<Hinge.StateType> hingeManager = robot.getHinge().getStateManager();
         StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
+
         if (isFirstTime()) {
             extensionManager.tryEnterState(Extension.StateType.FINDING_BLOCK);
 
             // if previous state was search and collect, this will hinge up and stop collector
-            if (hingeManager.getActiveStateType() == Hinge.StateType.DOWN)
-                hingeManager.tryEnterState(Hinge.StateType.HINGING_UP);
-            if (collectorManager.getActiveStateType() == Collector.StateType.COLLECTING)
-                collectorManager.tryEnterState(Collector.StateType.NOTHING);
+            hingeManager.tryEnterState(Hinge.StateType.HINGING_UP);
+            collectorManager.tryEnterState(Collector.StateType.NOTHING);
         }
     }
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == CollectingSystem.StateType.IN;
+        return stateManager.getActiveStateType() == CollectingSystem.StateType.IN ||
+                stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT;
     }
 
     @Override

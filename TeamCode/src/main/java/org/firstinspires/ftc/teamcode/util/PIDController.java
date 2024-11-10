@@ -27,6 +27,7 @@ public class PIDController {
         this.kD = kD;
     }
 
+    // the target position of motor
     public double getTarget() {
         return target;
     }
@@ -58,6 +59,8 @@ public class PIDController {
         shouldReset = true;
     }
 
+
+    // returns motor power given current position of motor
     public double update(double value) {
         value = Range.clip(value, lowerInputBound, higherInputBound);
 

@@ -12,6 +12,8 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     }
     @Override
     public void execute() {
+        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
+
         if (isFirstTime()) {
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
             robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.HINGING_DOWN);
@@ -19,9 +21,6 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
         // collect once hinging is finished
         if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
-
-        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.VALID_BLOCK)
-            robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.HINGING_UP);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
 
     @Override
     public boolean isDone() {
-        return robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP;
+        return robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.VALID_BLOCK;
     }
 
     @Override

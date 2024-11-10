@@ -74,6 +74,7 @@ public class BrainSTEMRobot {
 
         // update individual subsystems
         collector.update(dt);
+        hinge.update(dt);
         extension.update(dt);
 
         grabber.update(dt);

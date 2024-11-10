@@ -42,8 +42,9 @@ public class StateManager<StateType extends Enum<StateType>> {
     public boolean tryEnterState(StateType stateType) {
         // only allow entering if meet requirements to enter state and either current state is done or current state can be overridden
         if (Objects.requireNonNull(stateMap.get(stateType)).canEnter() && (getActiveState().isDone() || getActiveState().canBeOverridden())) {
-            getActiveState().resetTime();
             activeStateType = stateType;
+            getActiveState().resetTime();
+            getActiveState().resetFramesRunning();
             return true;
         }
         return false;
@@ -57,5 +58,6 @@ public class StateManager<StateType extends Enum<StateType>> {
 
         getActiveState().execute();
         getActiveState().incrementTime(dt);
+        getActiveState().incrementFramesRunning();
     }
 }

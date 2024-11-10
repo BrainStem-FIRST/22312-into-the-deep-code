@@ -59,7 +59,6 @@ public class Extension extends Subsystem {
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
         stateManager.setupStates(getRobot(), stateManager);
-        stateManager.tryEnterState(StateType.IN);
     }
 
     public StateManager<StateType> getStateManager() {
@@ -91,16 +90,6 @@ public class Extension extends Subsystem {
 
     @Override
     public void update(double dt) {
-        // if the magnet switch detects the extension is close enough, it will reset its encoders
-        if (hitRetractHardStop()) {
-            Subsystem.setMotorPower(extensionMotor, 0);
-            stateManager.tryEnterState(StateType.IN);
-            extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-
-        if (extensionMotor.getCurrentPosition() >= MAX_POSITION)
-            Subsystem.setMotorPower(extensionMotor, 0);
-
         stateManager.update(dt);
     }
 

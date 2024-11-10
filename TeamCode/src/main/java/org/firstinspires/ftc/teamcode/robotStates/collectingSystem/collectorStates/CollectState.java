@@ -37,8 +37,6 @@ public class CollectState extends RobotState<Collector.StateType> {
     @Override
     public boolean canEnter() {
         return true;
-        //return stateManager.getActiveStateType() == Collector.StateType.HINGE_DOWN ||
-        //        stateManager.getActiveStateType() == Collector.StateType.SPITTING;
     }
 
     @Override

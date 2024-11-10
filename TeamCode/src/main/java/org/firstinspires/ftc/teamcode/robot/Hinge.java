@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 public class Hinge extends Subsystem {
     public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1726;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
-    public static double HINGE_DOWN_TIME = 0.7, HINGE_UP_TIME = 0.85;
+    public static double HINGE_DOWN_TIME = 0.5, HINGE_UP_TIME = 0.5;
 
     public enum StateType {
         UP,
@@ -37,9 +37,10 @@ public class Hinge extends Subsystem {
 
         stateManager = new StateManager<>(StateType.UP);
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
-        stateManager.addState(StateType.HINGING_DOWN, new HingeDownState());
         stateManager.addState(StateType.HINGING_UP, new HingeUpState());
         stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
+        stateManager.addState(StateType.HINGING_DOWN, new HingeDownState());
+        stateManager.setupStates(getRobot(), stateManager);
     }
     public StateManager<StateType> getStateManager() {
         return stateManager;
@@ -52,7 +53,7 @@ public class Hinge extends Subsystem {
 
     @Override
     public void update(double dt) {
-
+        stateManager.update(dt);
     }
 
 

@@ -11,17 +11,16 @@ public class HingeUpState extends RobotState<Hinge.StateType> {
     @Override
     public void execute() {
         robot.getHinge().setHingeServoPosition(Hinge.HINGE_UP_POSITION);
-        robot.getCollector().setSpindleMotorPower(0);
     }
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Hinge.StateType.DOWN;
+        return stateManager.getActiveStateType() == Hinge.StateType.DOWN || stateManager.getActiveStateType() == Hinge.StateType.HINGING_DOWN;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override

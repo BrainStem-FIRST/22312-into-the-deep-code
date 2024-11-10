@@ -67,8 +67,9 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             telemetry.addData("gamepad1 a down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
+            telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-            telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
+            telemetry.addData("extension target power", robot.getExtension().getTargetPower());
             telemetry.update();
         }
     }
@@ -110,44 +111,42 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
         StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
         StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
 
-        // right triggers toggle between (hinging down and collecting) and (hinging up and doing nothing)
+        // go into search mode
+        if (input.getGamepadTracker1().isRightBumperPressed() && collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN)
+            collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
+
+        // set extension target power
+        if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
+                collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+            if (input.getGamepadTracker1().isRightBumperPressed())
+                robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
+            else if (input.getGamepadTracker1().isLeftBumperPressed())
+                robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
+            else
+                robot.getExtension().setTargetPower(0);
+        else
+            robot.getExtension().setTargetPower(0);
+
+        // right trigger toggle between (hinging down and collecting) and (hinging up and doing nothing)
         if (input.getGamepadTracker1().isFirstFrameRightTrigger()) {
 
             // go to search and collect mode
             if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
 
-                // go to search mode
-            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN ||
-                    collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+            // go to search mode
+            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
         }
-
-        // left and right bumpers move extension
-        if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
-                collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-            // move extension out
-            if (input.getGamepadTracker1().isRightBumperPressed())
-                    robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-            // move extension in
-            else if (input.getGamepadTracker1().isLeftBumperPressed())
-                robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
-            else
-                robot.getExtension().setTargetPower(0);
 
         // left trigger retracts
         if (input.getGamepadTracker1().isFirstFrameLeftTrigger())
             collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
-        // force spit in case block gets stuck
-        // spits as long as gamepad is down
-        if (input.getGamepadTracker2().isDpadUpPressed()) {
+        // force spit in case block gets stuck - spits as long as gamepad button is down
+        if (input.getGamepadTracker1().isDpadUpPressed()) {
             collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
-
-        // force retraction for emergencies
-        if (input.getGamepadTracker2().isDpadDownPressed())
-            collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
 }

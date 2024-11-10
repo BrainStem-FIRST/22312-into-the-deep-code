@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSy
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class RetractingState extends RobotState<CollectingSystem.StateType> {
@@ -12,12 +13,13 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        //robot.getCollector().getStateManager().tryEnterState(Collector.StateType.HINGE_UP);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
+            robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.HINGING_UP);
 
-        //wait for hinging to finish before retracting extension
-        //if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.READY_TO_HINGE_DOWN ||
-        //        robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.DONE_HINGING_UP)
-        //    robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
+        // wait for hinging to finish before retracting extension
+        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
+            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
     }
 
     @Override
