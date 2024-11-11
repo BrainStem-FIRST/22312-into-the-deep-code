@@ -8,6 +8,8 @@ public class PathPoint {
     private Pose2D point;
     private double displacementTolerance;
     private double headingTolerance;
+    private double targetVelocity;
+    private double velocityTolerance;
     private DistanceUnit distanceUnit = DistanceUnit.INCH;
     private AngleUnit angleUnit = AngleUnit.DEGREES;
 
@@ -15,6 +17,17 @@ public class PathPoint {
         this.point = point;
         this.displacementTolerance = displacementTolerance;
         this.headingTolerance = headingTolerance;
+        this.targetVelocity = 0;
+        this.velocityTolerance = 0;
+    }
+
+    public PathPoint(Pose2D point, double displacementTolerance, double headingTolerance,
+                     double targetVelocity, double velocityTolerance) {
+        this.point = point;
+        this.displacementTolerance = displacementTolerance;
+        this.headingTolerance = headingTolerance;
+        this.targetVelocity = targetVelocity;
+        this.velocityTolerance = velocityTolerance;
     }
 
     public Pose2D getPoint() {
@@ -29,7 +42,7 @@ public class PathPoint {
         return headingTolerance;
     }
 
-    public boolean inTolerance(Pose2D comparisonPoint) {
+    public boolean inTolerance(Pose2D comparisonPoint, double currentVelocity) {
         double x = comparisonPoint.getX(distanceUnit);
         double y = comparisonPoint.getY(distanceUnit);
 
@@ -40,6 +53,8 @@ public class PathPoint {
                 point.getHeading(angleUnit))) < headingTolerance;
         boolean displacementInTolerance = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <
                 Math.pow(displacementTolerance, 2);
-        return headingInTolerance && displacementInTolerance;
+        boolean velocityInTolerance = Math.abs(targetVelocity - currentVelocity) < velocityTolerance;
+
+        return headingInTolerance && displacementInTolerance && velocityInTolerance;
     }
 }

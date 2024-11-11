@@ -14,10 +14,9 @@ public class Lift extends Subsystem {
         TROUGH_POS = 0,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
-
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 565,
-        HIGH_RAM_BEFORE_POS = 1000,
+        HIGH_RAM_BEFORE_POS = 750,
         HIGH_RAM_AFTER_POS = 1800,
 
         LOW_BASKET_POS = 1700,
@@ -36,7 +35,7 @@ public class Lift extends Subsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        stateManager = new StateManager<>(StateType.TROUGH);
+        stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
         NothingState<StateType> troughState = new NothingState<>(StateType.TROUGH);
         troughState.addMotor(liftMotor);

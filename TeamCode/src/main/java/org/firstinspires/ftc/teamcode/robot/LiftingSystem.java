@@ -42,12 +42,6 @@ public class LiftingSystem {
                 robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
             stateManager.tryEnterState(StateType.BASKET_TO_TROUGH);
 
-        // transitioning arm to setup for ram once specimen is picked up
-        else if(stateManager.getActiveStateType() == StateType.DROP_AREA &&
-                robot.getGrabber().getHasSpecimen() &&
-                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
-            stateManager.tryEnterState(StateType.DROP_AREA_TO_RAM);
-
         // once lift is done ramming
         else if(stateManager.getActiveStateType() == StateType.SPECIMEN_RAM &&
                 robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)

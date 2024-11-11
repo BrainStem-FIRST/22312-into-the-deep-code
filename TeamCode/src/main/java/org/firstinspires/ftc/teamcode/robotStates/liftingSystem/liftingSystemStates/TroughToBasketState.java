@@ -13,9 +13,9 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute() {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN)
-            robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);
+            robot.getArm().getTransitionState().setGoalState(Arm.RIGHT_POS, Arm.StateType.RIGHT);
 
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP) {
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.RIGHT) {
             robot.telemetry.addData("recognizing arm is up in troughToBasketState", "");
             // only want to set lift state to be in transition if in trough
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)

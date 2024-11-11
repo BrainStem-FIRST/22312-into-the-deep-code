@@ -56,7 +56,7 @@ public class Collector extends Subsystem {
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
 
-        blockColorSensor = new BlockColorSensor(hwMap, telemetry);
+        blockColorSensor = new BlockColorSensor(hwMap);
 
         stateManager = new StateManager<>(StateType.NOTHING);
         NothingState<StateType> nothingState = new NothingState<>(StateType.NOTHING);

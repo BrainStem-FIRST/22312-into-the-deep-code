@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
+import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.Input;
 
 
@@ -30,11 +32,7 @@ public class Tele extends LinearOpMode {
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
-
-        while(!robot.setup()) {
-            telemetry.addData("robot status", "setting up");
-            telemetry.update();
-        }
+        robot.setup();
 
         // TODO: delete code once done testing life
         robot.setBlockColorHeld(BlockColor.YELLOW);
@@ -128,53 +126,47 @@ public class Tele extends LinearOpMode {
     }
 
     private void listenForCollectionInput() {
+        StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
+        StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
 
-        // left and right bumpers move extension
-        if (input.getGamepadTracker1().isRightBumperPressed()) {
+        // go into search mode
+        if (input.getGamepadTracker1().isRightBumperPressed() && collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN)
+            collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
 
-            // enter search state if not already
-            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
-
-            // move extension out
-            robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-        }
-        // move extension in
-        else if (input.getGamepadTracker1().isLeftBumperPressed()) {
-            robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
-        }
-        else {
+        // set extension target power
+        if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
+                collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+            if (input.getGamepadTracker1().isRightBumperPressed())
+                robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
+            else if (input.getGamepadTracker1().isLeftBumperPressed())
+                robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
+            else
+                robot.getExtension().setTargetPower(0);
+        else
             robot.getExtension().setTargetPower(0);
-        }
 
-        // right triggers toggle between (hinging down and collecting) and (hinging up and doing nothing)
+        // right trigger toggle between (hinging down and collecting) and (hinging up and doing nothing)
         if (input.getGamepadTracker1().isFirstFrameRightTrigger()) {
 
-            // hinge down and collect
-            if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
+            // go to search and collect mode
+            if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
+                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
 
-            // hinge up and stop collecting
-            else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+                // go to search mode
+            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
         }
 
         // left trigger retracts
         if (input.getGamepadTracker1().isFirstFrameLeftTrigger())
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+            collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
-        // force spit in case block gets stuck
-        // spits as long as game pad is down
-        if (input.getGamepadTracker2().isDpadDownPressed()) {
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
-            ((SpitTempState) robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
+        // force spit in case block gets stuck - spits as long as gamepad button is down
+        if (input.getGamepadTracker1().isDpadUpPressed()) {
+            collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
+            ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
-
-        // force retraction for emergencies
-        if (input.getGamepadTracker2().isDpadUpPressed())
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
-
     private void listenForLiftingInput() {
         // TODO: get rid of conditional below once lifting system and collecting system can work together
         if(input.getGamepadTracker1().isFirstFrameX())
@@ -204,11 +196,11 @@ public class Tele extends LinearOpMode {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        //if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-                        if(robot.getInDepositingMode())
+                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+                        //if(robot.getInDepositingMode())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        else
-                        //else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
+                        //else
+                        else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
                 case BASKET_DEPOSIT:
@@ -218,14 +210,20 @@ public class Tele extends LinearOpMode {
                     break;
                 case DROP_AREA:
                     if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                        robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
-                        robot.getGrabber().setHasBlock(false);
-                        // technically should set robot.blockColorHeld to false, but it will immediately be set to true when specimen is picked up, so no point of changing value
+                        // dropping block to human player station
+                        if(!robot.getGrabber().getHasSpecimen()) {
+                            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                            robot.getGrabber().setHasBlock(false);
+                        }
+                        // assuming robot is flush with submersible, so transitions to ram before
+                        else
+                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
                     }
                     else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
                         robot.getGrabber().setHasSpecimen(true);
                     }
+
                     break;
                 case SPECIMEN_RAM:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)

@@ -11,7 +11,7 @@ public class ColorTele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        BlockColorSensor blockColorSensor = new BlockColorSensor(hardwareMap, telemetry);
+        BlockColorSensor blockColorSensor = new BlockColorSensor(hardwareMap);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -28,15 +28,17 @@ public class ColorTele extends LinearOpMode {
             currentTime = System.currentTimeMillis();
             dt = (currentTime - prevTime) / 1000.;
 
-            telemetry.addData("sensor red value", blockColorSensor.red());
-            telemetry.addData("sensor green value", blockColorSensor.green());
-            telemetry.addData("sensor blue value", blockColorSensor.blue());
+            int r = blockColorSensor.red();
+            int g = blockColorSensor.green();
+            int b = blockColorSensor.blue();
+            double sum = r + g + b;
 
-            telemetry.addData("ideal red block r percent", BlockColorSensor.RED_BLOCK_PERCENTS[0]);
-            telemetry.addData("ideal red block g percent", BlockColorSensor.RED_BLOCK_PERCENTS[1]);
-            telemetry.addData("ideal red block b percent", BlockColorSensor.RED_BLOCK_PERCENTS[2]);
-
-            telemetry.addData("has red color", blockColorSensor.hasColor(BlockColor.RED));
+            telemetry.addData("r percent", r / sum);
+            telemetry.addData("g percent", g / sum);
+            telemetry.addData("b percent", b / sum);
+            telemetry.addData("has red block", blockColorSensor.hasColor(BlockColor.RED));
+            telemetry.addData("has yellow block", blockColorSensor.hasColor(BlockColor.YELLOW));
+            telemetry.addData("has blue block", blockColorSensor.hasColor(BlockColor.BLUE));
             telemetry.update();
         }
     }

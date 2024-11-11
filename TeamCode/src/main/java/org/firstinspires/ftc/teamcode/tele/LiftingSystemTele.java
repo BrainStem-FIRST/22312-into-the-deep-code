@@ -5,19 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Arm;
-import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
-import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele2")
-public class Tele2 extends LinearOpMode {
+public class LiftingSystemTele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 

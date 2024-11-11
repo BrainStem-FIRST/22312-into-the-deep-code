@@ -47,24 +47,28 @@ public class BrainSTEMRobot {
         blockColorHeld = BlockColor.NONE;
     }
 
-    public boolean setup() {
-        // TODO: MAKE ARM GO TO DOWN POSITION FIRST, THEN MAKE LIFT LOWER
-        setupCollectingSystem();
-        grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
-
-        if(Math.abs(arm.getArmServo().getPosition() - Arm.DOWN_POS) <= Arm.DESTINATION_THRESHOLD ||
-                Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) <= Lift.DESTINATION_THRESHOLD) {
-            arm.getArmServo().setPosition(Arm.DOWN_POS);
-            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_POS);
+    public void setup() {
+        double start = System.currentTimeMillis() / 1000.0;
+        double relativeTime = 0;
+        while(!systemsSetupDone(relativeTime)) {
+            telemetry.addData("robot status", "setting up");
+            telemetry.addData("relative time", relativeTime);
+            telemetry.update();
+            relativeTime = System.currentTimeMillis() / 1000.0 - start;
         }
-        else
-            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
-
-        return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_POS) <= Lift.DESTINATION_THRESHOLD;
     }
-
-    public void setupCollectingSystem() {
+    private boolean systemsSetupDone(double curTime) {
+        return setupCollectingSystem(curTime) && setupLiftingSystem(curTime);
+    }
+    public boolean setupCollectingSystem(double curTime) {
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
+        return true;
+    }
+    public boolean setupLiftingSystem(double curTime) {
+        grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
+        arm.getArmServo().setPosition(Arm.DOWN_POS);
+        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
+        return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) < Lift.DESTINATION_THRESHOLD;
     }
 
     public void update(double dt) {

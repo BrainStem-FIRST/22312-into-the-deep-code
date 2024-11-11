@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
 
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
@@ -17,12 +18,17 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // waiting for collection system to finish in taking block before grabbing onto it
 
         // TODO: replace conditional checking for gamepad input below w commented out conditional once collecting system fixed
-        //if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
-        //        robot.getCollector().hasValidBlockColor())
-        if(time > 2)
-            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
 
-        // TODO: change conditional below to else if once collecting from block input is restored
+        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
+                robot.getCollector().hasValidBlockColor())
+            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+            }
+
+
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)
+            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
         // waiting for grabber to close on block before raising lift
         if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
             robot.getGrabber().setHasBlock(true); 

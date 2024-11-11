@@ -25,6 +25,8 @@ public class SpitState extends RobotState<Collector.StateType> {
         // get the starting time to track safety
         if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)
             startTime = time;
+        if (robot.getCollector().getBlockColorSensor().getBlockColor() != BlockColor.NONE)
+            startTime = 0;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE;
+        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && time - startTime > SAFETY_TIME;
     }
 
     @Override

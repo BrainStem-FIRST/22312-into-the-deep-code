@@ -12,23 +12,27 @@ public class BlockColorSensor {
 
     public static final HashMap<BlockColor, Double[]> BLOCK_PERCENTS = new HashMap<>();
     public static final HashMap<BlockColor, Double> BLOCK_THRESHOLDS = new HashMap<>();
-    public static final Double[] RED_BLOCK_PERCENTS = { 54.7, 28.45, 16.8 };
+    public static final Double[] RED_BLOCK_PERCENTS = { 51.3, 29.9, 18.7 };
+    // 0.5, 0.3044, 0.1956
+    // 0.5274, 0.2927, 0.1799
     public static final Double RED_BLOCK_THRESHOLD = 6.;
-    public static final Double[] BLUE_BLOCK_PERCENTS = { 9.58, 23.00, 67.45 };
-    public static final Double BLUE_BLOCK_THRESHOLD = 2.;
-    public static final Double[] YELLOW_BLOCK_PERCENTS = { 34.30, 52.7, 12.95 };
-    public static final Double YELLOW_BLOCK_THRESHOLD = 2.;
+    public static final Double[] BLUE_BLOCK_PERCENTS = { 10.4, 24.25, 65. };
+    // 0.1082, 0.2497, 0.6422
+    // 0.1005, 0.2356, 0.664
+    public static final Double BLUE_BLOCK_THRESHOLD = 5.;
+    public static final Double[] YELLOW_BLOCK_PERCENTS = { 35.14, 51.57, 13.3 };
+    // 0.35, 0.5142, 0.1361
+    // 0.3528, 0.5172, 0.1298
+    public static final Double YELLOW_BLOCK_THRESHOLD = 5.;
 
-    private final Telemetry telemetry;
 
     private final ColorSensor colorSensor;
 
     private boolean updatedBlockColor;
     private BlockColor blockColor;
 
-    public BlockColorSensor(HardwareMap hwMap, Telemetry telemetry) {
+    public BlockColorSensor(HardwareMap hwMap) {
         colorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
-        this.telemetry = telemetry;
         updatedBlockColor = false;
         blockColor = BlockColor.NONE;
         BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS);
@@ -46,7 +50,7 @@ public class BlockColorSensor {
         return colorSensor.green();
     }
     public int blue() {
-        return colorSensor.green();
+        return colorSensor.blue();
     }
 
     public void resetUpdateBlockColor() {

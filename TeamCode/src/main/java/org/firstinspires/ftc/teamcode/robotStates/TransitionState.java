@@ -9,8 +9,8 @@ public abstract class TransitionState<StateType extends Enum<StateType>> extends
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
     }
     public void setGoalState(double goalPosition, StateType goalStateType) {
-        // only sets goal state the current state in stateManager is not in transition (because don't want to override that transition)
-        if(stateManager.getActiveStateType() != stateType) {
+        // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
+        if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
             this.goalPosition = goalPosition;
             this.goalStateType = goalStateType;
             stateManager.tryEnterState(stateType);
