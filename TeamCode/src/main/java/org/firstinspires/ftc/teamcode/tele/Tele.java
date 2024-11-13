@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Arm;
@@ -42,7 +44,7 @@ public class Tele extends LinearOpMode {
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
-        double interval = 1000/60.;
+        double interval = 1000/60.; // 60 fps
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
@@ -60,10 +62,6 @@ public class Tele extends LinearOpMode {
             dt = (currentTime - prevTime) / 1000.;
             timeSinceLastUpdate += dt;
 
-            //if (timeSinceLastUpdate < interval)
-            //    continue;
-            //timeSinceLastUpdate -= interval;
-
             // update custom input
             input.update();
 
@@ -71,12 +69,12 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
-            telemetry.addData("gamepad1 a down", input.getGamepadTracker1().isAPressed());
-            //telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
-            //telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
-            //telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-            //telemetry.addData("extension time", robot.getExtension().getStateManager().getState(Extension.StateType.RETRACTING).getTime());
-            telemetry.addData("in depositing mode", robot.getInDepositingMode());
+            telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
+            telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
+            telemetry.addData("robot vector real", robot.getDriveTrain().pose.heading.real);
+            telemetry.addData("robot vector imaginary", robot.getDriveTrain().pose.heading.imag);
+            telemetry.addData("robot angle", Math.atan2(robot.getDriveTrain().pose.heading.real, robot.getDriveTrain().pose.heading.imag));
+            telemetry.addData("in pid mode", robot.getInPidMode());
             telemetry.addData("high basket", robot.isHighDeposit());
             telemetry.addData("high ram", robot.isHighRam());
             telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
@@ -94,11 +92,23 @@ public class Tele extends LinearOpMode {
         listenForDriveTrainInput();
         listenForCollectionInput();
         listenForLiftingInput();
+
+        // x toggles pid actions
+        if(input.getGamepadTracker1().isFirstFrameX())
+            robot.setInPidMode(!robot.getInPidMode());
     }
 
-    // without roadrunner
     private void listenForDriveTrainInput() {
-
+        robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
+                new Vector2d(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x
+                ),
+                -gamepad1.right_stick_x
+        ));
+    }
+    // without roadrunner
+    private void listenForDriveTrainInputOld() {
         double leftStickX = gamepad1.left_stick_x;
         double leftStickY = gamepad1.left_stick_y * -1;
         double rightStickX;
@@ -169,8 +179,8 @@ public class Tele extends LinearOpMode {
     }
     private void listenForLiftingInput() {
         // TODO: get rid of conditional below once lifting system and collecting system can work together
-        if(input.getGamepadTracker1().isFirstFrameX())
-            robot.setInDepositingMode(!robot.getInDepositingMode());
+        //if(input.getGamepadTracker1().isFirstFrameX())
+        //    robot.setInDepositingMode(!robot.getInDepositingMode());
 
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
@@ -190,7 +200,6 @@ public class Tele extends LinearOpMode {
         //if(input.getGamepadTracker2().isRightTriggerPressed())
             //robot.setIsHighRam(false);
 
-        // TODO: change conditionals inside TROUGH case by uncommenting the commented ones and deleting current ones when collecting system and lifting system can work together
         // button for "progressing" a state
         if(input.getGamepadTracker1().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {

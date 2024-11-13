@@ -30,7 +30,7 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override

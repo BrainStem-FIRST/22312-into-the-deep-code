@@ -5,6 +5,8 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
+// TODO: fix so ends when lift goes to trought safety state, not trough (bc changd it)
+// TODO: do same for ram_to_troughState
 public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
     public BasketToTroughState() {
         super(LiftingSystem.StateType.BASKET_TO_TROUGH);
@@ -39,7 +41,7 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override

@@ -26,6 +26,7 @@ public class BrainSTEMRobot {
     private boolean isHighDeposit = true;
     private boolean isHighRam = true;
     private boolean inDepositingMode = true;
+    private boolean inPidMode = false;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -85,9 +86,10 @@ public class BrainSTEMRobot {
         arm.update(dt);
         lift.update(dt);
 
+        driveTrain.updatePoseEstimate();
     }
 
-    public MecanumDrive getDriveTrain() {
+    public PinpointDrive getDriveTrain() {
         return driveTrain;
     }
 
@@ -144,5 +146,11 @@ public class BrainSTEMRobot {
     }
     public void setInDepositingMode(boolean inDepositingMode) {
         this.inDepositingMode = inDepositingMode;
+    }
+    public boolean getInPidMode() {
+        return inPidMode;
+    }
+    public void setInPidMode(boolean inPidMode) {
+        this.inPidMode = inPidMode;
     }
 }

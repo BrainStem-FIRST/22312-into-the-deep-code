@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.AccelPIDController;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -23,6 +25,7 @@ public class Extension extends Subsystem {
     // max position
     public static final int MAX_POSITION = 1400;
 
+    public static final int RETRACT_ACCEL_POINT = MAX_POSITION - 200;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 
@@ -38,6 +41,8 @@ public class Extension extends Subsystem {
     private final DigitalChannel magnetResetSwitch;
     private double targetPower;
 
+    private final PIDController pid;
+
     private final StateManager<StateType> stateManager;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
@@ -51,6 +56,9 @@ public class Extension extends Subsystem {
 
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
+
+        pid = new PIDController(0.5, 0, 0);
+        pid.setTarget(Extension.MIN_POSITION);
 
         stateManager = new StateManager<>(StateType.IN);
 
@@ -114,5 +122,9 @@ public class Extension extends Subsystem {
                 return true;
             }
         };
+    }
+
+    public PIDController getPid() {
+        return pid;
     }
 }

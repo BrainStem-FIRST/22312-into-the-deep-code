@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.util.Range;
 public class PIDController {
 
-    private double target;
-    private double kP, kI, kD;
-    private double proportional, integral, derivative;
-    private boolean shouldReset;
+    protected double target;
+    protected double kP, kI, kD;
+    protected double proportional, integral, derivative;
+    protected boolean shouldReset;
 
-    private double previousTime, previousError;
+    protected double previousTime, previousError;
 
-    private double lowerInputBound = Double.NEGATIVE_INFINITY, higherInputBound = Double.POSITIVE_INFINITY;
-    private double lowerOutputBound = Double.NEGATIVE_INFINITY, higherOutputBound = Double.POSITIVE_INFINITY;
+    protected double lowerInputBound = Double.NEGATIVE_INFINITY, higherInputBound = Double.POSITIVE_INFINITY;
+    protected double lowerOutputBound = Double.NEGATIVE_INFINITY, higherOutputBound = Double.POSITIVE_INFINITY;
 
     public PIDController(double kP, double kI, double kD) {
         this.kP = kP;
@@ -25,15 +25,6 @@ public class PIDController {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
-    }
-
-    // the target position of motor
-    public double getTarget() {
-        return target;
-    }
-
-    public void setTarget(double target) {
-        this.target = target;
     }
 
     public void setInputBounds(double lowerInputBound, double higherInputBound) {
@@ -62,6 +53,7 @@ public class PIDController {
 
     // returns motor power given current position of motor
     public double update(double value) {
+
         value = Range.clip(value, lowerInputBound, higherInputBound);
 
         double error = value - target;
@@ -69,7 +61,7 @@ public class PIDController {
         return updateWithError(error);
     }
 
-    public double updateWithError(double error) {
+    private double updateWithError(double error) {
         if (Double.isNaN(error) || Double.isInfinite(error))
             return 0;
 
@@ -97,5 +89,33 @@ public class PIDController {
 
         return Math.signum(correction) * Range.clip(Math.abs(correction),
                 lowerOutputBound, higherOutputBound);
+    }
+
+
+    // getters/setters
+    public double getkP() {
+        return kP;
+    }
+    public double getkI() {
+        return kI;
+    }
+    public double getkD() {
+        return kD;
+    }
+    // the target position of motor
+    public double getTarget() {
+        return target;
+    }
+    public void setkP(double kP) {
+        this.kP = kP;
+    }
+    public void setkI(double kI) {
+        this.kI = kI;
+    }
+    public void setkD(double kD) {
+        this.kD = kD;
+    }
+    public void setTarget(double target) {
+        this.target = target;
     }
 }
