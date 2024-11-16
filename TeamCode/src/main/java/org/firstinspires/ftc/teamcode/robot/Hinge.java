@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.hingeStates.H
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Hinge extends Subsystem {
-    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1726;
+    public static final int HINGE_UP_TICK = 2213, HINGE_DOWN_TICK = 1746;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_THRESHOLD = 0.05;
     public static double HINGE_DOWN_TIME = 0.5, HINGE_UP_TIME = 0.5;
 

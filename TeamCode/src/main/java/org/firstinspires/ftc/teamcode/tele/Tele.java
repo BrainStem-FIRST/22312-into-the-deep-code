@@ -58,28 +58,31 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
+            telemetry.addData("robot alliance", robot.getColorFromAlliance());
+            telemetry.addData("", "");
             telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
-
+            telemetry.addData("", "");
             telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
             telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
             telemetry.addData("robot vector real", robot.getDriveTrain().pose.heading.real);
             telemetry.addData("robot vector imaginary", robot.getDriveTrain().pose.heading.imag);
             telemetry.addData("robot angle", Math.atan2(robot.getDriveTrain().pose.heading.real, robot.getDriveTrain().pose.heading.imag));
-
+            telemetry.addData("", "");
             telemetry.addData("in pid mode", robot.getInPidMode());
-
+            telemetry.addData("", "");
             telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
             telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
-
+            telemetry.addData("", "");
             telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
+            telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("has red", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.RED));
             telemetry.addData("has blue", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.BLUE));
             telemetry.addData("has yellow", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.YELLOW));

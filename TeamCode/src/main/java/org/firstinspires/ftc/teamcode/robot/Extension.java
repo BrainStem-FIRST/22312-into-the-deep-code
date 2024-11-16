@@ -36,12 +36,11 @@ public class Extension extends Subsystem {
     public enum StateType {
         IN, FINDING_BLOCK, RETRACTING
     }
-
+    private PIDController pid;
     private final DcMotorEx extensionMotor;
     private final DigitalChannel magnetResetSwitch;
     private double targetPower;
 
-    private final PIDController pid;
 
     private final StateManager<StateType> stateManager;
 
@@ -55,8 +54,8 @@ public class Extension extends Subsystem {
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        pid = new PIDController(-0.5, 0, 0);
-        pid.setTarget(Extension.MIN_POSITION);
+        pid = new PIDController(0, 0, 0);
+        pid.setTarget(MIN_POSITION);
 
         stateManager = new StateManager<>(StateType.IN);
 
@@ -91,7 +90,8 @@ public class Extension extends Subsystem {
     }
 
     public boolean hitRetractHardStop() {
-        return !magnetResetSwitch.getState() || extensionMotor.getCurrentPosition() < MIN_POSITION;
+        return extensionMotor.getCurrentPosition() < MIN_POSITION;
+        //return magnetResetSwitch.getState() || extensionMotor.getCurrentPosition() < MIN_POSITION;
     }
 
     @Override
