@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.driveTrain;
 
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Trajectory;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
@@ -20,6 +22,8 @@ import org.firstinspires.ftc.teamcode.messages.PoseMessage;
  * Unless otherwise noted, comments are from Gobilda
  */
 public class PinpointDrive extends MecanumDrive {
+    public static final double BASKET_X = 180;
+    public static final double BASKET_Y = 5;
     public static class Params {
         /*
         Set the odometry pod positions relative to the point that the odometry computer tracks around.
@@ -119,6 +123,13 @@ public class PinpointDrive extends MecanumDrive {
         FlightRecorder.write("PINPOINT_STATUS",pinpoint.getDeviceStatus());
 
         return pinpoint.getVelocityRR();
+    }
+
+    public Action adjustForDeposit() {
+        // supposed to make robot go to corner and align diagonally
+        return actionBuilder(pose)
+                .splineToConstantHeading(new Vector2d(BASKET_X, BASKET_Y), Math.PI * 5/4)
+                .build();
     }
 
     // for debug logging

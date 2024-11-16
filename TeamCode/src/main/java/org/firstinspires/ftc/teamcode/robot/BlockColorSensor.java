@@ -12,10 +12,10 @@ public class BlockColorSensor {
 
     public static final HashMap<BlockColor, Double[]> BLOCK_PERCENTS = new HashMap<>();
     public static final HashMap<BlockColor, Double> BLOCK_THRESHOLDS = new HashMap<>();
-    public static final Double[] RED_BLOCK_PERCENTS = { 51.3, 29.9, 18.7 };
+    public static final Double[] RED_BLOCK_PERCENTS = { 43., 29.9, 25. };
     // 0.5, 0.3044, 0.1956
     // 0.5274, 0.2927, 0.1799
-    public static final Double RED_BLOCK_THRESHOLD = 6.;
+    public static final Double RED_BLOCK_THRESHOLD = 8.;
     public static final Double[] BLUE_BLOCK_PERCENTS = { 10.4, 24.25, 65. };
     // 0.1082, 0.2497, 0.6422
     // 0.1005, 0.2356, 0.664

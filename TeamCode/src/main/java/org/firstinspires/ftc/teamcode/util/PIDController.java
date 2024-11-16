@@ -74,7 +74,8 @@ public class PIDController {
             integral = 0;
             derivative = 0;
             previousError = error;
-        } else {
+        }
+        else {
             double dT = currentTime - previousTime;
 
             integral += kI * error * dT;

@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
-import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
@@ -29,15 +28,13 @@ public class Tele extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         input = new Input(gamepad1, gamepad2);
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, AllianceColor.BLUE);
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, AllianceColor.RED);
 
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
+        // setup assumes all motors are good
         robot.setup();
-
-        // TODO: delete code once done testing life
-        robot.setBlockColorHeld(BlockColor.YELLOW);
 
         waitForStart();
 
@@ -48,14 +45,6 @@ public class Tele extends LinearOpMode {
         double timeSinceLastUpdate = 0;
 
         while (opModeIsActive()) {
-
-            /*
-            telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
-            telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
-            telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
-            telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
-            */
-
             // update dt
             prevTime = currentTime;
             currentTime = System.currentTimeMillis();
@@ -69,21 +58,31 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
+            telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
+            telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
+
             telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
             telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
             telemetry.addData("robot vector real", robot.getDriveTrain().pose.heading.real);
             telemetry.addData("robot vector imaginary", robot.getDriveTrain().pose.heading.imag);
             telemetry.addData("robot angle", Math.atan2(robot.getDriveTrain().pose.heading.real, robot.getDriveTrain().pose.heading.imag));
+
             telemetry.addData("in pid mode", robot.getInPidMode());
-            telemetry.addData("high basket", robot.isHighDeposit());
-            telemetry.addData("high ram", robot.isHighRam());
+
             telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
             telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
-            telemetry.addData("lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
+
+            telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
+            telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+            telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
+            telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
+            telemetry.addData("has red", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.RED));
+            telemetry.addData("has blue", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.BLUE));
+            telemetry.addData("has yellow", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.YELLOW));
             telemetry.update();
         }
     }
@@ -178,10 +177,6 @@ public class Tele extends LinearOpMode {
         }
     }
     private void listenForLiftingInput() {
-        // TODO: get rid of conditional below once lifting system and collecting system can work together
-        //if(input.getGamepadTracker1().isFirstFrameX())
-        //    robot.setInDepositingMode(!robot.getInDepositingMode());
-
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
@@ -206,9 +201,7 @@ public class Tele extends LinearOpMode {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                         if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-                        //if(robot.getInDepositingMode())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        //else
                         else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;

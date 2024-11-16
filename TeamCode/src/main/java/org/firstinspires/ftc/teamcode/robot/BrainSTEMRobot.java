@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.driveTrain.MecanumDrive;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 
 public class BrainSTEMRobot {
@@ -51,24 +50,23 @@ public class BrainSTEMRobot {
     public void setup() {
         double start = System.currentTimeMillis() / 1000.0;
         double relativeTime = 0;
-        while(!systemsSetupDone(relativeTime)) {
+        while(!setupCollectingSystem(relativeTime) || !setupLiftingSystem(relativeTime)) {
             telemetry.addData("robot status", "setting up");
             telemetry.addData("relative time", relativeTime);
+            telemetry.addData("lift encoder", lift.getLiftMotor().getCurrentPosition());
             telemetry.update();
             relativeTime = System.currentTimeMillis() / 1000.0 - start;
         }
     }
-    private boolean systemsSetupDone(double curTime) {
-        return setupCollectingSystem(curTime) && setupLiftingSystem(curTime);
-    }
-    public boolean setupCollectingSystem(double curTime) {
+    public boolean setupCollectingSystem(double relativeTime) {
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
         return true;
     }
-    public boolean setupLiftingSystem(double curTime) {
+    public boolean setupLiftingSystem(double relativeTime) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
         arm.getArmServo().setPosition(Arm.DOWN_POS);
-        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
+        if(relativeTime > 1)
+            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
         return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) < Lift.DESTINATION_THRESHOLD;
     }
 

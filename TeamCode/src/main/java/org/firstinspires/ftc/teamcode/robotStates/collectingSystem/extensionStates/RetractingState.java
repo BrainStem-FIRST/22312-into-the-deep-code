@@ -13,10 +13,8 @@ public class RetractingState extends RobotState<Extension.StateType> {
     @Override
     public void execute() {
         int curPos = robot.getExtension().getExtensionMotor().getCurrentPosition();
-        //if(isFirstTime()) {
-            //robot.getExtension().getPid().reset();
-            //robot.getExtension().getPid().setTarget(Extension.MIN_POSITION);
-        //}
+        if(isFirstTime())
+            robot.getExtension().getPid().reset();
         if(robot.getInPidMode())
             robot.getExtension().setExtensionMotorPower(-robot.getExtension().getPid().update(curPos));
         else

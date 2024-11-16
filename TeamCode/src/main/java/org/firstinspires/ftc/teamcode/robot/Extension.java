@@ -49,15 +49,13 @@ public class Extension extends Subsystem {
         super(hwMap, telemetry, allianceColor, robot);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
-        extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        pid = new PIDController(0.5, 0, 0);
+        pid = new PIDController(-0.5, 0, 0);
         pid.setTarget(Extension.MIN_POSITION);
 
         stateManager = new StateManager<>(StateType.IN);

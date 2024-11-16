@@ -34,6 +34,7 @@ public class Lift extends Subsystem {
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
