@@ -87,9 +87,7 @@ public class Collector extends Subsystem {
         stateManager.update(dt);
     }
     public boolean hasValidBlockColor() {
-        return blockColorSensor.getBlockColor() == BlockColor.YELLOW ||
-                (blockColorSensor.getBlockColor() == BlockColor.BLUE && getAllianceColor() == AllianceColor.BLUE) ||
-                (blockColorSensor.getBlockColor() == BlockColor.RED && getAllianceColor() == AllianceColor.RED);
+        return blockColorSensor.getBlockColor() == BlockColor.YELLOW || blockColorSensor.getBlockColor() == getRobot().getColorFromAlliance();
     }
     public Action collectAction() {
         return new Action() {

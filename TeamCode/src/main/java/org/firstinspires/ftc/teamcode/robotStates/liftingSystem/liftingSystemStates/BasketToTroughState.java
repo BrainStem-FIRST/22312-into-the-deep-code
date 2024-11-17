@@ -41,7 +41,7 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN;
     }
 
     @Override

@@ -20,11 +20,15 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // TODO: replace conditional checking for gamepad input below w commented out conditional once collecting system fixed
 
         if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
-                robot.getCollector().hasValidBlockColor())
-            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+                robot.getCollector().hasValidBlockColor()) {
+            // setting robot block color for testing if we just put block color in trough and don't collect
+
+            robot.setBlockColorHeld(robot.getCollector().getBlockColorSensor().getBlockColor());
+            if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                 robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
             }
+        }
 
 
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)

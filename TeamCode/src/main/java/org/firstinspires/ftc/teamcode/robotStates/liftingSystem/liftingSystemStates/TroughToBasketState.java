@@ -16,7 +16,6 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
             robot.getArm().getTransitionState().setGoalState(Arm.RIGHT_POS, Arm.StateType.RIGHT);
 
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.RIGHT) {
-            robot.telemetry.addData("recognizing arm is up in troughToBasketState", "");
             // only want to set lift state to be in transition if in trough
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                 if (robot.isHighDeposit())
@@ -24,8 +23,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 else
                     robot.getLift().getTransitionState().setGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
 
-                // TODO: else if below needs serious testing; not sure if it works
-                // checking if when lift is in transition gamepad 2 switches deposit state
+            // checking if when lift is in transition gamepad 2 switches deposit state
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
                 if (robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS);

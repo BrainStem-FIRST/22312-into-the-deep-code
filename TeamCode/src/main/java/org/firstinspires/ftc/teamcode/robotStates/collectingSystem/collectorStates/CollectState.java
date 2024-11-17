@@ -26,7 +26,7 @@ public class CollectState extends RobotState<Collector.StateType> {
         if (curBlockColor == prevBlockColor && robot.getCollector().getBlockColorSensor().getBlockColor() != BlockColor.NONE) {
             blockColorFrame++;
             // adding block color to robot if done
-            if(blockColorFrame > BLOCK_COLOR_VALIDATION_FRAMES)
+            if(blockColorFrame > BLOCK_COLOR_VALIDATION_FRAMES -1 && robot.getBlockColorHeld() == BlockColor.NONE)
                 robot.setBlockColorHeld(curBlockColor);
         }
         else

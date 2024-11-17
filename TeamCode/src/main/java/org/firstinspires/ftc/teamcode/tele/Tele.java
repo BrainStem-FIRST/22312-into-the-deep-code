@@ -59,6 +59,7 @@ public class Tele extends LinearOpMode {
             robot.update(dt);
 
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
+            telemetry.addData("robot color held", robot.getBlockColorHeld());
             telemetry.addData("", "");
             telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
@@ -203,7 +204,8 @@ public class Tele extends LinearOpMode {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+                        if(true)
+                        //if(robot.getBlockColorHeld() == BlockColor.YELLOW)
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                         else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
