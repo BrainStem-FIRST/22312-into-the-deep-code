@@ -26,6 +26,7 @@ public class Extension extends Subsystem {
     // max position
     public static final int MAX_POSITION = 1000;
 
+    public static int SHORT_EXTEND_POSITION = 200;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 

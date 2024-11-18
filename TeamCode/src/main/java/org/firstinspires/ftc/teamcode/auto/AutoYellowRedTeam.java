@@ -10,13 +10,15 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 public class AutoYellowRedTeam extends AutoYellow {
     public AutoYellowRedTeam() {
         super(AllianceColor.RED, new YellowBlockParams(
-                new Pose2d(-63, -85, Math.PI*1.5),
-                new Vector2d(-24, -42.5),
+                new Pose2d(-48, -85, Math.PI*1.5), // begin position
+
+                new Vector2d(-24, -42.5), // destination and heading for block one
                 Math.PI * 1.5,
-                // TODO: find block positions and headings for two and three
-                new Vector2d(-24, -42.5),
+
+                new Vector2d(-60, -42.5), // destination and heading for block two
                 Math.PI * 1.5,
-                new Pose2d(-24, -42.5, Math.PI * 0.75),
+
+                new Pose2d(-64, -40, Math.PI * 0.75), // path and heading for block three
                 Math.PI * 0.75
         ));
     }

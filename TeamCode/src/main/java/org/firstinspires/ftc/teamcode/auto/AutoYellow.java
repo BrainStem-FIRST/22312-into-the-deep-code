@@ -10,12 +10,12 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 
 @Autonomous
 public abstract class AutoYellow extends Auto {
 
     // TODO: FIND EXTEND TICK POSITION
-    public static int EXTEND_POSITION = 200;
 
     private final YellowBlockParams yellowBlockParams;
     public AutoYellow(AllianceColor allianceColor, YellowBlockParams yellowBlockParams) {
@@ -41,18 +41,21 @@ public abstract class AutoYellow extends Auto {
     // moves in straight line and adjusts heading
     public Action getBlockLineTrajectory(Vector2d blockPosition, double heading) {
         return robot.getDriveTrain().actionBuilder(robot.getDriveTrain().pose)
-                // TODO: allow retracting lift and moving to happen concurrently
+
                 .stopAndAdd(robot.getLiftingSystem().depositHigh())
 
-                .stopAndAdd(lineToPos(blockPosition, heading))
-
-                .stopAndAdd(robot.getCollectingSystem().extendAndCollectAction(EXTEND_POSITION))
+                .stopAndAdd(new ParallelAction(
+                        robot.getLiftingSystem().lowerFromDeposit(),
+                        lineToPos(blockPosition, heading),
+                        robot.getCollectingSystem().extendAndCollectAction(Extension.SHORT_EXTEND_POSITION)
+                ))
 
                 // retract and go to deposit position at same time
                 .stopAndAdd(new ParallelAction(
                         robot.getExtension().retractAction(),
                         lineToPos(Auto.getPositionVector(yellowBlockParams.getBeginPose()), Auto.getHeading(yellowBlockParams.getBeginPose()))
                 ))
+                .stopAndAdd(robot.getLiftingSystem().transferBlock())
                 .build();
     }
     // moves in spline and adjusts heading
@@ -66,7 +69,7 @@ public abstract class AutoYellow extends Auto {
                         .build()
                 )
 
-                .stopAndAdd(robot.getCollectingSystem().extendAndCollectAction(EXTEND_POSITION))
+                .stopAndAdd(robot.getCollectingSystem().extendAndCollectAction(Extension.SHORT_EXTEND_POSITION))
 
                 // retract and go to deposit position at same time
                 .stopAndAdd(new ParallelAction(

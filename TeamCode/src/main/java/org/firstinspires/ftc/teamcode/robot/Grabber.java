@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.grabberStates.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -44,6 +49,28 @@ public class Grabber extends Subsystem {
     public void update(double dt) {
         stateManager.update(dt);
     }
+
+    public Action open() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateFramesRunning();
+                grabServo.setPosition(OPEN_POSITION);
+                return getTime() > 0.2;
+            }
+        };
+    }
+    public Action close() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateFramesRunning();
+                grabServo.setPosition(CLOSE_POSITION);
+                return getTime() > 0.2;
+            }
+        };
+    }
+
     public ServoImplEx getGrabServo() {
         return grabServo;
     }

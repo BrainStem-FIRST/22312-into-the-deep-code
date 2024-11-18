@@ -1,17 +1,28 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
-import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 
 @Autonomous
-public class AutoSpecimenBlueTeam extends Auto {
+public class AutoSpecimenBlueTeam extends AutoSpecimen {
 
     public AutoSpecimenBlueTeam() {
-        super(AllianceColor.BLUE);
+        // TODO: find values for specimen blue
+        super(AllianceColor.BLUE, new AllianceColorParams(
+                new Pose2d(0, 0, 0),
+                new Pose2d(0, 0, 0),
+                0,
+                new Pose2d(0, 0, 0),
+                0,
+                new Pose2d(0, 0, 0),
+                0,
+                new Vector2d(0, 0),
+                0,
+                new Vector2d(0, 0)
+        ));
     }
 
     @Override

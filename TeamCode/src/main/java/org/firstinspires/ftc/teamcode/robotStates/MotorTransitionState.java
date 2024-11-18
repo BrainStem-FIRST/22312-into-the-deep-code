@@ -7,7 +7,11 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class MotorTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final DcMotorEx motor;
-    private PIDController pid;
+    private final PIDController pid;
+
+    private int absoluteMin;
+    private int absoluteMax;
+
     // stateType is enum of transition state type
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD) {
         super(stateType, DESTINATION_THRESHOLD);
@@ -19,17 +23,22 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.motor = motor;
         this.pid = pid;
     }
+    public void setEncoderBounds(int min, int max) {
+        absoluteMin = min;
+        absoluteMax = max;
+    }
     @Override
     public void execute() {
-        if(pid != null) {
-            if (isFirstTime()) {
-                pid.setTarget(goalPosition);
-                pid.reset();
+        if(motor.getCurrentPosition() > absoluteMin && motor.getCurrentPosition() < absoluteMax)
+            if(pid != null) {
+                if (isFirstTime()) {
+                    pid.setTarget(goalPosition);
+                    pid.reset();
+                }
+                Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
             }
-            Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
-        }
-        else
-            Subsystem.setMotorPosition(motor, (int) goalPosition);
+            else
+                Subsystem.setMotorPosition(motor, (int) goalPosition);
     }
 
     @Override

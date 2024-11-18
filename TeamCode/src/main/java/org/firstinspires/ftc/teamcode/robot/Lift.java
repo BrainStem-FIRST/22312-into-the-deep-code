@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -20,9 +25,11 @@ public class Lift extends Subsystem {
         HIGH_RAM_AFTER_POS = 1800,
 
         LOW_BASKET_POS = 1700,
-        HIGH_BASKET_POS = 3040;
+        HIGH_BASKET_POS = 3040,
+        ABSOLUTE_MAX = 3040,
+        ABSOLUTE_MIN = 0;
 
-    public static final int DESTINATION_THRESHOLD = 30;
+    public static final int DESTINATION_THRESHOLD = 5;
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
     }
@@ -70,6 +77,7 @@ public class Lift extends Subsystem {
         stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
 
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD, pid);
+        this.transitionState.setEncoderBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
         stateManager.setupStates(robot, stateManager);
@@ -78,6 +86,22 @@ public class Lift extends Subsystem {
     @Override
     public void update(double dt) {
         stateManager.update(dt);
+    }
+
+    public Action moveTo(int target) {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateFramesRunning();
+                if(getFramesRunning() == 1) {
+                    pid.reset();
+                    pid.setTarget(target);
+                }
+                Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
+
+                return Math.abs(liftMotor.getCurrentPosition() - target) <= DESTINATION_THRESHOLD;
+            }
+        };
     }
 
     public DcMotorEx getLiftMotor() {

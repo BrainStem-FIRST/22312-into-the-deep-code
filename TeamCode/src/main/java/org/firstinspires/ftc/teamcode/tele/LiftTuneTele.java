@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
+import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
 
@@ -39,7 +40,7 @@ public class LiftTuneTele extends LinearOpMode {
             else if(gamepad1.dpad_right)
                 armServo.setPosition(Arm.RIGHT_POS);
 
-            if(Math.abs(gamepad1.left_stick_y) > 0.2)
+            if(Math.abs(gamepad1.left_stick_y) > 0.2 && motor.getCurrentPosition() > Lift.ABSOLUTE_MIN + 10 && motor.getCurrentPosition() < Lift.ABSOLUTE_MAX - 10)
                 Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
             else
                 Subsystem.setMotorPower(motor, 0.05);
