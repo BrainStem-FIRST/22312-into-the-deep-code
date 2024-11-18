@@ -18,8 +18,8 @@ public abstract class AutoYellow extends Auto {
     public static int EXTEND_POSITION = 200;
 
     private final YellowBlockParams yellowBlockParams;
-    public AutoYellow(YellowBlockParams yellowBlockParams) {
-        super(AllianceColor.BLUE);
+    public AutoYellow(AllianceColor allianceColor, YellowBlockParams yellowBlockParams) {
+        super(allianceColor);
 
         this.yellowBlockParams = yellowBlockParams;
     }
