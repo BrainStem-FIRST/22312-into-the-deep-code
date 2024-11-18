@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
+import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
@@ -21,8 +22,9 @@ import org.firstinspires.ftc.teamcode.util.Input;
 public class Tele extends LinearOpMode {
 
     private Input input;
-
     private BrainSTEMRobot robot;
+
+    private double timeSinceStart;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -42,14 +44,14 @@ public class Tele extends LinearOpMode {
         long prevTime;
         double dt;
         double interval = 1000/60.; // 60 fps
-        double timeSinceLastUpdate = 0;
+        timeSinceStart = 0; // time since start of match
 
         while (opModeIsActive()) {
             // update dt
             prevTime = currentTime;
             currentTime = System.currentTimeMillis();
             dt = (currentTime - prevTime) / 1000.;
-            timeSinceLastUpdate += dt;
+            timeSinceStart += dt;
 
             // update custom input
             input.update();
@@ -58,9 +60,15 @@ public class Tele extends LinearOpMode {
 
             robot.update(dt);
 
+            telemetry.addData("magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
+
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
             telemetry.addData("robot color held", robot.getBlockColorHeld());
             telemetry.addData("", "");
+            telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());
+            telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
+            telemetry.addData("can enter going up hanging", robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP));
+
             telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
             telemetry.addData("", "");
@@ -95,6 +103,7 @@ public class Tele extends LinearOpMode {
         listenForDriveTrainInput();
         listenForCollectionInput();
         listenForLiftingInput();
+        listenForHangingInput();
 
         // x toggles pid actions
         if(input.getGamepadTracker1().isFirstFrameX())
@@ -109,33 +118,6 @@ public class Tele extends LinearOpMode {
                 ),
                 -gamepad1.right_stick_x
         ));
-    }
-    // without roadrunner
-    private void listenForDriveTrainInputOld() {
-        double leftStickX = gamepad1.left_stick_x;
-        double leftStickY = gamepad1.left_stick_y * -1;
-        double rightStickX;
-        double threshold = 0.1F;
-        if (Math.abs(gamepad1.right_stick_x) > threshold) {
-            if (gamepad1.right_stick_x < 0) {
-                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * -1 * (4.0 / 5.0) - (1.0 / 5.0));
-            }
-            else {
-                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * (4.0 / 5.0) + (1.0 / 5.0));
-            }
-        } else {
-            rightStickX = 0;
-        }
-        if ((Math.abs(gamepad1.left_stick_y) > threshold) || (Math.abs(gamepad1.left_stick_x) > threshold) || Math.abs(gamepad1.right_stick_x) > threshold) {
-            //Calculate formula for mecanum drive function
-            double addValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) + leftStickX * Math.abs(leftStickX))))) / 100;
-            double subtractValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) - leftStickX * Math.abs(leftStickX))))) / 100;
-
-
-            //Set motor speed variables
-            robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
-        } else
-            robot.getDriveTrain().stopMotors();
     }
 
     private void listenForCollectionInput() {
@@ -246,7 +228,47 @@ public class Tele extends LinearOpMode {
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
     }
 
+    private void listenForHangingInput() {
+        //temp code
+        if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
+            robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
 
+        // automatically start raising hanging at 2:20
+        //if (timeSinceStart >= 140 && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
+        //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
+        // lower hanging to raise robot
+        if (input.getGamepadTracker1().isDpadDownPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
+            robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_DOWN);
+    }
+
+    // without roadrunner
+    private void listenForDriveTrainInputOld() {
+        double leftStickX = gamepad1.left_stick_x;
+        double leftStickY = gamepad1.left_stick_y * -1;
+        double rightStickX;
+        double threshold = 0.1F;
+        if (Math.abs(gamepad1.right_stick_x) > threshold) {
+            if (gamepad1.right_stick_x < 0) {
+                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * -1 * (4.0 / 5.0) - (1.0 / 5.0));
+            }
+            else {
+                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * (4.0 / 5.0) + (1.0 / 5.0));
+            }
+        } else {
+            rightStickX = 0;
+        }
+        if ((Math.abs(gamepad1.left_stick_y) > threshold) || (Math.abs(gamepad1.left_stick_x) > threshold) || Math.abs(gamepad1.right_stick_x) > threshold) {
+            //Calculate formula for mecanum drive function
+            double addValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) + leftStickX * Math.abs(leftStickX))))) / 100;
+            double subtractValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) - leftStickX * Math.abs(leftStickX))))) / 100;
+
+
+            //Set motor speed variables
+            robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+        } else
+            robot.getDriveTrain().stopMotors();
+    }
+    // before controller refactor
     private void listenForCollectionInputOld() {
 
         // update states

@@ -21,6 +21,7 @@ public class BrainSTEMRobot {
     private final Arm arm;
     private final Lift lift;
     private final LiftingSystem liftingSystem;
+    private final Hanger hanger;
     private BlockColor blockColorHeld;
     private boolean isHighDeposit = true;
     private boolean isHighRam = true;
@@ -43,6 +44,8 @@ public class BrainSTEMRobot {
         arm = new Arm(hwMap, telemetry, allianceColor, this);
         lift = new Lift(hwMap, telemetry, allianceColor, this);
         liftingSystem = new LiftingSystem(this);
+
+        hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
         blockColorHeld = BlockColor.NONE;
     }
@@ -84,6 +87,8 @@ public class BrainSTEMRobot {
         arm.update(dt);
         lift.update(dt);
 
+        hanger.update(dt);
+
         driveTrain.updatePoseEstimate();
     }
 
@@ -117,6 +122,8 @@ public class BrainSTEMRobot {
     public LiftingSystem getLiftingSystem() {
         return liftingSystem;
     }
+
+    public Hanger getHanger() { return hanger; }
 
     public BlockColor getColorFromAlliance() {
         return allianceColor == AllianceColor.BLUE ? BlockColor.BLUE : BlockColor.RED;

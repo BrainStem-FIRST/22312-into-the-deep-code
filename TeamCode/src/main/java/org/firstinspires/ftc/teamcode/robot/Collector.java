@@ -94,7 +94,7 @@ public class Collector extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setSpindleMotorPower(Collector.MAX_SPIN_POWER);
-                return hasValidBlockColor();
+                return !hasValidBlockColor();
             }
         };
     }

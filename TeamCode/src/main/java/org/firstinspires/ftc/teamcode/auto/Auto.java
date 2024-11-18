@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.auto;
 
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
+
 
 public abstract class Auto extends LinearOpMode {
 
@@ -29,6 +31,7 @@ public abstract class Auto extends LinearOpMode {
         robot.setup();
 
         waitForStart();
+
         runAuto();
     }
 

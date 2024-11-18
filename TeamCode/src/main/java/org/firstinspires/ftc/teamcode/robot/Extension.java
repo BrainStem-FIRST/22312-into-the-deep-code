@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlockState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
@@ -21,11 +22,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
-    public static final int MIN_POSITION = 10;
+    public static final int MIN_POSITION = 0;
     // max position
-    public static final int MAX_POSITION = 1400;
+    public static final int MAX_POSITION = 1000;
 
-    public static final int RETRACT_ACCEL_POINT = MAX_POSITION - 200;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 
@@ -36,7 +36,7 @@ public class Extension extends Subsystem {
     public enum StateType {
         IN, FINDING_BLOCK, RETRACTING
     }
-    private PIDController pid;
+    private final PIDController pid;
     private final DcMotorEx extensionMotor;
     private final DigitalChannel magnetResetSwitch;
     private double targetPower;
@@ -51,11 +51,13 @@ public class Extension extends Subsystem {
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // magnet switch doesn't work, getState() always returns true
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        pid = new PIDController(0, 0, 0);
+        pid = new PIDController(0.5, 0, 0.1);
         pid.setTarget(MIN_POSITION);
+        pid.setOutputBounds(-0.99,0.99);
 
         stateManager = new StateManager<>(StateType.IN);
 
@@ -79,8 +81,8 @@ public class Extension extends Subsystem {
     public void setExtensionMotorPower(double power) {
         Subsystem.setMotorPower(extensionMotor, power);
     }
-    public DigitalChannel getMagnetResetSwitch() {
-        return magnetResetSwitch;
+    public boolean isMagnetSwitchActivated() {
+        return !magnetResetSwitch.getState();
     }
     public double getTargetPower() {
         return targetPower;
@@ -89,9 +91,9 @@ public class Extension extends Subsystem {
         this.targetPower = targetPower;
     }
 
+    //TODO: ask whitmer why this isn't working
     public boolean hitRetractHardStop() {
-        return extensionMotor.getCurrentPosition() < MIN_POSITION;
-        //return magnetResetSwitch.getState() || extensionMotor.getCurrentPosition() < MIN_POSITION;
+        return extensionMotor.getCurrentPosition() < MIN_POSITION || isMagnetSwitchActivated();
     }
 
     @Override
@@ -99,6 +101,7 @@ public class Extension extends Subsystem {
         stateManager.update(dt);
     }
 
+    // returns true to keep going
     public Action extendAction(int targetPosition) {
         return new Action() {
             @Override
@@ -109,11 +112,19 @@ public class Extension extends Subsystem {
         };
     }
     public Action retractAction() {
-        return new Action() {
+        return new TimedAction() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setExtensionMotorPower(Extension.RETRACT_POWER);
-                if (!getMagnetResetSwitch().getState()) {
+                updateFramesRunning();
+
+                if (getFramesRunning() == 1)
+                    pid.reset();
+                if(getRobot().getInPidMode())
+                    setExtensionMotorPower(pid.update(extensionMotor.getCurrentPosition()));
+                else
+                    setExtensionMotorPower(Extension.RETRACT_POWER);
+
+                if (isMagnetSwitchActivated()) {
                     setExtensionMotorPower(0);
                     return false;
                 }

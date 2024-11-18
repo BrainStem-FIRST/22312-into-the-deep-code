@@ -12,9 +12,9 @@ import org.firstinspires.ftc.teamcode.driveTrain.useless.TankDrive;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.TwoDeadWheelLocalizer;
 
-@Disabled
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "ManualFeedbackTuner")
 public final class ManualFeedbackTuner extends LinearOpMode {
-    public static double DISTANCE = 64;
+    public static double DISTANCE = 32;
 
     @Override
     public void runOpMode() throws InterruptedException {

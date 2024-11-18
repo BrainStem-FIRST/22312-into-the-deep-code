@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -62,5 +68,17 @@ public class LiftingSystem {
 
     public StateManager<StateType> getStateManager() {
         return stateManager;
+    }
+    public Action depositHigh() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.getArm().getArmServo().setPosition(Arm.RIGHT_POS);
+                // assumes arm servo is done rotating
+                if(getTime() > 0.5)
+                    Subsystem.setMotorPosition(robot.getLift().getLiftMotor(), Lift.HIGH_BASKET_POS);
+                return Math.abs(robot.getLift().getLiftMotor().getCurrentPosition() - Lift.HIGH_BASKET_POS) < Lift.DESTINATION_THRESHOLD;
+            }
+        };
     }
 }

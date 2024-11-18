@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Tele2")
-public class LiftingSystemTele extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "LiftTuneTele")
+public class LiftTuneTele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -39,16 +39,13 @@ public class LiftingSystemTele extends LinearOpMode {
             else if(gamepad1.dpad_right)
                 armServo.setPosition(Arm.RIGHT_POS);
 
-            if(gamepad1.dpad_down)
-                Subsystem.setMotorPower(motor, -0.3);
-            else if(gamepad1.dpad_up)
-                Subsystem.setMotorPower(motor, 0.3);
+            if(Math.abs(gamepad1.left_stick_y) > 0.2)
+                Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
             else
                 Subsystem.setMotorPower(motor, 0.05);
 
             telemetry.addData("a", gamepad1.a);
-            telemetry.addData("dpad left", gamepad1.dpad_left);
-            telemetry.addData("dpad right", gamepad1.dpad_right);
+            telemetry.addData("left stick y", gamepad1.left_stick_y);
             telemetry.addData("dpad up", gamepad1.dpad_up);
             telemetry.addData("dpad down", gamepad1.dpad_down);
             telemetry.addData("arm servo current pwm", armServo.getPosition());

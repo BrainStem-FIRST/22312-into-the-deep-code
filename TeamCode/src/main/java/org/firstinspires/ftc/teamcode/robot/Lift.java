@@ -7,11 +7,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
-    public static final int MAX_POS = 3050,
-        TROUGH_POS = 0,
+    public static final int TROUGH_POS = 0,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
         LOW_RAM_BEFORE_POS = 320,
@@ -26,6 +26,7 @@ public class Lift extends Subsystem {
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
     }
+    private final PIDController pid;
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
 
@@ -35,6 +36,8 @@ public class Lift extends Subsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pid = new PIDController(0.3, 0, 0.1);
 
         stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
@@ -66,7 +69,7 @@ public class Lift extends Subsystem {
         basketSafetyState.addMotor(liftMotor);
         stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
 
-        this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
+        this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD, pid);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
         stateManager.setupStates(robot, stateManager);
@@ -99,5 +102,9 @@ public class Lift extends Subsystem {
     public boolean atLowBasket() {
         return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
                 getTransitionState().getGoalStatePosition() == LOW_BASKET_POS;
+    }
+
+    public PIDController getPid() {
+        return pid;
     }
 }

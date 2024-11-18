@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.Input;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "PIDTele")
-public class PIDTele extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "PIDExtensionTele")
+public class PIDExtensionTele extends LinearOpMode {
     BrainSTEMRobot robot;
     Input input;
 
@@ -72,13 +72,16 @@ public class PIDTele extends LinearOpMode {
 
             // checking for adjusting k values
             if(input.getGamepadTracker2().isFirstFrameDpadUp())
-                incrementPIDVar(pid, editMode, 0.005);
+                incrementPIDVar(pid, editMode, 0.05);
             else if(input.getGamepadTracker2().isFirstFrameDpadDown())
-                incrementPIDVar(pid, editMode, -0.005);
+                incrementPIDVar(pid, editMode, -0.05);
+
 
             robot.update(dt);
             listenForCollectionInput();
-
+            telemetry.addData("error", pid.getTarget() - robot.getExtension().getExtensionMotor().getCurrentPosition());
+            telemetry.addData("motor power", robot.getExtension().getExtensionMotor().getPower());
+            telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
