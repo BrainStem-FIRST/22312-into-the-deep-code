@@ -13,11 +13,6 @@ public class AutoSpecimenRedTeam extends Auto {
     }
 
     @Override
-    public Pose2d getBeginPose() {
-        return null;
-    }
-
-    @Override
     public void runAuto() {
 
     }
