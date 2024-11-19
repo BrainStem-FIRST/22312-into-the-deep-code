@@ -29,8 +29,12 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public void execute() {
-        if(motor.getCurrentPosition() > absoluteMin && motor.getCurrentPosition() < absoluteMax)
-            if(pid != null) {
+        if(motor.getCurrentPosition() < absoluteMin)
+            Subsystem.setMotorPosition(motor, absoluteMin);
+        else if(motor.getCurrentPosition() > absoluteMax)
+            Subsystem.setMotorPosition(motor, absoluteMax);
+        else
+            if(robot.getInPidMode() && pid != null) {
                 if (isFirstTime()) {
                     pid.setTarget(goalPosition);
                     pid.reset();

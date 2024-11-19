@@ -13,14 +13,14 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        // move extension
-        robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
-
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
             robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_POSITION)
             robot.getExtension().setTargetPower(Math.max(0, robot.getExtension().getTargetPower()));
+
+        // move extension
+        robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
     }
 
     @Override

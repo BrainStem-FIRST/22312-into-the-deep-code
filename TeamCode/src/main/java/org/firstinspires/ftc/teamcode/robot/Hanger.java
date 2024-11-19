@@ -48,8 +48,9 @@ public class Hanger extends Subsystem {
 
         stateManager.setupStates(getRobot(), stateManager);
 
-        goingUpState.setGoalState(UP_TICK, StateType.UP);
-        goingUpState.setGoalState(DOWN_TICK, StateType.HANG_DOWN);
+        // TODO: only have 1 motor transition state
+        //goingUpState.setGoalState(UP_TICK, StateType.UP);
+        //goingUpState.setGoalState(DOWN_TICK, StateType.HANG_DOWN);
     }
 
     public StateManager<StateType> getStateManager() { return stateManager; }

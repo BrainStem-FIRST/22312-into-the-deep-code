@@ -31,16 +31,21 @@ public class LiftTuneTele extends LinearOpMode {
         grabberServo.setPwmRange(new PwmControl.PwmRange(Grabber.MIN_TICK, Grabber.MAX_TICK));
         while(opModeIsActive()) {
             if(gamepad1.a)
-                grabberServo.setPosition(0.99);
+                armServo.setPosition(Arm.DOWN_POS);
             else if(gamepad1.b)
-                grabberServo.setPosition(0.01);
+                armServo.setPosition(Arm.RIGHT_POS);
+            else if(gamepad1.y)
+                armServo.setPosition(Arm.UP_POS);
+            else if(gamepad1.x)
+                armServo.setPosition(Arm.LEFT_POS);
 
             if(gamepad1.dpad_left)
-                armServo.setPosition(Arm.DOWN_POS);
+                grabberServo.setPosition(0.99);
             else if(gamepad1.dpad_right)
-                armServo.setPosition(Arm.RIGHT_POS);
+                grabberServo.setPosition(0.01);
 
-            if(Math.abs(gamepad1.left_stick_y) > 0.2 && motor.getCurrentPosition() > Lift.ABSOLUTE_MIN + 10 && motor.getCurrentPosition() < Lift.ABSOLUTE_MAX - 10)
+            if((gamepad1.left_stick_y > 0.2 && motor.getCurrentPosition() > Lift.ABSOLUTE_MIN + 10) || // checking down movement
+                (gamepad1.left_stick_y < -0.2 && motor.getCurrentPosition() < Lift.ABSOLUTE_MAX - 10)) // checking up movement
                 Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
             else
                 Subsystem.setMotorPower(motor, 0.05);

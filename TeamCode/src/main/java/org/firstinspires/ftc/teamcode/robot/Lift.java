@@ -22,11 +22,11 @@ public class Lift extends Subsystem {
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 565,
         HIGH_RAM_BEFORE_POS = 750,
-        HIGH_RAM_AFTER_POS = 1800,
+        HIGH_RAM_AFTER_POS = 1670,
 
         LOW_BASKET_POS = 1700,
-        HIGH_BASKET_POS = 3040,
-        ABSOLUTE_MAX = 3040,
+        HIGH_BASKET_POS = 3020,
+        ABSOLUTE_MAX = 3020,
         ABSOLUTE_MIN = 0;
 
     public static final int DESTINATION_THRESHOLD = 5;
@@ -42,7 +42,6 @@ public class Lift extends Subsystem {
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         pid = new PIDController(0.3, 0, 0.1);
 

@@ -67,10 +67,11 @@ public class BrainSTEMRobot {
     }
     public boolean setupLiftingSystem(double relativeTime) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
-        arm.getArmServo().setPosition(Arm.DOWN_POS);
-        if(relativeTime > 1)
-            Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
-        return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) < Lift.DESTINATION_THRESHOLD;
+        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
+        if(Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) < Lift.DESTINATION_THRESHOLD)
+            arm.getArmServo().setPosition(Arm.DOWN_POS);
+        return Math.abs(lift.getLiftMotor().getCurrentPosition() - Lift.TROUGH_SAFETY_POS) < Lift.DESTINATION_THRESHOLD &&
+                arm.getArmServo().getPosition() == Arm.DOWN_POS;
     }
 
     public void update(double dt) {
@@ -87,7 +88,7 @@ public class BrainSTEMRobot {
         arm.update(dt);
         lift.update(dt);
 
-        hanger.update(dt);
+        //hanger.update(dt);
 
         driveTrain.updatePoseEstimate();
     }

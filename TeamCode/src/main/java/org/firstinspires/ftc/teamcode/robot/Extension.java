@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.AccelPIDController;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -22,9 +21,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
 
     // TODO: find extension encoder ticks for these 3
-    public static final int MIN_POSITION = 0;
+    public static final int MIN_POSITION = 5;
     // max position
-    public static final int MAX_POSITION = 1000;
+    public static final int MAX_POSITION = 1080;
 
     public static int SHORT_EXTEND_POSITION = 200;
     // threshold whenever extension is going to a target position
@@ -92,9 +91,8 @@ public class Extension extends Subsystem {
         this.targetPower = targetPower;
     }
 
-    //TODO: ask whitmer why this isn't working
     public boolean hitRetractHardStop() {
-        return extensionMotor.getCurrentPosition() < MIN_POSITION || isMagnetSwitchActivated();
+        return isMagnetSwitchActivated();
     }
 
     @Override

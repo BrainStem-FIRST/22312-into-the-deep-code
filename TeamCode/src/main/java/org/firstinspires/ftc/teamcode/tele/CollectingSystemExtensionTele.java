@@ -133,7 +133,7 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
 
-            // go to search mode
+                // go to search mode
             else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
         }

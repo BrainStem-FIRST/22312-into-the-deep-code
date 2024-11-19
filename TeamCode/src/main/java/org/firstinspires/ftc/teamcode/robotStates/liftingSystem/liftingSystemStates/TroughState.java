@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 
@@ -14,23 +15,19 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.telemetry.addData("inside execute for trough state of lifting system", "");
         // waiting for collection system to finish in taking block before grabbing onto it
-
-        // TODO: replace conditional checking for gamepad input below w commented out conditional once collecting system fixed
-
         if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
                 robot.getCollector().hasValidBlockColor()) {
             // setting robot block color for testing if we just put block color in trough and don't collect
-
             robot.setBlockColorHeld(robot.getCollector().getBlockColorSensor().getBlockColor());
+
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                 robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
             }
         }
 
-
+        // closing onto block once lift is down
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
         // waiting for grabber to close on block before raising lift
@@ -38,6 +35,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             robot.getGrabber().setHasBlock(true); 
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
+
+        // giving slight power to extension to ensure collector is fully in and there is no contact with grabber
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
+            Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), -0.2);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     // only can be overridden if grabber is not closing in on block
     @Override
     public boolean canBeOverridden() {
-        return robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.CLOSING;
+        return robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED;
     }
 
     @Override

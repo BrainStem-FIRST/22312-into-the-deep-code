@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.util.Input;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class Tele extends LinearOpMode {
 
+    private final double TURN_AMP = 0.8;
+
     private Input input;
     private BrainSTEMRobot robot;
 
@@ -84,6 +86,8 @@ public class Tele extends LinearOpMode {
             telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
+            telemetry.addData("lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
+            telemetry.addData("lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("", "");
@@ -116,7 +120,7 @@ public class Tele extends LinearOpMode {
                         -gamepad1.left_stick_y,
                         -gamepad1.left_stick_x
                 ),
-                -gamepad1.right_stick_x
+                -gamepad1.right_stick_x * TURN_AMP
         ));
     }
 
@@ -186,8 +190,7 @@ public class Tele extends LinearOpMode {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        if(true)
-                        //if(robot.getBlockColorHeld() == BlockColor.YELLOW)
+                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                         else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
@@ -230,8 +233,8 @@ public class Tele extends LinearOpMode {
 
     private void listenForHangingInput() {
         //temp code
-        if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-            robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
+        //if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
+        //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
 
         // automatically start raising hanging at 2:20
         //if (timeSinceStart >= 140 && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
