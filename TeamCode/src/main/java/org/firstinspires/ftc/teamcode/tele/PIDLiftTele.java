@@ -91,6 +91,9 @@ public class PIDLiftTele extends LinearOpMode {
             else if(input.getGamepadTracker2().isFirstFrameDpadDown())
                 incrementPIDVar(pid, editMode, -0.05);
 
+            // checking for pid mode toggling
+            if(input.getGamepadTracker1().isFirstFrameX())
+                robot.setInPidMode(!robot.getInPidMode());
 
 
             listenForLiftingInput();
@@ -102,12 +105,9 @@ public class PIDLiftTele extends LinearOpMode {
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("a", gamepad2.a + " | " + input.getGamepadTracker2().isAPressed());
             telemetry.addData("editMode", editMode);
-            //telemetry.addData("kA", pid.getkA());
             telemetry.addData("kP", pid.getkP());
             telemetry.addData("kI", pid.getkI());
             telemetry.addData("kD", pid.getkD());
-            //telemetry.addData("start", pid.getStart());
-            //telemetry.addData("accel point", pid.getAccelerationPoint());
             telemetry.addData("target", pid.getTarget());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
             telemetry.update();

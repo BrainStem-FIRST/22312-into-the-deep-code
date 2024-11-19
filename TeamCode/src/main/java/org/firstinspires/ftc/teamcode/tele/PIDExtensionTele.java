@@ -38,7 +38,6 @@ public class PIDExtensionTele extends LinearOpMode {
 
         input = new Input(gamepad1, gamepad2);
         robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.BLUE);
-        PIDController pid = robot.getExtension().getPid();
 
         int editMode = 0; // 0 = kA, 1 = kP, etc
 
@@ -72,14 +71,18 @@ public class PIDExtensionTele extends LinearOpMode {
 
             // checking for adjusting k values
             if(input.getGamepadTracker2().isFirstFrameDpadUp())
-                incrementPIDVar(pid, editMode, 0.05);
+                incrementPIDVar(robot.getExtension().getPid(), editMode, 0.05);
             else if(input.getGamepadTracker2().isFirstFrameDpadDown())
-                incrementPIDVar(pid, editMode, -0.05);
+                incrementPIDVar(robot.getExtension().getPid(), editMode, -0.05);
 
+            // checking for pid mode toggling
+            if(input.getGamepadTracker1().isFirstFrameX())
+                robot.setInPidMode(!robot.getInPidMode());
 
             robot.update(dt);
             listenForCollectionInput();
-            telemetry.addData("error", pid.getTarget() - robot.getExtension().getExtensionMotor().getCurrentPosition());
+            telemetry.addData("pid mode", robot.getInPidMode());
+            telemetry.addData("error", robot.getExtension().getPid().getTarget() - robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("motor power", robot.getExtension().getExtensionMotor().getPower());
             telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
@@ -88,13 +91,10 @@ public class PIDExtensionTele extends LinearOpMode {
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("a", gamepad2.a + " | " + input.getGamepadTracker2().isAPressed());
             telemetry.addData("editMode", editMode);
-            //telemetry.addData("kA", pid.getkA());
-            telemetry.addData("kP", pid.getkP());
-            telemetry.addData("kI", pid.getkI());
-            telemetry.addData("kD", pid.getkD());
-            //telemetry.addData("start", pid.getStart());
-            //telemetry.addData("accel point", pid.getAccelerationPoint());
-            telemetry.addData("target", pid.getTarget());
+            telemetry.addData("kP", robot.getExtension().getPid().getkP());
+            telemetry.addData("kI", robot.getExtension().getPid().getkI());
+            telemetry.addData("kD", robot.getExtension().getPid().getkD());
+            telemetry.addData("target", robot.getExtension().getPid().getTarget());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
             telemetry.update();
         }

@@ -81,9 +81,6 @@ public class Extension extends Subsystem {
     public void setExtensionMotorPower(double power) {
         Subsystem.setMotorPower(extensionMotor, power);
     }
-    public boolean isMagnetSwitchActivated() {
-        return !magnetResetSwitch.getState();
-    }
     public double getTargetPower() {
         return targetPower;
     }
@@ -91,6 +88,9 @@ public class Extension extends Subsystem {
         this.targetPower = targetPower;
     }
 
+    public boolean isMagnetSwitchActivated() {
+        return !magnetResetSwitch.getState();
+    }
     public boolean hitRetractHardStop() {
         return isMagnetSwitchActivated();
     }

@@ -56,7 +56,8 @@ public class PIDController {
 
         value = Range.clip(value, lowerInputBound, higherInputBound);
 
-        double error = value - target;
+        // BEFORE: double error = value - target;
+        double error = target - value;
 
         return updateWithError(error);
     }

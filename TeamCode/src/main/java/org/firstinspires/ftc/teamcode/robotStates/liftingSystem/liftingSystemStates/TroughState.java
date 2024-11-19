@@ -37,8 +37,8 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         }
 
         // giving slight power to extension to ensure collector is fully in and there is no contact with grabber
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
-            Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), -0.2);
+        //if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
+        //    Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), -0.2);
     }
 
     @Override
