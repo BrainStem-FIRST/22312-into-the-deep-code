@@ -32,13 +32,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
         // waiting for grabber to close on block before raising lift
         if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-            robot.getGrabber().setHasBlock(true); 
+            robot.getGrabber().setHasBlock(true);
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
-
-        // giving slight power to extension to ensure collector is fully in and there is no contact with grabber
-        //if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
-        //    Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), -0.2);
     }
 
     @Override

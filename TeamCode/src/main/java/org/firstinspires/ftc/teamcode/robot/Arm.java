@@ -18,7 +18,6 @@ public class Arm extends Subsystem {
     // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
     public static final int MIN_TICK = 940, MAX_TICK = 2445;
     public static final double DOWN_POS = 0.01, LEFT_POS = 0.33, UP_POS = 0.66, RIGHT_POS = 0.99;
-    public static final double DESTINATION_THRESHOLD = 0.1;
     public enum StateType {
         DOWN, LEFT, UP, RIGHT, TRANSITION
     }
@@ -39,7 +38,7 @@ public class Arm extends Subsystem {
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.RIGHT, new NothingState<>(StateType.RIGHT));
 
-        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, DESTINATION_THRESHOLD);
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);

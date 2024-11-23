@@ -12,15 +12,13 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        robot.telemetry.addData("in retracting state of extension", "");
-
-        if(isFirstTime())
-            robot.getExtension().getPid().reset();
-        if(!robot.getInPidMode())
-            Subsystem.setMotorPosition(robot.getExtension().getExtensionMotor(), Extension.MIN_POSITION);
-        else
-            Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(),
-                    robot.getExtension().getPid().update(robot.getExtension().getExtensionMotor().getCurrentPosition()));
+        //if(isFirstTime())
+        //    robot.getExtension().getPid().reset();
+        //if(!robot.getInPidMode())
+        robot.getExtension().retractExtensionMotor();
+        //else
+        //Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(),
+        //        robot.getExtension().getPid().update(robot.getExtension().getExtensionMotor().getCurrentPosition()));
     }
 
     @Override

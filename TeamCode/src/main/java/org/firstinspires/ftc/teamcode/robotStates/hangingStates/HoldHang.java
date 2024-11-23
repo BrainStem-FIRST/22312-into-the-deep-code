@@ -15,7 +15,7 @@ public class HoldHang extends RobotState<Hanger.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Hanger.StateType.GOING_DOWN;
+        return stateManager.getActiveStateType() == Hanger.StateType.TRANSITION;
     }
 
     @Override

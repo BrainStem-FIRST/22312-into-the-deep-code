@@ -6,8 +6,8 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 
 public class ServoTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final ServoImplEx servo;
-    public ServoTransitionState(StateType stateType, ServoImplEx servo, double DESTINATION_THRESHOLD) {
-        super(stateType, DESTINATION_THRESHOLD);
+    public ServoTransitionState(StateType stateType, ServoImplEx servo) {
+        super(stateType);
         this.servo = servo;
     }
     @Override

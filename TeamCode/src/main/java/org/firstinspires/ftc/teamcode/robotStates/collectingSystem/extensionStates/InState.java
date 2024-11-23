@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class InState extends RobotState<Extension.StateType> {
@@ -13,8 +11,12 @@ public class InState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        robot.getExtension().setExtensionMotorPower(0);
-        robot.getExtension().getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(robot.getExtension().hitRetractHardStop()) {
+            robot.getExtension().setExtensionMotorPower(0);
+            robot.getExtension().getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        else
+            robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER_SLOW);
     }
 
     @Override

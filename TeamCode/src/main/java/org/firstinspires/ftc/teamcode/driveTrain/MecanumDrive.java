@@ -59,17 +59,21 @@ public class MecanumDrive {
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         // drive model parameters - DON'T NEED TO DO THESE
         // can skip forward and lateral push test
-        public double inPerTick = 0.99951482;
-        public double lateralInPerTick = 0.5128940536655626;
+        public double inPerTick = 1.00236705;
+        // 0.5115577966727853
+        // 0.494904970911729
+        // 0.4971664843169549
+        public double lateralInPerTick = 0.4971664843169549;
         public double trackWidthTicks = 0;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.617737799256298;
-        public double kV = 0.022399097339862773;
+        //kV: 0.02954217888517911, kS: 0.41059529164231834
+        public double kS = 0.41059529164231834;
+        public double kV = 0.02954217888517911;
         public double kA = 0;
 
         // path profile parameters (in inches)

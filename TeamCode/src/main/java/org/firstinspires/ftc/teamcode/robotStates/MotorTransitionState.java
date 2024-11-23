@@ -7,42 +7,35 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class MotorTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final DcMotorEx motor;
-    private final PIDController pid;
+    public final int DESTINATION_THRESHOLD;
 
     private int absoluteMin;
     private int absoluteMax;
 
     // stateType is enum of transition state type
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD) {
-        super(stateType, DESTINATION_THRESHOLD);
+        super(stateType);
         this.motor = motor;
-        this.pid = null;
-    }
-    public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
-        super(stateType, DESTINATION_THRESHOLD);
-        this.motor = motor;
-        this.pid = pid;
+        this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
     }
     public void setEncoderBounds(int min, int max) {
         absoluteMin = min;
         absoluteMax = max;
     }
+
     @Override
     public void execute() {
+        // checking hardstops
         if(motor.getCurrentPosition() < absoluteMin)
             Subsystem.setMotorPosition(motor, absoluteMin);
         else if(motor.getCurrentPosition() > absoluteMax)
             Subsystem.setMotorPosition(motor, absoluteMax);
+
+        // running regular motor
         else
-            if(robot.getInPidMode() && pid != null) {
-                if (isFirstTime()) {
-                    pid.setTarget(goalPosition);
-                    pid.reset();
-                }
-                Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
-            }
-            else
-                Subsystem.setMotorPosition(motor, (int) goalPosition);
+            Subsystem.setMotorPosition(motor, (int) goalPosition);
+            //Subsystem.setMotorPower(motor, Math.signum(goalPosition - motor.getCurrentPosition()) * power);
+
     }
 
     @Override

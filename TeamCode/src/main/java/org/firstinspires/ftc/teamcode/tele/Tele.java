@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Input;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class Tele extends LinearOpMode {
 
-    private final double TURN_AMP = 0.8;
+    private final double TURN_AMP = 0.4;
 
     private Input input;
     private BrainSTEMRobot robot;
@@ -69,7 +69,6 @@ public class Tele extends LinearOpMode {
             telemetry.addData("", "");
             telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());
             telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
-            telemetry.addData("can enter going up hanging", robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP));
 
             telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
             telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
@@ -88,6 +87,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
             telemetry.addData("lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
+            telemetry.addData("lift motor power", robot.getLift().getLiftMotor().getPower());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("", "");
@@ -207,9 +207,6 @@ public class Tele extends LinearOpMode {
                             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
                             robot.getGrabber().setHasBlock(false);
                         }
-                        // assuming robot is flush with submersible, so transitions to ram before
-                        else
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
                     }
                     else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
@@ -225,12 +222,15 @@ public class Tele extends LinearOpMode {
 
         // button for "going back" a state
         else if(input.getGamepadTracker1().isFirstFrameB())
-            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA)
-                // toggling grabber
-                if(!robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING))
-                    robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+            // backtracking if fail to grab specimen
+            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.SPECIMEN_RAM &&
+                    robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE) {
+                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_DROP_AREA);
+                robot.getGrabber().setHasSpecimen(false);
+            }
     }
-
+    // TODO: if press right trigger and not extended, then extend constant length and colect
+    // TODO: only fully hinge parallel once collector is past submersible to prevent sag from causing back of collector to hit submersible wall
     private void listenForHangingInput() {
         //temp code
         //if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
@@ -240,65 +240,14 @@ public class Tele extends LinearOpMode {
         //if (timeSinceStart >= 140 && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
         //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
         // lower hanging to raise robot
-        if (input.getGamepadTracker1().isDpadDownPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
-            robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_DOWN);
-    }
-
-    // without roadrunner
-    private void listenForDriveTrainInputOld() {
-        double leftStickX = gamepad1.left_stick_x;
-        double leftStickY = gamepad1.left_stick_y * -1;
-        double rightStickX;
-        double threshold = 0.1F;
-        if (Math.abs(gamepad1.right_stick_x) > threshold) {
-            if (gamepad1.right_stick_x < 0) {
-                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * -1 * (4.0 / 5.0) - (1.0 / 5.0));
+        if (input.getGamepadTracker2().isFirstFrameA())
+            if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN) {
+                robot.getHanger().setMovementDir(1);
+                robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
             }
-            else {
-                rightStickX = (gamepad1.right_stick_x * gamepad1.right_stick_x * (4.0 / 5.0) + (1.0 / 5.0));
+            else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.HANG_DOWN) {
+                robot.getHanger().setMovementDir(-1);
+                robot.getHanger().getTransitionState().setGoalState(Hanger.FULL_DOWN_TICK, Hanger.StateType.FULL_DOWN);
             }
-        } else {
-            rightStickX = 0;
-        }
-        if ((Math.abs(gamepad1.left_stick_y) > threshold) || (Math.abs(gamepad1.left_stick_x) > threshold) || Math.abs(gamepad1.right_stick_x) > threshold) {
-            //Calculate formula for mecanum drive function
-            double addValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) + leftStickX * Math.abs(leftStickX))))) / 100;
-            double subtractValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) - leftStickX * Math.abs(leftStickX))))) / 100;
-
-
-            //Set motor speed variables
-            robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
-        } else
-            robot.getDriveTrain().stopMotors();
-    }
-    // before controller refactor
-    private void listenForCollectionInputOld() {
-
-        // update states
-        if (input.getGamepadTracker1().isFirstFrameA()) {
-            // goes from in to search, then toggles between search and search and collect
-            switch (robot.getCollectingSystem().getStateManager().getActiveStateType()) {
-                case IN:
-                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
-                    break;
-                case SEARCH:
-                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
-                    break;
-                case SEARCH_AND_COLLECT:
-                    robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
-                    break;
-            }
-        }
-        if (input.getGamepadTracker1().isFirstFrameB()) {
-            // if the collector is collecting, spit
-            if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-                robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING);
-            // if the collector is doing nothing, retract
-            else if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
-                robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
-        }
-
-        // update extension target power (how fast it moves)
-        robot.getExtension().setTargetPower(input.getGamepadTracker1().getGamepad().right_stick_y * -0.6);
     }
 }

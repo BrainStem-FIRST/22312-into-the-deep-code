@@ -14,8 +14,8 @@ public class BlockColorSensor {
     public static final HashMap<BlockColor, Double[]> MAX_BLOCK_PERCENTS = new HashMap<>();
     public static final HashMap<BlockColor, Double[]> MIN_BLOCK_PERCENTS = new HashMap<>();
 
-    public static Double[] RED_BLOCK_PERCENTS_MAX = { 37.5, 22.75, 8.5 };
-    public static Double[] RED_BLOCK_PERCENTS_MIN = { 57.5, 42.75, 28.5 };
+    public static Double[] RED_BLOCK_PERCENTS_MIN = { 37.5, 22.75, 8.5 };
+    public static Double[] RED_BLOCK_PERCENTS_MAX = { 57.5, 42.75, 28.5 };
     public static Double[] BLUE_BLOCK_PERCENTS_MAX = { 23.75, 39., 66.25 };
     public static Double[] BLUE_BLOCK_PERCENTS_MIN = { 3.75, 19., 46.25 };
     public static Double[] YELLOW_BLOCK_PERCENTS_MAX = { 43., 59.25, 27. };
@@ -35,6 +35,7 @@ public class BlockColorSensor {
         MAX_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MAX);
         MAX_BLOCK_PERCENTS.put(BlockColor.BLUE, BLUE_BLOCK_PERCENTS_MAX);
         MAX_BLOCK_PERCENTS.put(BlockColor.YELLOW, YELLOW_BLOCK_PERCENTS_MAX);
+
         MIN_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MIN);
         MIN_BLOCK_PERCENTS.put(BlockColor.BLUE, BLUE_BLOCK_PERCENTS_MIN);
         MIN_BLOCK_PERCENTS.put(BlockColor.YELLOW, YELLOW_BLOCK_PERCENTS_MIN);
@@ -57,7 +58,12 @@ public class BlockColorSensor {
     public String update(BlockColor blockColor) {
         if(dataMode)
             updateTesting(blockColor);
-        return "max percents: " + MAX_BLOCK_PERCENTS.get(blockColor) + " | min percents: " + MIN_BLOCK_PERCENTS.get(blockColor);
+        if(blockColor == BlockColor.NONE)
+            return "block color none; not printing values";
+        Double[] max = MAX_BLOCK_PERCENTS.get(blockColor);
+        Double[] min = MIN_BLOCK_PERCENTS.get(blockColor);
+        return "max percents: " + max[0] + "," + max[1] + "," + max[2] + " | min percents: " + min[0] + ", " + min[1] + ", " + min[2];
+        //return "max percents: " + MAX_BLOCK_PERCENTS.get(blockColor) + " | min percents: " + MIN_BLOCK_PERCENTS.get(blockColor);
     }
     private void updateTesting(BlockColor blockColor) {
 
@@ -104,13 +110,10 @@ public class BlockColorSensor {
         double gPercent = green * 100. / sum;
         double bPercent = blue * 100. / sum;
 
-        //telemetry.addData("red color percent", rPercent);
-        //telemetry.addData("green color percent", gPercent);
-        //telemetry.addData("blue color percent", bPercent);
 
         return colorPercentInRange(rPercent, MAX_BLOCK_PERCENTS.get(blockColor)[0], MIN_BLOCK_PERCENTS.get(blockColor)[0]) &&
                 colorPercentInRange(gPercent, MAX_BLOCK_PERCENTS.get(blockColor)[1], MIN_BLOCK_PERCENTS.get(blockColor)[1]) &&
-                colorPercentInRange(bPercent, Objects.requireNonNull(MAX_BLOCK_PERCENTS.get(blockColor))[2], Objects.requireNonNull(MIN_BLOCK_PERCENTS.get(blockColor))[2]);
+                colorPercentInRange(bPercent, MAX_BLOCK_PERCENTS.get(blockColor)[2], MIN_BLOCK_PERCENTS.get(blockColor)[2]);
     }
     private boolean colorPercentInRange(double num, double max, double min) {
         return num <= max && num >= min;

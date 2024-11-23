@@ -20,12 +20,13 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA ||
+                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_DROP_AREA;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override

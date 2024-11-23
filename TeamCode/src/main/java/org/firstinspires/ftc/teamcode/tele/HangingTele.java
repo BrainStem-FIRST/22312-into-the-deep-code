@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tele;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
@@ -31,6 +32,7 @@ public class HangingTele extends LinearOpMode {
 
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, "HangMotor");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();

@@ -12,28 +12,28 @@ import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Lift extends Subsystem {
+    public final static double FULL_POWER = 0.9;
+    public final static double TRANSFER_POWER = 0.5;
     private final DcMotorEx liftMotor;
-    public static final int TROUGH_POS = 0,
+    public static final int TROUGH_POS = -15,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
         LOW_RAM_BEFORE_POS = 320,
-        LOW_RAM_AFTER_POS = 565,
+        LOW_RAM_AFTER_POS = 595,
         HIGH_RAM_BEFORE_POS = 750,
-        HIGH_RAM_AFTER_POS = 1670,
+        HIGH_RAM_AFTER_POS = 1840,
 
         LOW_BASKET_POS = 1700,
-        HIGH_BASKET_POS = 3020,
-        ABSOLUTE_MAX = 3020,
+        HIGH_BASKET_POS = 3400,
+        ABSOLUTE_MAX = 3400,
         ABSOLUTE_MIN = 0;
 
-    public static final int DESTINATION_THRESHOLD = 5;
+    public static final int DESTINATION_THRESHOLD = 20;
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
     }
-    private final PIDController pid;
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
 
@@ -42,8 +42,6 @@ public class Lift extends Subsystem {
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        pid = new PIDController(0.3, 0, 0.1);
 
         stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
@@ -75,7 +73,7 @@ public class Lift extends Subsystem {
         basketSafetyState.addMotor(liftMotor);
         stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
 
-        this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD, pid);
+        this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         this.transitionState.setEncoderBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
@@ -92,11 +90,8 @@ public class Lift extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
-                if(getFramesRunning() == 1) {
-                    pid.reset();
-                    pid.setTarget(target);
-                }
-                Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
+                int dif = target - liftMotor.getCurrentPosition();
+                liftMotor.setPower(Math.signum(dif) * FULL_POWER);
 
                 return Math.abs(liftMotor.getCurrentPosition() - target) <= DESTINATION_THRESHOLD;
             }
@@ -112,6 +107,7 @@ public class Lift extends Subsystem {
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
     }
+
     public int getRamBeforePos() {
         return getRobot().isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
     }
@@ -125,9 +121,5 @@ public class Lift extends Subsystem {
     public boolean atLowBasket() {
         return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
                 getTransitionState().getGoalStatePosition() == LOW_BASKET_POS;
-    }
-
-    public PIDController getPid() {
-        return pid;
     }
 }

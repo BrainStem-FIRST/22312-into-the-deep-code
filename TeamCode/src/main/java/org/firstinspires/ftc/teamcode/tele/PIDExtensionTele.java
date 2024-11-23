@@ -83,7 +83,7 @@ public class PIDExtensionTele extends LinearOpMode {
             listenForCollectionInput();
             telemetry.addData("pid mode", robot.getInPidMode());
             telemetry.addData("error", robot.getExtension().getPid().getTarget() - robot.getExtension().getExtensionMotor().getCurrentPosition());
-            telemetry.addData("motor power", robot.getExtension().getExtensionMotor().getPower());
+            telemetry.addData("extension motor power", robot.getExtension().getExtensionMotor().getPower());
             telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("collecting system state, ", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("extension state, ",  robot.getExtension().getStateManager().getActiveStateType());

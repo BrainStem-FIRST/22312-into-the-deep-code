@@ -23,7 +23,7 @@ public class Extension extends Subsystem {
     // TODO: find extension encoder ticks for these 3
     public static final int MIN_POSITION = 5;
     // max position
-    public static final int MAX_POSITION = 1080;
+    public static final int MAX_POSITION = 1680;
 
     public static int SHORT_EXTEND_POSITION = 200;
     // threshold whenever extension is going to a target position
@@ -31,7 +31,8 @@ public class Extension extends Subsystem {
 
     // TODO - implement magnet sensor and encoder reset
     public static final double SEARCH_POWER = 0.55;
-    public static final double RETRACT_POWER = -0.9;
+    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.8;
+    public static final int RETRACT_SLOW_POSITION = 300;
 
     public enum StateType {
         IN, FINDING_BLOCK, RETRACTING
@@ -55,9 +56,9 @@ public class Extension extends Subsystem {
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        pid = new PIDController(0.5, 0, 0.1);
+        pid = new PIDController(0.01, 0, 0);
         pid.setTarget(MIN_POSITION);
-        pid.setOutputBounds(-0.99,0.99);
+        pid.setOutputBounds(-1,1);
 
         stateManager = new StateManager<>(StateType.IN);
 
@@ -81,6 +82,10 @@ public class Extension extends Subsystem {
     public void setExtensionMotorPower(double power) {
         Subsystem.setMotorPower(extensionMotor, power);
     }
+    public void retractExtensionMotor() {
+        Subsystem.setMotorPower(extensionMotor, extensionMotor.getCurrentPosition() > RETRACT_SLOW_POSITION ? RETRACT_POWER_FAST : RETRACT_POWER_SLOW);
+    }
+
     public double getTargetPower() {
         return targetPower;
     }
@@ -116,12 +121,13 @@ public class Extension extends Subsystem {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
 
-                if (getFramesRunning() == 1)
-                    pid.reset();
-                if(getRobot().getInPidMode())
-                    setExtensionMotorPower(pid.update(extensionMotor.getCurrentPosition()));
-                else
-                    setExtensionMotorPower(Extension.RETRACT_POWER);
+                //if (getFramesRunning() == 1)
+                //    pid.reset();
+                //if(getRobot().getInPidMode())
+                //    setExtensionMotorPower(pid.update(extensionMotor.getCurrentPosition()));
+                //else
+                //  setExtensionMotorPower(Extension.RETRACT_POWER_FAST);
+                retractExtensionMotor();
 
                 if (isMagnetSwitchActivated()) {
                     setExtensionMotorPower(0);
