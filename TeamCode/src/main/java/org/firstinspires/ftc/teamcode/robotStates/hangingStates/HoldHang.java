@@ -10,7 +10,7 @@ public class HoldHang extends RobotState<Hanger.StateType> {
 
     @Override
     public void execute() {
-        robot.getHanger().setHangMotorPower(Hanger.HANG_DOWN_POWER);
+        robot.getHanger().setHangMotorPower(Hanger.HANG_HOLD_POWER);
     }
 
     @Override

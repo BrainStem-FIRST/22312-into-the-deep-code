@@ -6,9 +6,16 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 
 public class ServoTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final ServoImplEx servo;
+    private final double timeDone;
     public ServoTransitionState(StateType stateType, ServoImplEx servo) {
         super(stateType);
         this.servo = servo;
+        timeDone = 0.5;
+    }
+    public ServoTransitionState(StateType stateType, ServoImplEx servo, double timeDone) {
+        super(stateType);
+        this.servo = servo;
+        this.timeDone = timeDone;
     }
     @Override
     public void execute() {
@@ -27,7 +34,7 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-        return time > 0.5;
+        return time > timeDone;
     }
 
     @Override

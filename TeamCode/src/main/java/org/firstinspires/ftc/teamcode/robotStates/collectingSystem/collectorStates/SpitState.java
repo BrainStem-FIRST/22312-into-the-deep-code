@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorSta
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SpitState extends RobotState<Collector.StateType> {
@@ -21,6 +22,9 @@ public class SpitState extends RobotState<Collector.StateType> {
 
         // spit
         robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
+
+        // hinge to middle
+        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
 
         // get the starting time to track safety
         if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)

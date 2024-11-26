@@ -16,12 +16,7 @@ public class Hanger extends Subsystem {
     // TODO: find down and up tick values and threshold
     // down refers to the position the hanging goes to after it is on the bar
     public final static int FULL_DOWN_TICK = 0, HANG_DOWN_TICK = 2076, UP_TICK = 33000, DESTINATION_THRESHOLD = 20;
-    public final static double HANG_DOWN_POWER = 1;
-    public final static int HANG_TICK_THRESHOLD = 5;
-
-    // 1 represents transitioning to final hang from base position
-    // -1 represents transitioning from final hang to base position
-    private int movementDir = 0;
+    public final static double HANG_HOLD_POWER = -0.3;
 
     public enum StateType {
         FULL_DOWN,
@@ -63,9 +58,6 @@ public class Hanger extends Subsystem {
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
     }
-    public void setMovementDir(int movementDir) {
-        this.movementDir = movementDir;
-    }
 
     public void setHangMotorPosition(int position) {
         Subsystem.setMotorPosition(hangMotor, position);
@@ -77,12 +69,5 @@ public class Hanger extends Subsystem {
     @Override
     public void update(double dt) {
         stateManager.update(dt);
-
-        // auto transitioning hanging to lift robot once motor has reached high enough height
-        if(stateManager.getActiveStateType() == StateType.UP)
-            if(movementDir == 1)
-                transitionState.setGoalState(HANG_DOWN_TICK, StateType.HANG_DOWN);
-            else if(movementDir == -1)
-                transitionState.setGoalState(FULL_DOWN_TICK, StateType.FULL_DOWN);
     }
 }

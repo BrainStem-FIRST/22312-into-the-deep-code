@@ -12,12 +12,13 @@ import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Lift extends Subsystem {
     public final static double FULL_POWER = 0.9;
-    public final static double TRANSFER_POWER = 0.5;
     private final DcMotorEx liftMotor;
-    public static final int TROUGH_POS = -15,
+    private final PIDController pid;
+    public static final int TROUGH_POS = -5,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 0,
         LOW_RAM_BEFORE_POS = 320,
@@ -28,7 +29,7 @@ public class Lift extends Subsystem {
         LOW_BASKET_POS = 1700,
         HIGH_BASKET_POS = 3400,
         ABSOLUTE_MAX = 3400,
-        ABSOLUTE_MIN = 0;
+        ABSOLUTE_MIN = -5;
 
     public static final int DESTINATION_THRESHOLD = 20;
     public enum StateType {
@@ -48,6 +49,10 @@ public class Lift extends Subsystem {
         NothingState<StateType> troughState = new NothingState<>(StateType.TROUGH);
         troughState.addMotor(liftMotor);
         stateManager.addState(StateType.TROUGH, troughState);
+
+        pid = new PIDController(0.01, 0, 0);
+        pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
+        pid.setOutputBounds(-1, 1);
 
         NothingState<StateType> troughSafetyState = new NothingState<>(StateType.TROUGH_SAFETY);
         troughSafetyState.addMotor(liftMotor);
@@ -121,5 +126,8 @@ public class Lift extends Subsystem {
     public boolean atLowBasket() {
         return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
                 getTransitionState().getGoalStatePosition() == LOW_BASKET_POS;
+    }
+    public PIDController getPid() {
+        return pid;
     }
 }

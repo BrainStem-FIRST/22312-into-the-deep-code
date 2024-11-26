@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorSta
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SpitTempState extends RobotState<Collector.StateType> {
@@ -23,8 +24,12 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
+        // spit
         robot.getCollector().setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
         framesRunning++;
+
+        // hinge to middle
+        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
     }
 
     @Override

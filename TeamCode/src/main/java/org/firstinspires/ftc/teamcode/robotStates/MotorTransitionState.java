@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class MotorTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final DcMotorEx motor;
+    private PIDController pid;
     public final int DESTINATION_THRESHOLD;
 
     private int absoluteMin;
@@ -18,9 +19,29 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
     }
+    public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
+        super(stateType);
+        this.motor = motor;
+        this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
+        this.pid = pid;
+    }
     public void setEncoderBounds(int min, int max) {
         absoluteMin = min;
         absoluteMax = max;
+    }
+
+    @Override
+    public void setGoalState(double goalPosition, StateType goalStateType) {
+        // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
+        if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
+            if(pid != null) {
+                pid.reset();
+                pid.setTarget(goalPosition);
+            }
+            this.goalPosition = goalPosition;
+            this.goalStateType = goalStateType;
+            stateManager.tryEnterState(stateType);
+        }
     }
 
     @Override
@@ -33,8 +54,10 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
         // running regular motor
         else
-            Subsystem.setMotorPosition(motor, (int) goalPosition);
-            //Subsystem.setMotorPower(motor, Math.signum(goalPosition - motor.getCurrentPosition()) * power);
+            if(pid == null)
+                Subsystem.setMotorPosition(motor, (int) goalPosition);
+            else
+                Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
 
     }
 

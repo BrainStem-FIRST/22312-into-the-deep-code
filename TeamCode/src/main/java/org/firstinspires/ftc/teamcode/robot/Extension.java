@@ -25,13 +25,15 @@ public class Extension extends Subsystem {
     // max position
     public static final int MAX_POSITION = 1680;
 
+    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 420;
+
     public static int SHORT_EXTEND_POSITION = 200;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 
     // TODO - implement magnet sensor and encoder reset
     public static final double SEARCH_POWER = 0.55;
-    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.8;
+    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.3, RETRACT_POWER_IN = -0.1;
     public static final int RETRACT_SLOW_POSITION = 300;
 
     public enum StateType {

@@ -16,7 +16,7 @@ public class InState extends RobotState<Extension.StateType> {
             robot.getExtension().getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         else
-            robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER_SLOW);
+            robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER_IN);
     }
 
     @Override

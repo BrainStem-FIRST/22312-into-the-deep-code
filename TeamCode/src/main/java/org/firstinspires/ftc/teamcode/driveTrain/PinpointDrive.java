@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.driveTrain;
 
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Trajectory;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
@@ -33,7 +30,7 @@ public class PinpointDrive extends MecanumDrive {
          */
         //These are tuned for 3110-0002-0001 Product Insight #1
         // RR localizer note: These units are inches, presets are converted from mm (which is why they are inexact)
-        public double xOffset = 163.92;
+        public double xOffset = 6.45;
         public double yOffset = 0;
 
         /*
@@ -67,8 +64,7 @@ public class PinpointDrive extends MecanumDrive {
         pinpoint = hardwareMap.get(GoBildaPinpointDriverRR.class,"odo");
 
         // RR localizer note: don't love this conversion (change driver?)
-        //pinpoint.setOffsets(DistanceUnit.MM.fromInches(PARAMS.xOffset), DistanceUnit.MM.fromInches(PARAMS.yOffset));
-        pinpoint.setOffsets(PARAMS.xOffset, PARAMS.yOffset);
+        pinpoint.setOffsets(DistanceUnit.MM.fromInches(PARAMS.xOffset), DistanceUnit.MM.fromInches(PARAMS.yOffset));
 
 
         pinpoint.setEncoderResolution(PARAMS.encoderResolution);
@@ -108,6 +104,7 @@ public class PinpointDrive extends MecanumDrive {
         }
         pinpoint.update();
         pose = pinpoint.getPositionRR();
+
         lastPinpointPose = pose;
 
         // RR standard
@@ -123,6 +120,7 @@ public class PinpointDrive extends MecanumDrive {
         return pinpoint.getVelocityRR();
     }
 
+
     // for debug logging
     public static final class FTCPoseMessage {
         public long timestamp;
@@ -137,4 +135,7 @@ public class PinpointDrive extends MecanumDrive {
             this.heading = pose.getHeading(AngleUnit.RADIANS);
         }
     }
+
+
+
 }

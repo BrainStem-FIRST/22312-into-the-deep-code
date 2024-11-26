@@ -21,7 +21,7 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
             extensionManager.tryEnterState(Extension.StateType.FINDING_BLOCK);
 
             // if previous state was search and collect, this will hinge up and stop collector
-            hingeManager.tryEnterState(Hinge.StateType.HINGING_UP);
+            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
             collectorManager.tryEnterState(Collector.StateType.NOTHING);
         }
     }
@@ -39,11 +39,11 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return false;
+        return robot.getExtension().hitRetractHardStop();
     }
 
     @Override
     public CollectingSystem.StateType getNextStateType() {
-        return null;
+        return CollectingSystem.StateType.IN;
     }
 }

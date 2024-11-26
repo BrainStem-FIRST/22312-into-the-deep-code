@@ -61,6 +61,7 @@ public class Tele extends LinearOpMode {
             listenForRobotControls();
 
             robot.update(dt);
+            robot.getDriveTrain().updatePoseEstimate();
 
             telemetry.addData("magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
 
@@ -77,7 +78,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
             telemetry.addData("robot vector real", robot.getDriveTrain().pose.heading.real);
             telemetry.addData("robot vector imaginary", robot.getDriveTrain().pose.heading.imag);
-            telemetry.addData("robot angle", Math.atan2(robot.getDriveTrain().pose.heading.real, robot.getDriveTrain().pose.heading.imag));
+            telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
             telemetry.addData("", "");
             telemetry.addData("in pid mode", robot.getInPidMode());
             telemetry.addData("", "");
@@ -87,6 +88,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
             telemetry.addData("lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
+            telemetry.addData("lift error", robot.getLift().getPid().getTarget() - robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("lift motor power", robot.getLift().getLiftMotor().getPower());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
@@ -96,6 +98,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
+            telemetry.addData("hitting extension hard stop", robot.getExtension().hitRetractHardStop());
             telemetry.addData("has red", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.RED));
             telemetry.addData("has blue", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.BLUE));
             telemetry.addData("has yellow", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.YELLOW));
@@ -137,7 +140,9 @@ public class Tele extends LinearOpMode {
                 collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
             if (input.getGamepadTracker1().isRightBumperPressed())
                 robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-            else if (input.getGamepadTracker1().isLeftBumperPressed())
+            else if (input.getGamepadTracker1().isLeftBumperPressed()
+                    && (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH
+                    || robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION))
                 robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
             else
                 robot.getExtension().setTargetPower(0);
@@ -242,12 +247,10 @@ public class Tele extends LinearOpMode {
         // lower hanging to raise robot
         if (input.getGamepadTracker2().isFirstFrameA())
             if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN) {
-                robot.getHanger().setMovementDir(1);
                 robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
             }
-            else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.HANG_DOWN) {
-                robot.getHanger().setMovementDir(-1);
-                robot.getHanger().getTransitionState().setGoalState(Hanger.FULL_DOWN_TICK, Hanger.StateType.FULL_DOWN);
+            else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP) {
+                robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_TICK, Hanger.StateType.HANG_DOWN);
             }
     }
 }
