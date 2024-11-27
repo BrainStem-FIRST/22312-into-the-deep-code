@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.driveTrain;
 
+
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
@@ -31,7 +33,7 @@ public class PinpointDrive extends MecanumDrive {
         //These are tuned for 3110-0002-0001 Product Insight #1
         // RR localizer note: These units are inches, presets are converted from mm (which is why they are inexact)
         public double xOffset = 6.45;
-        public double yOffset = 0;
+        public double yOffset = 0.0;
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -104,7 +106,6 @@ public class PinpointDrive extends MecanumDrive {
         }
         pinpoint.update();
         pose = pinpoint.getPositionRR();
-
         lastPinpointPose = pose;
 
         // RR standard
