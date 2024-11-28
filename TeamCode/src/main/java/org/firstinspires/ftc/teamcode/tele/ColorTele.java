@@ -56,8 +56,7 @@ public class ColorTele extends LinearOpMode {
             telemetry.addData("collecting data", blockColorSensor.getDataMode());
             telemetry.addData("manually selected block", curBlockColor);
 
-            telemetry.addData("", blockColorSensor.update(curBlockColor));
-
+            telemetry.addData("", blockColorSensor.updateBlockColorTesting(curBlockColor));
 
             telemetry.addData("r percent", r / sum);
             telemetry.addData("g percent", g / sum);

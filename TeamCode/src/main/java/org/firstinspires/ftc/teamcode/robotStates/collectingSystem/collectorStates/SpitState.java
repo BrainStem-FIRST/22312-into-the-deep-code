@@ -23,9 +23,6 @@ public class SpitState extends RobotState<Collector.StateType> {
         // spit
         robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
 
-        // hinge to middle
-        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
-
         // get the starting time to track safety
         if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)
             startTime = time;
@@ -35,7 +32,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Collector.StateType.COLLECTING;
+        return true;
     }
 
     @Override

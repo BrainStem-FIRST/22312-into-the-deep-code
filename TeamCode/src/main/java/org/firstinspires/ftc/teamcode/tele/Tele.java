@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.Input;
@@ -165,10 +166,16 @@ public class Tele extends LinearOpMode {
         if (input.getGamepadTracker1().isFirstFrameLeftTrigger())
             collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
-        // force spit in case block gets stuck - spits as long as gamepad button is down
+        // force spit in case block gets stuck - spits as long as gamepad up is pressed
         if (input.getGamepadTracker1().isDpadUpPressed()) {
             collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
+        }
+
+        // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
+        if (input.getGamepadTracker2().isDpadDownPressed()) {
+            collectorManager.tryEnterState(Collector.StateType.COLLECTING_TEMP);
+            ((CollectTempState) collectorManager.getState(Collector.StateType.COLLECTING_TEMP)).continueRunning();
         }
     }
     private void listenForLiftingInput() {

@@ -27,7 +27,7 @@ public class Extension extends Subsystem {
 
     public static final int MIN_SEARCH_AND_COLLECT_POSITION = 420;
 
-    public static int SHORT_EXTEND_POSITION = 200;
+    public static int SHORT_EXTEND_POSITION = 420;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 

@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
-public class SpitTempState extends RobotState<Collector.StateType> {
+public class CollectTempState extends RobotState<Collector.StateType> {
 
     // keeps track of how many frames - not based on time - it has been running for
     private int framesRunning;
 
-    public SpitTempState() {
-        super(Collector.StateType.SPITTING_TEMP);
+    public CollectTempState() {
+        super(Collector.StateType.COLLECTING_TEMP);
         framesRunning = 0;
     }
 
@@ -22,12 +24,9 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        // spit
-        robot.getCollector().setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
+        // collect
+        robot.getCollector().setSpindleMotorPower(-Collector.COLLECT_TEMP_POWER);
         framesRunning++;
-
-        // hinge to middle
-        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override
@@ -47,6 +46,6 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        return Collector.StateType.COLLECTING;
+        return Collector.StateType.NOTHING;
     }
 }

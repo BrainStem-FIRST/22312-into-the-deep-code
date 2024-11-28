@@ -13,6 +13,7 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     @Override
     public void execute() {
         if (isFirstTime()) {
+            robot.getExtension().setTargetPower(0);
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
         }
@@ -21,12 +22,9 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
         // transitioning between collecting and spitting
-        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.COLLECTING
-        && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.DOWN)
+        if (robot.getCollector().isCollecting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.DOWN)
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
-        else if ((robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.SPITTING
-        || robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.SPITTING_TEMP)
-        && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.MIDDLE)
+        else if (robot.getCollector().isSpitting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.MIDDLE)
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
     }
 

@@ -6,12 +6,20 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSys
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.RetractingState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.ShortExtendState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class CollectingSystem {
 
+    // TODO: FIND THESE
+    // tick to start forcing hinge to go up if it is in middle position
+    public static final int FORCE_HINGE_UP_FROM_MIDDLE_POSITION = 1000;
+
+    // same as force hing up from middle but for down position
+    public static final int FORCE_HINGE_UP_FROM_DOWN_POSITION = 1000;
+
     public enum StateType {
-        IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING
+        IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING, SHORT_COLLECT, SHORT_SPIT
     }
 
     private final BrainSTEMRobot robot;
@@ -23,6 +31,7 @@ public class CollectingSystem {
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.SEARCH, new SearchingState());
         stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
+        stateManager.addState(StateType.SHORT_COLLECT, new ShortExtendState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
         stateManager.setupStates(robot, stateManager);
@@ -31,6 +40,14 @@ public class CollectingSystem {
 
     public StateManager<StateType> getStateManager() {
         return stateManager;
+    }
+
+    public boolean hingeMustBeUp() {
+        if (getRobot().getHinge().getStateManager().getActiveStateType() == Hinge.StateType.MIDDLE)
+            return getRobot().getExtension().getExtensionMotor().getCurrentPosition() <= FORCE_HINGE_UP_FROM_MIDDLE_POSITION;
+        if (getRobot().getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
+            return getRobot().getExtension().getExtensionMotor().getCurrentPosition() <= FORCE_HINGE_UP_FROM_DOWN_POSITION;
+        return false;
     }
 
     public void update(double dt) {

@@ -8,17 +8,29 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class RetractingState extends RobotState<CollectingSystem.StateType> {
 
+    private boolean waitingForHinge;
     public RetractingState() {
         super(CollectingSystem.StateType.RETRACTING);
+        waitingForHinge = false;
     }
     @Override
     public void execute() {
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
-        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
+
+        if (isFirstTime()) {
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING); // initially stop collector
+            waitingForHinge = robot.getCollectingSystem().hingeMustBeUp(); // if the extension needs to wait for the hinge, just wait for it to go all the way up and then retract
+        }
+
+        // force hinge to be in up position
+        if (robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
 
-        // wait for hinging to finish before retracting extension
-        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
+        // case for retract only when hinge is done
+        if (waitingForHinge && robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
+                robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
+
+        // case for retract immediately
+        if (!waitingForHinge)
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
     }
 

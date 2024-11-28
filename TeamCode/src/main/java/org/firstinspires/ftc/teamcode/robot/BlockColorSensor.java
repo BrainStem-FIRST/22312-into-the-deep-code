@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
 public class BlockColorSensor {
-    private boolean dataMode = false;
+
+    // how many frames the collector has had the block with the same color (to reduce noise)
+    public static double BLOCK_COLOR_VALIDATION_TIME = 0.5;
 
     // stores r, g and b bounds as Double[] for each block color as a new entry in the hashmap
     public static final HashMap<BlockColor, Double[]> MAX_BLOCK_PERCENTS = new HashMap<>();
@@ -22,15 +24,36 @@ public class BlockColorSensor {
     public static Double[] YELLOW_BLOCK_PERCENTS_MIN = { 23., 39.25, 7. };
 
 
+    private BrainSTEMRobot robot;
     private final ColorSensor colorSensor;
-
     private boolean updatedBlockColor;
+    private double startingTime, currentTime;
+    private BlockColor prevBlockColor;
+    private boolean dataMode = false;
     private BlockColor blockColor;
 
     public BlockColorSensor(HardwareMap hwMap) {
         colorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
         updatedBlockColor = false;
         blockColor = BlockColor.NONE;
+        startingTime = 0;
+        prevBlockColor = BlockColor.NONE;
+
+        MAX_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MAX);
+        MAX_BLOCK_PERCENTS.put(BlockColor.BLUE, BLUE_BLOCK_PERCENTS_MAX);
+        MAX_BLOCK_PERCENTS.put(BlockColor.YELLOW, YELLOW_BLOCK_PERCENTS_MAX);
+
+        MIN_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MIN);
+        MIN_BLOCK_PERCENTS.put(BlockColor.BLUE, BLUE_BLOCK_PERCENTS_MIN);
+        MIN_BLOCK_PERCENTS.put(BlockColor.YELLOW, YELLOW_BLOCK_PERCENTS_MIN);
+    }
+    public BlockColorSensor(HardwareMap hwMap, BrainSTEMRobot robot) {
+        this.robot = robot;
+        colorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
+        updatedBlockColor = false;
+        blockColor = BlockColor.NONE;
+        startingTime = 0;
+        prevBlockColor = BlockColor.NONE;
 
         MAX_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MAX);
         MAX_BLOCK_PERCENTS.put(BlockColor.BLUE, BLUE_BLOCK_PERCENTS_MAX);
@@ -51,13 +74,25 @@ public class BlockColorSensor {
         return colorSensor.blue();
     }
 
-    public void resetUpdateBlockColor() {
+    public void update(double dt) {
         updatedBlockColor = false;
+
+        // update validation time
+        if (getBlockColor() == prevBlockColor && getBlockColor() != BlockColor.NONE)
+            currentTime += dt;
+        else
+            currentTime = 0;
+
+        prevBlockColor = getBlockColor();
+
+        // adding block color to robot if done
+        if(hasValidatedColor())
+            robot.setBlockColorHeld(getBlockColor());
     }
 
-    public String update(BlockColor blockColor) {
+    public String updateBlockColorTesting(BlockColor blockColor) {
         if(dataMode)
-            updateTesting(blockColor);
+            collectTestingData(blockColor);
         if(blockColor == BlockColor.NONE)
             return "block color none; not printing values";
         Double[] max = MAX_BLOCK_PERCENTS.get(blockColor);
@@ -65,7 +100,7 @@ public class BlockColorSensor {
         return "max percents: " + max[0] + "," + max[1] + "," + max[2] + " | min percents: " + min[0] + ", " + min[1] + ", " + min[2];
         //return "max percents: " + MAX_BLOCK_PERCENTS.get(blockColor) + " | min percents: " + MIN_BLOCK_PERCENTS.get(blockColor);
     }
-    private void updateTesting(BlockColor blockColor) {
+    private void collectTestingData(BlockColor blockColor) {
 
         if(blockColor == BlockColor.NONE)
             return;
@@ -101,6 +136,10 @@ public class BlockColorSensor {
             blockColor = BlockColor.NONE;
         }
         return blockColor;
+    }
+
+    public boolean hasValidatedColor() {
+        return currentTime > BLOCK_COLOR_VALIDATION_TIME && getBlockColor() != BlockColor.NONE;
     }
 
     public boolean hasColor(BlockColor blockColor) {

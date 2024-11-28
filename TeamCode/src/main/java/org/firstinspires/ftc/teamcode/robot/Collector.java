@@ -30,7 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 0.8;
-    public static final double SPIT_TEMP_POWER = 0.5;
+    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.5;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
 
@@ -40,6 +40,7 @@ public class Collector extends Subsystem {
     public enum StateType {
         NOTHING,
         COLLECTING,
+        COLLECTING_TEMP, // stops next frame unless called continuously
         SPITTING, // only stops when block color sensor detects nothing + safety time
         SPITTING_TEMP, // stops next frame unless called continuously
         VALID_BLOCK
@@ -83,8 +84,15 @@ public class Collector extends Subsystem {
 
     @Override
     public void update(double dt) {
-        blockColorSensor.resetUpdateBlockColor();
+        blockColorSensor.update(dt);
         stateManager.update(dt);
+    }
+
+    public boolean isCollecting() {
+        return stateManager.getActiveStateType() == StateType.COLLECTING || stateManager.getActiveStateType() == StateType.COLLECTING_TEMP;
+    }
+    public boolean isSpitting() {
+        return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
     public boolean hasValidBlockColor() {
         return blockColorSensor.getBlockColor() == BlockColor.YELLOW || blockColorSensor.getBlockColor() == getRobot().getColorFromAlliance();
