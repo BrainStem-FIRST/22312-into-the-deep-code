@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
+import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
@@ -20,9 +21,9 @@ import org.firstinspires.ftc.teamcode.util.Input;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
-public class Tele extends LinearOpMode {
+public class TeleMain extends LinearOpMode {
 
-    private final double TURN_AMP = 0.4;
+    private final double TURN_AMP = 0.8;
 
     private Input input;
     private BrainSTEMRobot robot;
@@ -207,12 +208,32 @@ public class Tele extends LinearOpMode {
                         else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
+                case TROUGH_TO_BASKET:
+                case BASKET_TO_BASKET:
+                    if(robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.TRANSITION ||
+                        robot.getArm().getTransitionState().getGoalStatePosition() != Arm.BLOCK_DROP_POS)
+                        break;
                 case BASKET_DEPOSIT:
                     robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
                     robot.getGrabber().setHasBlock(false);
                     robot.setBlockColorHeld(BlockColor.NONE);
                     break;
+                case TROUGH_TO_DROP_AREA:
+                    // purpose of this is to also allow toggling of grabber while arm is in place; its just the lifting system is still in transition bc the lift has not fully lowered
+                    if(robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.BLOCK_DROP)
+                        break;
                 case DROP_AREA:
+                    // used ternary operator; if grabber state is closed/closing, want to open it, and vice versa
+                    robot.getGrabber().getStateManager().tryEnterState(
+                            (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED ||
+                             robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSING) ?
+                                    Grabber.StateType.OPENING : Grabber.StateType.CLOSING);
+
+                    robot.getGrabber().setHasBlock(robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.OPENING);
+                    robot.getGrabber().setHasSpecimen(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSING);
+
+                    // OLD CODE;
+                    /*
                     if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                         // dropping block to human player station
                         if(!robot.getGrabber().getHasSpecimen()) {
@@ -224,6 +245,7 @@ public class Tele extends LinearOpMode {
                         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
                         robot.getGrabber().setHasSpecimen(true);
                     }
+                    */
 
                     break;
                 case SPECIMEN_RAM:
@@ -241,8 +263,6 @@ public class Tele extends LinearOpMode {
                 robot.getGrabber().setHasSpecimen(false);
             }
     }
-    // TODO: if press right trigger and not extended, then extend constant length and colect
-    // TODO: only fully hinge parallel once collector is past submersible to prevent sag from causing back of collector to hit submersible wall
     private void listenForHangingInput() {
         //temp code
         //if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)

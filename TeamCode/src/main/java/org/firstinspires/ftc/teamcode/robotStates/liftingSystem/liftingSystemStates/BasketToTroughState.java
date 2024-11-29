@@ -16,16 +16,20 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
         // if lift still at position of basket depositing
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // moving arm up if arm still at left position
-            if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
-                robot.getArm().getTransitionState().setGoalState(Arm.RIGHT_POS, Arm.StateType.RIGHT);
-                // moving lift down once arm is set
-            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.RIGHT)
+            if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
+
+            // OLD CODE (non optimized); moving lift down once arm is set
+            // else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
+            //   robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+
+            else if(robot.getArm().getTransitionState().getTime() >= Arm.BLOCK_DROP_TO_UP_TIME)
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         }
         // once lift reach safety threshold
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             // moving arm down if still right
-            robot.getArm().getTransitionState().setGoalState(Arm.DOWN_POS, Arm.StateType.DOWN);
+            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
         }
     }
 
@@ -41,7 +45,7 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DOWN;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER;
     }
 
     @Override

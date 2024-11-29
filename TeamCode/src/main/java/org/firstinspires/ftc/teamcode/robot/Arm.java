@@ -15,11 +15,13 @@ import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Arm extends Subsystem {
-    // TODO: find arm servo positions and fine tune destination threshold (for this subsystem and all other subsystems)
     public static final int MIN_TICK = 935, MAX_TICK = 2445;
-    public static final double DOWN_POS = 0.01, LEFT_POS = 0.33, UP_POS = 0.66, RIGHT_POS = 0.99;
+    // TODO: FIND CORRECT TRANSITION TIMES FOR ARM
+    // if times r wrong then optimizations will be messed up
+    public static final double TRANSFER_TO_BASKET_SAFETY_TIME = 0.3, BASKET_SAFETY_TO_BLOCK_DROP_TIME = 0.2, BLOCK_DROP_TO_UP_TIME = 0.05, TRANSFER_TO_BLOCK_DROP_TIME = 0.1, BLOCK_DROP_TO_SPECIMEN_HANG_TIME = 0.2, SPECIMEN_HANG_TO_UP_TIME = 0.1, SPECIMEN_HANG_TO_TRANSFER_TIME = 0.3;
+    public static final double TRANSFER_POS = 0.01, BLOCK_DROP_POS = 0.33, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.8;
     public enum StateType {
-        DOWN, LEFT, UP, RIGHT, TRANSITION
+        TRANSFER, BLOCK_DROP, SPECIMEN_HANG, BASKET_SAFETY, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final ServoTransitionState<StateType> transitionState;
@@ -31,12 +33,12 @@ public class Arm extends Subsystem {
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
 
-        stateManager = new StateManager<>(Arm.StateType.DOWN);
+        stateManager = new StateManager<>(Arm.StateType.TRANSFER);
 
-        stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
-        stateManager.addState(StateType.LEFT, new NothingState<>(StateType.LEFT));
-        stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
-        stateManager.addState(StateType.RIGHT, new NothingState<>(StateType.RIGHT));
+        stateManager.addState(StateType.TRANSFER, new NothingState<>(StateType.TRANSFER));
+        stateManager.addState(StateType.BLOCK_DROP, new NothingState<>(StateType.BLOCK_DROP));
+        stateManager.addState(StateType.BASKET_SAFETY, new NothingState<>(StateType.BASKET_SAFETY));
+        stateManager.addState(StateType.SPECIMEN_HANG, new NothingState<>(StateType.SPECIMEN_HANG));
 
         transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo);
         stateManager.addState(StateType.TRANSITION, transitionState);

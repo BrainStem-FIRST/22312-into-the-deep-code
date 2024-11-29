@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
 
+import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -18,15 +19,15 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // waiting for collection system to finish in taking block before grabbing onto it
         if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN &&
                 robot.getCollector().hasValidBlockColor()) {
-            // setting robot block color for testing if we just put block color in trough and don't collect
+            // setting robot block color for testing if we just put block color in trough and don't collect; note: collector also sets blockColorHeld
             robot.setBlockColorHeld(robot.getCollector().getBlockColorSensor().getBlockColor());
+            robot.getGrabber().setHasBlock(false); // resetting grabber for looping cycle in transfer each time the lift goes back up
 
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                 robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
             }
         }
-
         // closing onto block once lift is down
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)
             robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
@@ -52,7 +53,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return false;
+        // want to automatically transition to drop area state if block color held is equal to alliance color
+        return robot.getBlockColorHeld() == robot.getColorFromAlliance() &&
+                robot.getGrabber().getHasBlock() &&
+                robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class BlockColorSensor {
         prevBlockColor = getBlockColor();
 
         // adding block color to robot if done
-        if(hasValidatedColor())
+        if(hasValidatedColor() && robot != null)
             robot.setBlockColorHeld(getBlockColor());
     }
 

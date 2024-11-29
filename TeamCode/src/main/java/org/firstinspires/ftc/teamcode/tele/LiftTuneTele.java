@@ -31,13 +31,13 @@ public class LiftTuneTele extends LinearOpMode {
         grabberServo.setPwmRange(new PwmControl.PwmRange(Grabber.MIN_TICK, Grabber.MAX_TICK));
         while(opModeIsActive()) {
             if(gamepad1.a)
-                armServo.setPosition(Arm.DOWN_POS);
+                armServo.setPosition(Arm.TRANSFER_POS);
             else if(gamepad1.b)
-                armServo.setPosition(Arm.RIGHT_POS);
+                armServo.setPosition(Arm.SPECIMEN_HANG_POS);
             else if(gamepad1.y)
-                armServo.setPosition(Arm.UP_POS);
+                armServo.setPosition(Arm.BASKET_SAFETY_POS);
             else if(gamepad1.x)
-                armServo.setPosition(Arm.LEFT_POS);
+                armServo.setPosition(Arm.BLOCK_DROP_POS);
 
             if(gamepad1.dpad_left)
                 grabberServo.setPosition(0.99);

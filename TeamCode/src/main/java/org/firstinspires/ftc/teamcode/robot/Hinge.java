@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Hinge extends Subsystem {
-    public static final int HINGE_UP_TICK = 2200, HINGE_DOWN_TICK = 1480;
+    public static final int HINGE_UP_TICK = 2150, HINGE_DOWN_TICK = 1480;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.5;
     public static double HINGE_TIME = 0.5;
 

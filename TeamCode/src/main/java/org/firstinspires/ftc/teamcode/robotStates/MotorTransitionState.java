@@ -58,7 +58,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
                 Subsystem.setMotorPosition(motor, (int) goalPosition);
             else
                 Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
-
     }
 
     @Override
@@ -73,7 +72,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-        return Math.abs(motor.getCurrentPosition() - goalPosition) < DESTINATION_THRESHOLD;
+        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
     }
 
     @Override

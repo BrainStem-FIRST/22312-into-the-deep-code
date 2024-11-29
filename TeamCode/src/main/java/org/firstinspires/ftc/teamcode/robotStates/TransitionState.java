@@ -6,6 +6,11 @@ public abstract class TransitionState<StateType extends Enum<StateType>> extends
     public TransitionState(StateType stateType) {
         super(stateType);
     }
+
+    /**
+     * @param goalPosition the goal position to reach
+     * @param goalStateType the next stateType to transition to after finishing transition
+     */
     public void setGoalState(double goalPosition, StateType goalStateType) {
         // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
         if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
@@ -14,9 +19,13 @@ public abstract class TransitionState<StateType extends Enum<StateType>> extends
             stateManager.tryEnterState(stateType);
         }
     }
-    public void overrideGoalState(double goalPosition) {
+
+    /**
+     * changes goal position of transition, but keeps the state in transition (should be used if in transition and need to change destination point)
+     * @param goalPosition the new position to transition to
+     */
+    public void overrideGoalPosition(double goalPosition) {
         this.goalPosition = goalPosition;
-        stateManager.tryEnterState(this.stateType);
     }
     public double getGoalStatePosition() {
         return goalPosition;

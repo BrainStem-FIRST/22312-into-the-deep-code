@@ -113,7 +113,8 @@ public class Extension extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setExtensionMotorPosition(targetPosition);
-                return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
+                return Subsystem.inRange(getExtensionMotor(), targetPosition, GO_TO_THRESHOLD);
+                //return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
             }
         };
     }

@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.driveTrain.useless.SparkFunOTOSDrive;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.TankDrive;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.TwoDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.tele.Tele;
+import org.firstinspires.ftc.teamcode.tele.TeleMain;
 import org.firstinspires.ftc.teamcode.util.PIDLocalizationTest;
 
 import java.util.ArrayList;
@@ -226,7 +226,7 @@ public final class TuningOpModes {
         manager.register(metaForClass(SplineTest.class), SplineTest.class);
         manager.register(metaForClass(LocalizationTest.class), LocalizationTest.class);
         manager.register(metaForClass(PIDLocalizationTest.class), PIDLocalizationTest.class);
-        manager.register(metaForClass(Tele.class), Tele.class);
+        manager.register(metaForClass(TeleMain.class), TeleMain.class);
 
         FtcDashboard.getInstance().withConfigRoot(configRoot -> {
             for (Class<?> c : Arrays.asList(

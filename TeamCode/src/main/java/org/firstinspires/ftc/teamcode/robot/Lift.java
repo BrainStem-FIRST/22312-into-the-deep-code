@@ -18,22 +18,25 @@ public class Lift extends Subsystem {
     public final static double FULL_POWER = 0.9;
     private final DcMotorEx liftMotor;
     private final PIDController pid;
+    // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
     public static final int TROUGH_POS = -5,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
-        DROP_AREA_POS = 0,
+        DROP_AREA_POS = 5,
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 595,
         HIGH_RAM_BEFORE_POS = 750,
         HIGH_RAM_AFTER_POS = 1840,
 
         LOW_BASKET_POS = 1700,
+        LOW_BASKET_SAFETY_POS = 1680,
         HIGH_BASKET_POS = 3400,
-        ABSOLUTE_MAX = 3400,
+        HIGH_BASKET_SAFETY_POS = 3380,
+        ABSOLUTE_MAX = 3420,
         ABSOLUTE_MIN = -5;
 
     public static final int DESTINATION_THRESHOLD = 20;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, BASKET_SAFETY, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -74,10 +77,6 @@ public class Lift extends Subsystem {
         basketState.addMotor(liftMotor);
         stateManager.addState(StateType.BASKET_DEPOSIT, basketState);
 
-        NothingState<StateType> basketSafetyState = new NothingState<>(StateType.BASKET_SAFETY);
-        basketSafetyState.addMotor(liftMotor);
-        stateManager.addState(StateType.BASKET_SAFETY, basketSafetyState);
-
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         this.transitionState.setEncoderBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
@@ -98,7 +97,7 @@ public class Lift extends Subsystem {
                 int dif = target - liftMotor.getCurrentPosition();
                 liftMotor.setPower(Math.signum(dif) * FULL_POWER);
 
-                return Math.abs(liftMotor.getCurrentPosition() - target) <= DESTINATION_THRESHOLD;
+                return Subsystem.inRange(liftMotor, target, DESTINATION_THRESHOLD);
             }
         };
     }

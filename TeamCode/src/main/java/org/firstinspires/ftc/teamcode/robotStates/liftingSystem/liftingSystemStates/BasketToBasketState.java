@@ -13,11 +13,11 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         robot.telemetry.addData("inside execute of basket to basket state of lifting system", "");
         // accounting switching baskets after arm is already down
-        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT)
-            robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);
+        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
 
         // accounting switching baskets before arm is down/once arm not down
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP) {
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
 
             // setting lift to transition to high basket if not there and need to be there
             if (robot.isHighDeposit() && !robot.getLift().atHighBasket())
@@ -28,7 +28,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
 
             // setting arm to lower once lift done transitioning (should make sense bc this conditional is only checked if arm is up
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
-                robot.getArm().getTransitionState().setGoalState(Arm.LEFT_POS, Arm.StateType.LEFT);
+                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
         }
     }
 
@@ -44,7 +44,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.LEFT &&
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP &&
                 ((robot.isHighDeposit() && robot.getLift().atHighBasket()) || (!robot.isHighDeposit() && robot.getLift().atLowBasket()));
     }
 
