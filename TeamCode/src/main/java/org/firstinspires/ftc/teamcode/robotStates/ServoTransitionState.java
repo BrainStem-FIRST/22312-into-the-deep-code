@@ -2,29 +2,31 @@ package org.firstinspires.ftc.teamcode.robotStates;
 
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.teamcode.robot.Lift;
+import org.firstinspires.ftc.teamcode.robot.Subsystem;
+
 
 public class ServoTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final ServoImplEx servo;
     private double timeDone;
+    public final double FULL_ROTATION_TIME;
     public ServoTransitionState(StateType stateType, ServoImplEx servo) {
         super(stateType);
         this.servo = servo;
-        timeDone = 0.5;
+        this.FULL_ROTATION_TIME = 1;
     }
-    public ServoTransitionState(StateType stateType, ServoImplEx servo, double timeDone) {
+    public ServoTransitionState(StateType stateType, ServoImplEx servo, double fullRotationTime) {
         super(stateType);
         this.servo = servo;
-        this.timeDone = timeDone;
+        this.FULL_ROTATION_TIME = fullRotationTime;
     }
 
-    // NOTE: am NOT overriding the setGoalState in TransitionState, just providing alternative if one wants to change the timeDone
-    public void setGoalState(double goalPosition, StateType goalStateType, double timeDone) {
+    @Override
+    public void setGoalState(double goalPosition, StateType goalStateType) {
         // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
         if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
+            this.timeDone = Subsystem.getServoTime(this.goalPosition, goalPosition, FULL_ROTATION_TIME);
             this.goalPosition = goalPosition;
             this.goalStateType = goalStateType;
-            this.timeDone = timeDone;
             stateManager.tryEnterState(stateType);
         }
     }

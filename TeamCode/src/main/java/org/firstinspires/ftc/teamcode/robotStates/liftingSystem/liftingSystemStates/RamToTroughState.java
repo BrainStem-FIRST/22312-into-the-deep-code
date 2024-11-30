@@ -12,7 +12,7 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute() {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_HANG) {
-            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.SPECIMEN_HANG_TO_TRANSFER_TIME);
+            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
         }
         // non optimized code
         //else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)

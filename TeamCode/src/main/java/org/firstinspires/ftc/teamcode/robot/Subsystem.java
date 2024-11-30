@@ -39,6 +39,18 @@ public abstract class Subsystem {
         return Math.abs(motor.getCurrentPosition() - target) <= threshold;
     }
 
+    /**
+     * @param start pwm of starting position
+     * @param end pwm of ending position
+     * @param fullRotationTime time to rotate from 0.01 pwm to 0.98 pwm
+     * @return returns time to travel from start to end
+     */
+    public static double getServoTime(double start, double end, double fullRotationTime) {
+        // dist / entire dist = time / entire time
+        // time = dist / entire dist * entire time
+        return Math.abs(end - start) / 0.98 * fullRotationTime;
+    }
+
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
     private final AllianceColor allianceColor;

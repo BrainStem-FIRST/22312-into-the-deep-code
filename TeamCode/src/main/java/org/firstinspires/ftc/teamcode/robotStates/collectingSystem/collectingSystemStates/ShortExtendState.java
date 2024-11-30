@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
 
     public ShortExtendState() {
-        super(CollectingSystem.StateType.SEARCH);
+        super(CollectingSystem.StateType.SHORT_EXTEND);
     }
     @Override
     public void execute() {
@@ -29,7 +29,10 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.SHORT_EXTEND_POSITION;
+        boolean isDone = robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.SHORT_EXTEND_POSITION;
+        if (isDone)
+            robot.getExtension().setTargetPower(0);
+        return isDone;
     }
 
     @Override

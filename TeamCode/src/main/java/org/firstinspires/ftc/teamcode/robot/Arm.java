@@ -16,10 +16,12 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Arm extends Subsystem {
     public static final int MIN_TICK = 935, MAX_TICK = 2445;
-    // TODO: FIND CORRECT TRANSITION TIMES FOR ARM
+
+    // TODO: find FULL_ROTATION_TIME;
     // if times r wrong then optimizations will be messed up
-    public static final double TRANSFER_TO_BASKET_SAFETY_TIME = 0.3, BASKET_SAFETY_TO_BLOCK_DROP_TIME = 0.2, BLOCK_DROP_TO_UP_TIME = 0.05, TRANSFER_TO_BLOCK_DROP_TIME = 0.1, BLOCK_DROP_TO_SPECIMEN_HANG_TIME = 0.2, SPECIMEN_HANG_TO_UP_TIME = 0.1, SPECIMEN_HANG_TO_TRANSFER_TIME = 0.3;
-    public static final double TRANSFER_POS = 0.01, BLOCK_DROP_POS = 0.33, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.8;
+    public static final double FULL_ROTATION_TIME = 0.5;
+    public static final double TRANSFER_POS = 0.01, BLOCK_DROP_POS = 0.33, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
+    public static final double BLOCK_DROP_TO_UP_TIME = Subsystem.getServoTime(BLOCK_DROP_POS, UP_POS, FULL_ROTATION_TIME), SPECIMEN_HANG_TO_UP_TIME = Subsystem.getServoTime(SPECIMEN_HANG_POS, UP_POS, FULL_ROTATION_TIME);
     public enum StateType {
         TRANSFER, BLOCK_DROP, SPECIMEN_HANG, BASKET_SAFETY, TRANSITION
     }
@@ -40,7 +42,7 @@ public class Arm extends Subsystem {
         stateManager.addState(StateType.BASKET_SAFETY, new NothingState<>(StateType.BASKET_SAFETY));
         stateManager.addState(StateType.SPECIMEN_HANG, new NothingState<>(StateType.SPECIMEN_HANG));
 
-        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo);
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, FULL_ROTATION_TIME);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);

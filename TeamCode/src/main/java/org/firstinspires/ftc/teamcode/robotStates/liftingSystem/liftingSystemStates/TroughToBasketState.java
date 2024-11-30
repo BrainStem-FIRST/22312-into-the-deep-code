@@ -13,7 +13,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute() {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
-            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
 
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
             // only want to set lift state to be in transition if in trough; not if its already going up
@@ -36,7 +36,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 // moves arm down once lift is within range of basket (not necessarily there yet)
                 else if(robot.getLift().getLiftMotor().getCurrentPosition() >= (robot.isHighDeposit() ? Lift.HIGH_BASKET_SAFETY_POS : Lift.LOW_BASKET_SAFETY_POS) &&
                         robot.getLift().getLiftMotor().getCurrentPosition() <= (robot.isHighDeposit() ? Lift.HIGH_BASKET_POS : Lift.LOW_BASKET_POS))
-                    robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
+                    robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
             }
 
             // NON OPTIMIZED CODE: moving arm down after lift reach desired basket height

@@ -12,7 +12,7 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP, Arm.BLOCK_DROP_TO_SPECIMEN_HANG_TIME);
+        robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
         robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
     }

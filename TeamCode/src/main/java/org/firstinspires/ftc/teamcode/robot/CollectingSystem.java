@@ -11,15 +11,15 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class CollectingSystem {
 
-    // TODO: FIND THESE
+    // TODO: FIND THESE - currently set to max extension position
     // tick to start forcing hinge to go up if it is in middle position
-    public static final int FORCE_HINGE_UP_FROM_MIDDLE_POSITION = 1000;
+    public static final int FORCE_HINGE_UP_FROM_MIDDLE_POSITION = Extension.MAX_POSITION;
 
-    // same as force hing up from middle but for down position
-    public static final int FORCE_HINGE_UP_FROM_DOWN_POSITION = 1000;
+    // same as force hinge up from middle but for down position
+    public static final int FORCE_HINGE_UP_FROM_DOWN_POSITION = Extension.MAX_POSITION;
 
     public enum StateType {
-        IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING, SHORT_COLLECT, SHORT_SPIT
+        IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING, SHORT_EXTEND
     }
 
     private final BrainSTEMRobot robot;
@@ -31,7 +31,7 @@ public class CollectingSystem {
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.SEARCH, new SearchingState());
         stateManager.addState(StateType.SEARCH_AND_COLLECT, new SearchAndCollectState());
-        stateManager.addState(StateType.SHORT_COLLECT, new ShortExtendState());
+        stateManager.addState(StateType.SHORT_EXTEND, new ShortExtendState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
         stateManager.setupStates(robot, stateManager);

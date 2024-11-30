@@ -118,7 +118,6 @@ public class TeleMain extends LinearOpMode {
         if(input.getGamepadTracker1().isFirstFrameX())
             robot.setInPidMode(!robot.getInPidMode());
     }
-
     private void listenForDriveTrainInput() {
         robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
                 new Vector2d(
@@ -128,7 +127,6 @@ public class TeleMain extends LinearOpMode {
                 -gamepad1.right_stick_x * TURN_AMP
         ));
     }
-
     private void listenForCollectionInput() {
         StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
         StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();
@@ -152,16 +150,20 @@ public class TeleMain extends LinearOpMode {
             robot.getExtension().setTargetPower(0);
 
         // right trigger toggle between (hinging down and collecting) and (hinging up and doing nothing)
-        if (input.getGamepadTracker1().isFirstFrameRightTrigger()) {
+        // or do a short extension and collection
+        if (input.getGamepadTracker1().isFirstFrameRightTrigger())
+
+            // short extension and collection
+            if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN)
+                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SHORT_EXTEND);
 
             // go to search and collect mode
-            if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
+            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
 
                 // go to search mode
             else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
                 collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
-        }
 
         // left trigger retracts
         if (input.getGamepadTracker1().isFirstFrameLeftTrigger())

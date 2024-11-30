@@ -25,13 +25,9 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
         if (robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
 
-        // case for retract only when hinge is done
-        if (waitingForHinge && robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
+        // retract as soon as possible
+        if (!waitingForHinge || robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
                 robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
-
-        // case for retract immediately
-        if (!waitingForHinge)
-            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
     }
 
     @Override

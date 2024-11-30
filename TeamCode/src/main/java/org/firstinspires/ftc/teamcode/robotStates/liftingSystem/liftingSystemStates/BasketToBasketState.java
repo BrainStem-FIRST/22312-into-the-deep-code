@@ -14,7 +14,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
         robot.telemetry.addData("inside execute of basket to basket state of lifting system", "");
         // accounting switching baskets after arm is already down
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
-            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
 
         // accounting switching baskets before arm is down/once arm not down
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
@@ -28,7 +28,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
 
             // setting arm to lower once lift done transitioning (should make sense bc this conditional is only checked if arm is up
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
-                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP, Arm.BASKET_SAFETY_TO_BLOCK_DROP_TIME);
+                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         }
     }
 

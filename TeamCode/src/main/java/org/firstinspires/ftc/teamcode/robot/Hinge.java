@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 public class Hinge extends Subsystem {
     public static final int HINGE_UP_TICK = 2150, HINGE_DOWN_TICK = 1480;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.5;
-    public static double HINGE_TIME = 0.5;
+    public static double FULL_ROTATION_TIME = 0.3;
 
     public enum StateType {
         UP,
@@ -42,7 +42,7 @@ public class Hinge extends Subsystem {
         stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
         stateManager.addState(StateType.MIDDLE, new NothingState<>(StateType.MIDDLE));
 
-        transitionState = new ServoTransitionState<>(StateType.TRANSITION, hingeServo, HINGE_TIME);
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, hingeServo, FULL_ROTATION_TIME);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(getRobot(), stateManager);
@@ -65,13 +65,12 @@ public class Hinge extends Subsystem {
         stateManager.update(dt);
     }
 
-
     public Action hingeUpAction() {
         return new TimedAction() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setHingeServoPosition(HINGE_UP_POSITION);
-                return getTime() < HINGE_TIME;
+                return getTime() < FULL_ROTATION_TIME;
             }
         };
     }
@@ -80,7 +79,7 @@ public class Hinge extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setHingeServoPosition(HINGE_DOWN_POSITION);
-                return getTime() < HINGE_TIME;
+                return getTime() < FULL_ROTATION_TIME;
             }
         };
     }
