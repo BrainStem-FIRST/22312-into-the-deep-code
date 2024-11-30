@@ -54,28 +54,26 @@ public class BrainSTEMRobot {
 
     public void setup() {
         double start = System.currentTimeMillis() / 1000.0;
-        double relativeTime = 0;
+        double time = 0;
 
-        while(true) {
+
+        while (!setupLiftingSystem(time) || !setupCollectingSystem()) {
             // setup lift first, then collection and extension
             // once both are set, stop
-            if(setupLiftingSystem() && setupCollectingSystem())
-                    break;
 
             telemetry.addData("robot status", "setting up");
-            telemetry.addData("relative time", relativeTime);
+            telemetry.addData("time", time);
             telemetry.addData("lift encoder", lift.getLiftMotor().getCurrentPosition());
             telemetry.update();
-            relativeTime = System.currentTimeMillis() / 1000.0 - start;
+            time = System.currentTimeMillis() / 1000.0 - start;
         }
     }
-    public boolean setupLiftingSystem() {
+    public boolean setupLiftingSystem(double time) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
         Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
-        boolean liftInRange = Subsystem.inRange(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.DESTINATION_THRESHOLD);
-        if(liftInRange)
+        if(lift.getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
             arm.getArmServo().setPosition(Arm.TRANSFER_POS);
-        return liftInRange && arm.getArmServo().getPosition() == Arm.TRANSFER_POS;
+        return arm.getArmServo().getPosition() == Arm.TRANSFER_POS && time > 1;
     }
 
     public boolean setupCollectingSystem() {

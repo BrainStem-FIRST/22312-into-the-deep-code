@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.util.Input;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
 
-    private final double STRAFE_SPEED = 0.2;
+    private final double STRAFE_AMP = 0.2;
     private final double TURN_AMP = 0.8;
 
     private Input input;
@@ -40,7 +40,6 @@ public class TeleMain extends LinearOpMode {
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
-        // setup assumes all motors are good
         robot.setup();
 
         waitForStart();
@@ -118,10 +117,12 @@ public class TeleMain extends LinearOpMode {
             robot.setInPidMode(!robot.getInPidMode());
     }
     private void listenForDriveTrainInput() {
-        int strafeDir = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
-        if (strafeDir != 0)
+        int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
+        int strafeDirY = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
+
+        if (strafeDirX != 0 || strafeDirY != 0)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(0, -strafeDir * STRAFE_SPEED),
+                    new Vector2d(-strafeDirX * STRAFE_AMP, -strafeDirY * STRAFE_AMP),
                     0
             ));
         else
