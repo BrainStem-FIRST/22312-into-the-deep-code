@@ -34,9 +34,9 @@ public class ColorTele extends LinearOpMode {
 
             input.update();
 
-            int r = blockColorSensor.red();
-            int g = blockColorSensor.green();
-            int b = blockColorSensor.blue();
+            int r = blockColorSensor.getColorSensor().red();
+            int g = blockColorSensor.getColorSensor().green();
+            int b = blockColorSensor.getColorSensor().blue();
             double sum = r + g + b;
 
             // checking switch of block color input
@@ -61,9 +61,7 @@ public class ColorTele extends LinearOpMode {
             telemetry.addData("r percent", r / sum);
             telemetry.addData("g percent", g / sum);
             telemetry.addData("b percent", b / sum);
-            telemetry.addData("has red block", blockColorSensor.hasColor(BlockColor.RED));
-            telemetry.addData("has yellow block", blockColorSensor.hasColor(BlockColor.YELLOW));
-            telemetry.addData("has blue block", blockColorSensor.hasColor(BlockColor.BLUE));
+            telemetry.addData("block color", blockColorSensor.getBlockColor());
             telemetry.update();
         }
     }

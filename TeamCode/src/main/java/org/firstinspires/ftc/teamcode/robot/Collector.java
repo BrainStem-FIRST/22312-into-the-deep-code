@@ -94,15 +94,12 @@ public class Collector extends Subsystem {
     public boolean isSpitting() {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
-    public boolean hasValidBlockColor() {
-        return blockColorSensor.getBlockColor() == BlockColor.YELLOW || blockColorSensor.getBlockColor() == getRobot().getColorFromAlliance();
-    }
     public Action collectAction() {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setSpindleMotorPower(Collector.MAX_SPIN_POWER);
-                return !hasValidBlockColor();
+                return !robot.hasValidBlockColor();
             }
         };
     }

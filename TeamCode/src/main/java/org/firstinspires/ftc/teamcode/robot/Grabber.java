@@ -11,20 +11,21 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.grabberStates.*;
+import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Grabber extends Subsystem {
-    //TODO: find min tick and max tick positions for servo
-    public static final int MIN_TICK = 1170, MAX_TICK = 2430;
-    public static final double CLOSE_POSITION = 0.05, OPEN_POSITION = 0.95;
-    public static final double DESTINATION_THRESHOLD = 0.1;
+    public static final int MIN_TICK = 1200, MAX_TICK = 2400;
+    public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
+    public static final double FULL_ROTATION_TIME = 0.3;
     private boolean hasBlock = false, hasSpecimen = false;
     public enum StateType {
-        OPEN, OPENING, CLOSED, CLOSING
+        OPEN, CLOSED, TRANSITION
     }
+    private final ServoTransitionState<StateType> transitionState;
     private final StateManager<StateType> stateManager;
     private final ServoImplEx grabServo;
+
 
     public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -35,9 +36,9 @@ public class Grabber extends Subsystem {
         stateManager = new StateManager<>(StateType.OPEN);
 
         stateManager.addState(StateType.OPEN, new NothingState<>(StateType.OPEN));
-        stateManager.addState(StateType.OPENING, new OpeningState());
         stateManager.addState(StateType.CLOSED, new NothingState<>(StateType.CLOSED));
-        stateManager.addState(StateType.CLOSING, new ClosingState());
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, grabServo, FULL_ROTATION_TIME);
+        stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
     }
@@ -55,7 +56,7 @@ public class Grabber extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
-                grabServo.setPosition(OPEN_POSITION);
+                grabServo.setPosition(OPEN_POS);
                 return getTime() > 0.2;
             }
         };
@@ -65,12 +66,14 @@ public class Grabber extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
-                grabServo.setPosition(CLOSE_POSITION);
+                grabServo.setPosition(CLOSE_POS);
                 return getTime() > 0.2;
             }
         };
     }
-
+    public ServoTransitionState<StateType> getTransitionState() {
+        return transitionState;
+    }
     public ServoImplEx getGrabServo() {
         return grabServo;
     }

@@ -27,16 +27,16 @@ public class BlockColorSensor {
     private BrainSTEMRobot robot;
     private final ColorSensor colorSensor;
     private boolean updatedBlockColor;
-    private double startingTime, currentTime;
+    private double currentTime;
     private BlockColor prevBlockColor;
     private boolean dataMode = false;
     private BlockColor blockColor;
 
+    // constructor without robot used only in ColorTele (for debugging color sensor)
     public BlockColorSensor(HardwareMap hwMap) {
         colorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
         updatedBlockColor = false;
         blockColor = BlockColor.NONE;
-        startingTime = 0;
         prevBlockColor = BlockColor.NONE;
 
         MAX_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MAX);
@@ -52,7 +52,6 @@ public class BlockColorSensor {
         colorSensor = hwMap.get(ColorSensor.class, "BlockColorSensor");
         updatedBlockColor = false;
         blockColor = BlockColor.NONE;
-        startingTime = 0;
         prevBlockColor = BlockColor.NONE;
 
         MAX_BLOCK_PERCENTS.put(BlockColor.RED, RED_BLOCK_PERCENTS_MAX);
@@ -64,15 +63,6 @@ public class BlockColorSensor {
         MIN_BLOCK_PERCENTS.put(BlockColor.YELLOW, YELLOW_BLOCK_PERCENTS_MIN);
     }
 
-    public int red() {
-        return colorSensor.red();
-    }
-    public int green() {
-        return colorSensor.green();
-    }
-    public int blue() {
-        return colorSensor.blue();
-    }
 
     public void update(double dt) {
         updatedBlockColor = false;
@@ -89,7 +79,53 @@ public class BlockColorSensor {
         if(hasValidatedColor() && robot != null)
             robot.setBlockColorHeld(getBlockColor());
     }
+    public BlockColor getBlockColor() {
+        if (!updatedBlockColor) {
+            updatedBlockColor = true;
 
+            // actually find block color
+            for (BlockColor blockColor1 : BlockColor.values()) {
+                if (blockColor1 == BlockColor.NONE)
+                    continue;
+                if (hasColor(blockColor1)) {
+                    blockColor = blockColor1;
+                    return blockColor;
+                }
+            }
+            blockColor = BlockColor.NONE;
+        }
+        return blockColor;
+    }
+    public boolean hasValidatedColor() {
+        return currentTime > BLOCK_COLOR_VALIDATION_TIME;
+    }
+
+
+    private int red() {
+        return colorSensor.red();
+    }
+    private int green() {
+        return colorSensor.green();
+    }
+    private int blue() {
+        return colorSensor.blue();
+    }
+    private boolean hasColor(BlockColor blockColor) {
+        int red = colorSensor.red(), green = colorSensor.green(), blue = colorSensor.blue();
+        int sum = red + green + blue;
+        double rPercent = red * 100. / sum;
+        double gPercent = green * 100. / sum;
+        double bPercent = blue * 100. / sum;
+
+
+        return colorPercentInRange(rPercent, MAX_BLOCK_PERCENTS.get(blockColor)[0], MIN_BLOCK_PERCENTS.get(blockColor)[0]) &&
+                colorPercentInRange(gPercent, MAX_BLOCK_PERCENTS.get(blockColor)[1], MIN_BLOCK_PERCENTS.get(blockColor)[1]) &&
+                colorPercentInRange(bPercent, MAX_BLOCK_PERCENTS.get(blockColor)[2], MIN_BLOCK_PERCENTS.get(blockColor)[2]);
+    }
+    private boolean colorPercentInRange(double num, double max, double min) {
+        return num <= max && num >= min;
+    }
+    // methods used in finding color sensor values; not actually used in tele/auto
     public String updateBlockColorTesting(BlockColor blockColor) {
         if(dataMode)
             collectTestingData(blockColor);
@@ -119,46 +155,9 @@ public class BlockColorSensor {
         minPercents[1] = Math.min(maxPercents[1], greenPercent);
         minPercents[2] = Math.min(maxPercents[2], bluePercent);
     }
-
-    public BlockColor getBlockColor() {
-        if (!updatedBlockColor) {
-            updatedBlockColor = true;
-
-            // actually find block color
-            for (BlockColor blockColor1 : BlockColor.values()) {
-                if (blockColor1 == BlockColor.NONE)
-                    continue;
-                if (hasColor(blockColor1)) {
-                    blockColor = blockColor1;
-                    return blockColor;
-                }
-            }
-            blockColor = BlockColor.NONE;
-        }
-        return blockColor;
+    public ColorSensor getColorSensor() {
+        return colorSensor;
     }
-
-    public boolean hasValidatedColor() {
-        return currentTime > BLOCK_COLOR_VALIDATION_TIME;
-    }
-
-    public boolean hasColor(BlockColor blockColor) {
-        int red = colorSensor.red(), green = colorSensor.green(), blue = colorSensor.blue();
-        int sum = red + green + blue;
-        double rPercent = red * 100. / sum;
-        double gPercent = green * 100. / sum;
-        double bPercent = blue * 100. / sum;
-
-
-        return colorPercentInRange(rPercent, MAX_BLOCK_PERCENTS.get(blockColor)[0], MIN_BLOCK_PERCENTS.get(blockColor)[0]) &&
-                colorPercentInRange(gPercent, MAX_BLOCK_PERCENTS.get(blockColor)[1], MIN_BLOCK_PERCENTS.get(blockColor)[1]) &&
-                colorPercentInRange(bPercent, MAX_BLOCK_PERCENTS.get(blockColor)[2], MIN_BLOCK_PERCENTS.get(blockColor)[2]);
-    }
-    private boolean colorPercentInRange(double num, double max, double min) {
-        return num <= max && num >= min;
-    }
-
-    // testing functions, can ignore
     public boolean getDataMode() {
         return dataMode;
     }

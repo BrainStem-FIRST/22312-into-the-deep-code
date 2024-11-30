@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
+package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Lift;

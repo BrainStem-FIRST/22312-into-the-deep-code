@@ -5,7 +5,14 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates.*;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToBasketState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToTroughState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaToRamState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.RamToDropAreaState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.RamToTroughState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughToBasketState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughToDropAreaState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class LiftingSystem {
@@ -47,23 +54,25 @@ public class LiftingSystem {
                 robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
             stateManager.tryEnterState(StateType.BASKET_TO_TROUGH);
 
+        /*
         else if(stateManager.getActiveStateType() == StateType.DROP_AREA &&
                 robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED &&
                 robot.getGrabber().getHasSpecimen()) {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
         }
+        */
 
         // once lift is done ramming
         else if(stateManager.getActiveStateType() == StateType.SPECIMEN_RAM &&
                 robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)
             // opening grabber once ram is done
             if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+                robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                 robot.getGrabber().setHasSpecimen(false);
                 robot.setBlockColorHeld(BlockColor.NONE);
             }
             // resetting lifting system once block is released
-            else if(!robot.getGrabber().getHasSpecimen())
+            else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
                 stateManager.tryEnterState(StateType.RAM_TO_TROUGH);
 
     }

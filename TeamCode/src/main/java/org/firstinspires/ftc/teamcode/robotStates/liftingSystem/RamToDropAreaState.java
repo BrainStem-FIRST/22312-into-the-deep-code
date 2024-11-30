@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotStates.liftingSystem.liftingSystemStates;
+package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -14,7 +14,7 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
-        robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
+        robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
     }
 
     @Override
