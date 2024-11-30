@@ -23,6 +23,7 @@ public class BrainSTEMRobot {
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
     private BlockColor blockColorHeld;
+    private boolean isBlockReadyForTransfer;
     private boolean isHighDeposit = true;
     private boolean isHighRam = true;
     private boolean inDepositingMode = true;
@@ -48,6 +49,7 @@ public class BrainSTEMRobot {
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
         blockColorHeld = BlockColor.NONE;
+        isBlockReadyForTransfer = true;
     }
 
     public void setup() {
@@ -145,6 +147,12 @@ public class BrainSTEMRobot {
     }
     public void setBlockColorHeld(BlockColor blockColorHeld) {
         this.blockColorHeld = blockColorHeld;
+    }
+    public boolean isBlockReadyForTransfer() {
+        return isBlockReadyForTransfer;
+    }
+    public void setBlockReadyForTransfer(boolean isBlockReadyForTransfer) {
+        this.isBlockReadyForTransfer = isBlockReadyForTransfer;
     }
     public boolean isHighDeposit() {
         return isHighDeposit;

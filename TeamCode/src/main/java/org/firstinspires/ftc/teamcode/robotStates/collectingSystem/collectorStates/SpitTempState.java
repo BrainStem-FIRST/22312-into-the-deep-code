@@ -26,8 +26,8 @@ public class SpitTempState extends RobotState<Collector.StateType> {
         robot.getCollector().setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
         framesRunning++;
 
-        // hinge to middle
-        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
+        // tell robot that block is not ready for transfer
+        robot.setBlockReadyForTransfer(false);
     }
 
     @Override

@@ -52,6 +52,11 @@ public class CollectingSystem {
 
     public void update(double dt) {
         stateManager.update(dt);
+
+        // hinge middle when spitting if possible
+        // hinging up and down is handled in other states
+        if (!hingeMustBeUp() && robot.getCollector().isSpitting())
+            robot.getHinge().getStateManager().tryEnterState(Hinge.StateType.MIDDLE);
     }
     public BrainSTEMRobot getRobot() {
         return robot;

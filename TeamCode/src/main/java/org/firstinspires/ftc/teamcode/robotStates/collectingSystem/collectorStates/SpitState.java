@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 public class SpitState extends RobotState<Collector.StateType> {
 
     // after the block color sensor stops detecting the block, still spit for 1 second
-    public static double SAFETY_TIME = 1;
+    public static double SAFETY_TIME = 0.8;
     private double startTime;
     public SpitState() {
         super(Collector.StateType.SPITTING);
@@ -26,6 +26,7 @@ public class SpitState extends RobotState<Collector.StateType> {
         // get the starting time to track safety
         if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)
             startTime = time;
+        // reset the starting time
         if (robot.getCollector().getBlockColorSensor().getBlockColor() != BlockColor.NONE)
             startTime = 0;
     }
