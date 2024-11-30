@@ -54,15 +54,15 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH;
     }
 
-    // only can be overridden if grabber is not closing in on block
+    // only can be overridden if lift is at trough safety and if grabber has block
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY && robot.getGrabber().getHasBlock();
     }
 
     @Override
     public boolean isDone() {
-        // want to automatically transition to drop area state if block color held is equal to alliance color
+        // want to automatically transition to drop area state if block color held is equal to alliance color; only time when this function should evaluate to true
         return robot.getBlockColorHeld() == robot.getColorFromAlliance() &&
                 robot.getGrabber().getHasBlock() &&
                 robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
@@ -70,10 +70,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
-        // if block is yellow, transition to basket, and if block is alliance color then transition to drop off to human player
-        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-            return LiftingSystem.StateType.TROUGH_TO_BASKET;
-        else
-            return LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        // always want to transition to drop area bc if block is yellow then isDone will never be true and this state will be overridden when gamepad1 presses a
+        return LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
     }
 }

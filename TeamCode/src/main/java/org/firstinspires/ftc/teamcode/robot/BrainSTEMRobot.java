@@ -26,8 +26,7 @@ public class BrainSTEMRobot {
     private boolean isBlockReadyForTransfer;
     private boolean isHighDeposit = true;
     private boolean isHighRam = true;
-    private boolean inDepositingMode = true;
-    private boolean inPidMode = false;
+    private boolean depositMode = true;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -56,7 +55,6 @@ public class BrainSTEMRobot {
         double start = System.currentTimeMillis() / 1000.0;
         double time = 0;
 
-
         while (!setupLiftingSystem(time) || !setupCollectingSystem()) {
             // setup lift first, then collection and extension
             // once both are set, stop
@@ -68,15 +66,14 @@ public class BrainSTEMRobot {
             time = System.currentTimeMillis() / 1000.0 - start;
         }
     }
-    public boolean setupLiftingSystem(double time) {
+    private boolean setupLiftingSystem(double time) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
         Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
         if(lift.getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
             arm.getArmServo().setPosition(Arm.TRANSFER_POS);
         return arm.getArmServo().getPosition() == Arm.TRANSFER_POS && time > 1;
     }
-
-    public boolean setupCollectingSystem() {
+    private boolean setupCollectingSystem() {
         // this allows the hinge to go to the up position
         hinge.getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
 
@@ -84,6 +81,7 @@ public class BrainSTEMRobot {
         collectingSystem.getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
         return collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN;
     }
+
 
     public void update(double dt) {
         // system managers
@@ -167,16 +165,10 @@ public class BrainSTEMRobot {
     public void setIsHighRam(boolean isHighRam) {
         this.isHighRam = isHighRam;
     }
-    public boolean getInDepositingMode() {
-        return inDepositingMode;
+    public boolean getDepositMode() {
+        return depositMode;
     }
-    public void setInDepositingMode(boolean inDepositingMode) {
-        this.inDepositingMode = inDepositingMode;
-    }
-    public boolean getInPidMode() {
-        return inPidMode;
-    }
-    public void setInPidMode(boolean inPidMode) {
-        this.inPidMode = inPidMode;
+    public void setDepositMode(boolean depositMode) {
+        this.depositMode = depositMode;
     }
 }

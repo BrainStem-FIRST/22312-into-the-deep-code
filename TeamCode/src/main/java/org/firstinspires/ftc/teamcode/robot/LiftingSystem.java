@@ -46,35 +46,6 @@ public class LiftingSystem {
 
     public void update(double dt) {
         stateManager.update(dt);
-
-        // transitioning states if one state is done (bc I have non-transition states as NothingStates)
-
-        // resetting lifting system once grabber releases block
-        if(stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&
-                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
-            stateManager.tryEnterState(StateType.BASKET_TO_TROUGH);
-
-        /*
-        else if(stateManager.getActiveStateType() == StateType.DROP_AREA &&
-                robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED &&
-                robot.getGrabber().getHasSpecimen()) {
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
-        }
-        */
-
-        // once lift is done ramming
-        else if(stateManager.getActiveStateType() == StateType.SPECIMEN_RAM &&
-                robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)
-            // opening grabber once ram is done
-            if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                robot.getGrabber().setHasSpecimen(false);
-                robot.setBlockColorHeld(BlockColor.NONE);
-            }
-            // resetting lifting system once block is released
-            else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
-                stateManager.tryEnterState(StateType.RAM_TO_TROUGH);
-
     }
     public BrainSTEMRobot getRobot() {
         return robot;

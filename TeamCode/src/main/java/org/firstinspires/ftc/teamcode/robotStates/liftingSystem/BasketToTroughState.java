@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
+import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
@@ -15,20 +17,24 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         // if lift still at position of basket depositing
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
-            // moving arm up if arm still at left position
-            if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
-                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
-
-            // OLD CODE (non optimized); moving lift down once arm is set
-            // else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
-            //   robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-
-            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
-                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            // releasing block
+            if(robot.getGrabber().getHasBlock()) {
+                robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                robot.getGrabber().setHasBlock(false);
+                robot.setBlockColorHeld(BlockColor.NONE);
+            }
+            // resetting after block is released
+            else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+                // moving arm up if arm still at left position
+                if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+                // moving lift down when arm done rotating
+                else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
+                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            }
         }
-        // once lift reach safety threshold
+        // once lift reach safety threshold, move arm down
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-            // moving arm down if still right
             robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
         }
     }

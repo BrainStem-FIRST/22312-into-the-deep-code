@@ -66,7 +66,6 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             telemetry.addData("color sensor color", robot.getCollector().getBlockColorSensor().getBlockColor());
             telemetry.addData("", "");
             telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());
-            telemetry.addData("in pid mode", robot.getInPidMode());
             telemetry.addData("", "");
             telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
@@ -82,10 +81,6 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
     private void listenForRobotControls() {
         listenForDriveTrainInput();
         listenForCollectionInput();
-
-        // x toggles pid actions
-        if(input.getGamepadTracker1().isFirstFrameX())
-            robot.setInPidMode(!robot.getInPidMode());
     }
 
     private void listenForDriveTrainInput() {

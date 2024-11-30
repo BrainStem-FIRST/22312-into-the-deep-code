@@ -47,7 +47,6 @@ public class TeleMain extends LinearOpMode {
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
-        double interval = 1000/60.; // 60 fps
         timeSinceStart = 0; // time since start of match
 
         while (opModeIsActive()) {
@@ -63,26 +62,15 @@ public class TeleMain extends LinearOpMode {
             listenForRobotControls();
 
             robot.update(dt);
-            robot.getDriveTrain().updatePoseEstimate();
-
-            telemetry.addData("magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
 
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
             telemetry.addData("robot color held", robot.getBlockColorHeld());
-            telemetry.addData("", "");
-            telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());
-            telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
 
-            telemetry.addData("a first down", input.getGamepadTracker1().isFirstFrameA());
-            telemetry.addData("a down", input.getGamepadTracker1().isAPressed());
             telemetry.addData("", "");
             telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
             telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
-            telemetry.addData("robot vector real", robot.getDriveTrain().pose.heading.real);
-            telemetry.addData("robot vector imaginary", robot.getDriveTrain().pose.heading.imag);
             telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
-            telemetry.addData("", "");
-            telemetry.addData("in pid mode", robot.getInPidMode());
+
             telemetry.addData("", "");
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
@@ -94,6 +82,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
             telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
+
             telemetry.addData("", "");
             telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
@@ -102,6 +91,10 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("hitting extension hard stop", robot.getExtension().hitRetractHardStop());
             telemetry.addData("block color sensor", robot.getCollector().getBlockColorSensor().getBlockColor());
+            telemetry.addData("magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
+
+            telemetry.addData("", "");
+            telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
             telemetry.update();
         }
     }
@@ -111,10 +104,6 @@ public class TeleMain extends LinearOpMode {
         listenForCollectionInput();
         listenForLiftingInput();
         listenForHangingInput();
-
-        // x toggles pid actions
-        if(input.getGamepadTracker1().isFirstFrameX())
-            robot.setInPidMode(!robot.getInPidMode());
     }
     private void listenForDriveTrainInput() {
         int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
@@ -219,9 +208,7 @@ public class TeleMain extends LinearOpMode {
                         robot.getArm().getTransitionState().getGoalStatePosition() != Arm.BLOCK_DROP_POS)
                         break;
                 case BASKET_DEPOSIT:
-                    robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                    robot.getGrabber().setHasBlock(false);
-                    robot.setBlockColorHeld(BlockColor.NONE);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_TROUGH);
                     break;
                 case TROUGH_TO_DROP_AREA:
                     // purpose of this is to also allow toggling of grabber while arm is in place; its just the lifting system is still in transition bc the lift has not fully lowered
@@ -242,8 +229,7 @@ public class TeleMain extends LinearOpMode {
                     }
                     break;
                 case SPECIMEN_RAM:
-                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
-                        robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
                     break;
             }
 
