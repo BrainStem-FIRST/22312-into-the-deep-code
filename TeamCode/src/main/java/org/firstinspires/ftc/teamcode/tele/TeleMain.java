@@ -279,7 +279,7 @@ public class TeleMain extends LinearOpMode {
         //if (timeSinceStart >= 140 && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
         //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
         // lower hanging to raise robot
-        if (input.getGamepadTracker2().isFirstFrameA())
+        if (input.getGamepadTracker2().isFirstFrameX())
             if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
             else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
