@@ -23,7 +23,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == Extension.StateType.FINDING_BLOCK;
+        return stateManager.getActiveStateType() != Extension.StateType.RETRACTING;
     }
 
     @Override

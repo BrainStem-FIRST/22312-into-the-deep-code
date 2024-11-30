@@ -16,10 +16,8 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     @Override
     public void execute() {
 
-        if (isFirstTime()) {
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING); // initially stop collector
+        if (isFirstTime())
             waitingForHinge = robot.getCollectingSystem().hingeMustBeUp(); // if the extension needs to wait for the hinge, just wait for it to go all the way up and then retract
-        }
 
         // force hinge to be in up position
         if (robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)

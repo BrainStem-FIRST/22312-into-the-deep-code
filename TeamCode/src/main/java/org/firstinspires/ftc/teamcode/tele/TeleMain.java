@@ -170,7 +170,7 @@ public class TeleMain extends LinearOpMode {
             collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck - spits as long as gamepad up is pressed
-        if (input.getGamepadTracker1().isDpadUpPressed()) {
+        if (input.getGamepadTracker2().isDpadUpPressed()) {
             collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
@@ -275,11 +275,9 @@ public class TeleMain extends LinearOpMode {
         //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
         // lower hanging to raise robot
         if (input.getGamepadTracker2().isFirstFrameA())
-            if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN) {
+            if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
-            }
-            else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP) {
+            else if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_TICK, Hanger.StateType.HANG_DOWN);
-            }
     }
 }

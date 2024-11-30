@@ -53,7 +53,13 @@ public class BrainSTEMRobot {
     public void setup() {
         double start = System.currentTimeMillis() / 1000.0;
         double relativeTime = 0;
-        while(!setupCollectingSystem(relativeTime) || !setupLiftingSystem(relativeTime)) {
+
+        while(true) {
+            // setup lift first, then collection and extension
+            // once both are set, stop
+            if(setupLiftingSystem() && setupCollectingSystem())
+                    break;
+
             telemetry.addData("robot status", "setting up");
             telemetry.addData("relative time", relativeTime);
             telemetry.addData("lift encoder", lift.getLiftMotor().getCurrentPosition());
@@ -61,17 +67,22 @@ public class BrainSTEMRobot {
             relativeTime = System.currentTimeMillis() / 1000.0 - start;
         }
     }
-    public boolean setupCollectingSystem(double relativeTime) {
-        hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
-        return true;
-    }
-    public boolean setupLiftingSystem(double relativeTime) {
+    public boolean setupLiftingSystem() {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
         Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
         boolean liftInRange = Subsystem.inRange(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.DESTINATION_THRESHOLD);
         if(liftInRange)
             arm.getArmServo().setPosition(Arm.TRANSFER_POS);
         return liftInRange && arm.getArmServo().getPosition() == Arm.TRANSFER_POS;
+    }
+
+    public boolean setupCollectingSystem() {
+        // this allows the hinge to go to the up position
+        hinge.getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
+
+        // perform full retraction sequence to make sure collecting system is setup correctly
+        collectingSystem.getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+        return collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN;
     }
 
     public void update(double dt) {

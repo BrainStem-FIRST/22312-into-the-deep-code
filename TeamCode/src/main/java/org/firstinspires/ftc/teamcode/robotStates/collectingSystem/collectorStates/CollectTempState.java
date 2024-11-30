@@ -25,7 +25,7 @@ public class CollectTempState extends RobotState<Collector.StateType> {
     @Override
     public void execute() {
         // collect
-        robot.getCollector().setSpindleMotorPower(-Collector.COLLECT_TEMP_POWER);
+        robot.getCollector().setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
         framesRunning++;
     }
 

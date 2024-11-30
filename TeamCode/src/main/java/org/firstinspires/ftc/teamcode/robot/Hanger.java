@@ -46,7 +46,6 @@ public class Hanger extends Subsystem {
         transitionState.setEncoderBounds(FULL_DOWN_TICK, UP_TICK);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-
         stateManager.setupStates(getRobot(), stateManager);
     }
 

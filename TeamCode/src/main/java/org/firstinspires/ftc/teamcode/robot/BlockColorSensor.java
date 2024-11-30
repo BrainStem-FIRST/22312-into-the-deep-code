@@ -139,7 +139,7 @@ public class BlockColorSensor {
     }
 
     public boolean hasValidatedColor() {
-        return currentTime > BLOCK_COLOR_VALIDATION_TIME && getBlockColor() != BlockColor.NONE;
+        return currentTime > BLOCK_COLOR_VALIDATION_TIME;
     }
 
     public boolean hasColor(BlockColor blockColor) {
@@ -157,6 +157,8 @@ public class BlockColorSensor {
     private boolean colorPercentInRange(double num, double max, double min) {
         return num <= max && num >= min;
     }
+
+    // testing functions, can ignore
     public boolean getDataMode() {
         return dataMode;
     }
