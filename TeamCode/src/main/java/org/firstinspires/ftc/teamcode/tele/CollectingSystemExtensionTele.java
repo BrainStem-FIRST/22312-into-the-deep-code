@@ -63,9 +63,7 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
 
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
             telemetry.addData("robot color held", robot.getBlockColorHeld());
-            telemetry.addData("has red", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.RED));
-            telemetry.addData("has blue", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.BLUE));
-            telemetry.addData("has yellow", robot.getCollector().getBlockColorSensor().hasColor(BlockColor.YELLOW));
+            telemetry.addData("color sensor color", robot.getCollector().getBlockColorSensor().getBlockColor());
             telemetry.addData("", "");
             telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());
             telemetry.addData("in pid mode", robot.getInPidMode());
@@ -84,7 +82,6 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
     private void listenForRobotControls() {
         listenForDriveTrainInput();
         listenForCollectionInput();
-        listenForLiftingInput();
 
         // x toggles pid actions
         if(input.getGamepadTracker1().isFirstFrameX())
@@ -142,69 +139,5 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
-    }
-    private void listenForLiftingInput() {
-        // checking changes in basket/bar heights
-        if(input.getGamepadTracker2().isLeftBumperPressed()) {
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
-            robot.setIsHighDeposit(true);
-        }
-
-        if(input.getGamepadTracker2().isLeftTriggerPressed()) {
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
-            robot.setIsHighDeposit(false);
-        }
-
-        if(input.getGamepadTracker2().isRightBumperPressed())
-            robot.setIsHighRam(true);
-
-        // TODO: enable low ram setting input once figure out how to ram on low bar
-        //if(input.getGamepadTracker2().isRightTriggerPressed())
-        //robot.setIsHighRam(false);
-
-        // button for "progressing" a state
-        if(input.getGamepadTracker1().isFirstFrameA())
-            switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
-                case TROUGH:
-                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
-                    break;
-                case BASKET_DEPOSIT:
-                    robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
-                    robot.getGrabber().setHasBlock(false);
-                    robot.setBlockColorHeld(BlockColor.NONE);
-                    break;
-                case DROP_AREA:
-                    if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                        // dropping block to human player station
-                        if(!robot.getGrabber().getHasSpecimen()) {
-                            robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
-                            robot.getGrabber().setHasBlock(false);
-                        }
-                        // assuming robot is flush with submersible, so transitions to ram before
-                        else
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
-                    }
-                    else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
-                        robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING);
-                        robot.getGrabber().setHasSpecimen(true);
-                    }
-
-                    break;
-                case SPECIMEN_RAM:
-                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
-                        robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
-                    break;
-            }
-
-            // button for "going back" a state
-        else if(input.getGamepadTracker1().isFirstFrameB())
-            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA)
-                // toggling grabber
-                if(!robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.CLOSING))
-                    robot.getGrabber().getStateManager().tryEnterState(Grabber.StateType.OPENING);
     }
 }

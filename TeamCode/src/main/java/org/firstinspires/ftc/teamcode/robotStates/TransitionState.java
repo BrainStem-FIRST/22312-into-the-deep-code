@@ -27,6 +27,11 @@ public abstract class TransitionState<StateType extends Enum<StateType>> extends
     public void overrideGoalPosition(double goalPosition) {
         this.goalPosition = goalPosition;
     }
+    public void overrideGoalState(double goalPosition, StateType goalStateType) {
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
+        stateManager.tryEnterState(stateType);
+    }
     public double getGoalStatePosition() {
         return goalPosition;
     }

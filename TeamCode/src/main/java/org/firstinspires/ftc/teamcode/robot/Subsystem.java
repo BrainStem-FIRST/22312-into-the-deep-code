@@ -54,7 +54,7 @@ public abstract class Subsystem {
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
     private final AllianceColor allianceColor;
-    private final BrainSTEMRobot robot;
+    protected final BrainSTEMRobot robot;
 
     public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         this.hwMap = hwMap;

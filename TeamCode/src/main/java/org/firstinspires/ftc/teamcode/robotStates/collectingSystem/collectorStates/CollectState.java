@@ -31,7 +31,7 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        if (robot.getCollector().hasValidBlockColor())
+        if (robot.hasValidBlockColor())
             return Collector.StateType.VALID_BLOCK;
         return Collector.StateType.SPITTING;
     }

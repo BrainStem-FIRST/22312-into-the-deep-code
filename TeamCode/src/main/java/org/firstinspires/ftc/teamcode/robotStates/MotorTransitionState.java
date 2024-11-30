@@ -43,6 +43,15 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
             stateManager.tryEnterState(stateType);
         }
     }
+    @Override
+    public void overrideGoalState(double goalPosition, StateType goalStateType) {
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
+        if(pid != null) {
+            pid.reset();
+            pid.setTarget(goalPosition);
+        }
+    }
 
     @Override
     public void execute() {

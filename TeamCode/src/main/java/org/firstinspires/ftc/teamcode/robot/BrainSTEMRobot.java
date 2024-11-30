@@ -70,7 +70,7 @@ public class BrainSTEMRobot {
         }
     }
     public boolean setupLiftingSystem() {
-        grabber.getGrabServo().setPosition(Grabber.OPEN_POSITION);
+        grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
         Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
         boolean liftInRange = Subsystem.inRange(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.DESTINATION_THRESHOLD);
         if(liftInRange)
@@ -144,6 +144,9 @@ public class BrainSTEMRobot {
     }
     public BlockColor getBlockColorHeld() {
         return blockColorHeld;
+    }
+    public boolean hasValidBlockColor() {
+        return getBlockColorHeld() == getColorFromAlliance() || getBlockColorHeld() == BlockColor.YELLOW;
     }
     public void setBlockColorHeld(BlockColor blockColorHeld) {
         this.blockColorHeld = blockColorHeld;
