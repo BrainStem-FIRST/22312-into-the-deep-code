@@ -269,7 +269,7 @@ public class TeleMain extends LinearOpMode {
                 robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_TICK, Hanger.StateType.HANG_DOWN);
     }
 
-    private void listenForDrivetrainOld() {
+    private void listenForDriveTrainInputOld() {
         // drivetrain
         double leftStickX = gamepad1.left_stick_x;
         double leftStickY = gamepad1.left_stick_y * -1;

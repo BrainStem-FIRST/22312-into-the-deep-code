@@ -150,6 +150,9 @@ public class BrainSTEMRobot {
     public boolean isBlockReadyForTransfer() {
         return isBlockReadyForTransfer;
     }
+    public boolean canCollect() {
+        return blockColorHeld == BlockColor.NONE;
+    }
     public void setBlockReadyForTransfer(boolean isBlockReadyForTransfer) {
         this.isBlockReadyForTransfer = isBlockReadyForTransfer;
     }
