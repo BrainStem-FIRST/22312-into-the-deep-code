@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.TankDrive;
 
 @Config
-public final class SplineTest extends LinearOpMode {
+public final class LineTest extends LinearOpMode {
     public static class Params {
         public double beginX = 31.5, beginY = -64.5, beginA = Math.PI/2;
         public double hangX = 0, hangY = -21.8, hangA = Math.PI/2;

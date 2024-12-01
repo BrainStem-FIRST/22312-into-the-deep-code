@@ -17,7 +17,6 @@ public class AutoSpecimen extends Auto {
     public AutoSpecimen(AllianceColor allianceColor, AllianceColorParams allianceColorParams) {
         super(allianceColor);
         this.allianceColorParams = allianceColorParams;
-
     }
     @Override
     public void runAuto() {

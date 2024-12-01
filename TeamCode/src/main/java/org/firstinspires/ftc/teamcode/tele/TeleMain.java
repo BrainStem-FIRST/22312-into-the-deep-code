@@ -93,6 +93,7 @@ public class TeleMain extends LinearOpMode {
 
             telemetry.addData("", "");
             telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
+            telemetry.addData("hanging motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
             telemetry.update();
         }
     }
@@ -108,12 +109,12 @@ public class TeleMain extends LinearOpMode {
         final double STRAFE_Y_AMP = 0.5;
         final double TURN_AMP = 0.8;
 
-        int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
+        //int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
         int strafeDirY = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
 
-        if (strafeDirX != 0 || strafeDirY != 0)
+        if (strafeDirY != 0)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(strafeDirX * STRAFE_X_AMP, -strafeDirY * STRAFE_Y_AMP),
+                    new Vector2d(0, -strafeDirY * STRAFE_Y_AMP),
                     0
             ));
         else
@@ -163,13 +164,13 @@ public class TeleMain extends LinearOpMode {
             collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
 
         // force spit in case block gets stuck - spits as long as gamepad up is pressed
-        if (input.getGamepadTracker2().isDpadUpPressed()) {
+        if (input.getGamepadTracker1().isDpadUpPressed()) {
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
 
         // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
-        if (input.getGamepadTracker2().isDpadDownPressed()) {
+        if (input.getGamepadTracker1().isDpadDownPressed()) {
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
             ((CollectTempState) collectorManager.getState(Collector.StateType.COLLECTING_TEMP)).continueRunning();
         }
@@ -194,11 +195,14 @@ public class TeleMain extends LinearOpMode {
         if(input.getGamepadTracker1().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
-                    if(!robot.canTransfer())
+                    if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
                         // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
                         robot.setCanTransfer(true);
-                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY && robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
+                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                            && robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
+                    else
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
                 case BASKET_DEPOSIT:
                     robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_TROUGH);
@@ -234,6 +238,8 @@ public class TeleMain extends LinearOpMode {
                     robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                     robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                 }
+                else if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS)
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
     }
     private void listenForHangingInput() {
         //temp code

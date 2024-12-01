@@ -22,6 +22,7 @@ public class Lift extends Subsystem {
     public static final int TROUGH_POS = -5,
         TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 5,
+        DROP_AREA_AFTER_POS = 30,
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 595,
         HIGH_RAM_BEFORE_POS = 750,

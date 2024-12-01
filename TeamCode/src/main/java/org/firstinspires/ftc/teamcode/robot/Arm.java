@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Arm extends Subsystem {
-    public static final int MIN_TICK = 935, MAX_TICK = 2445;
+    public static final int MIN_TICK = 935, MAX_TICK = 2450;
 
     // TODO: find FULL_ROTATION_TIME;
     // if times r wrong then optimizations will be messed up

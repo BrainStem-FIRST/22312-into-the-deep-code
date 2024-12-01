@@ -22,7 +22,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
 
             // would want to continue transfer if and only if block has been latched onto (would not want to release grabber then)
-            else if(robot.getGrabber().hasBlock() && robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_SAFETY_POS)
+            else if(!robot.getCollector().hasValidBlockColor() && robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_SAFETY_POS)
                 return;
             // handling resetting of grabber
             if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
@@ -31,35 +31,39 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
         }
         // checking if extension properly set
-        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor()) {
-            // opening grabber and lowering lift if at trough safety
-            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
-                && !robot.getGrabber().hasBlock()) {
-                // need to open grabber each time bc if have failed transfer grabber stays closed (also why we reset hasBlock to false)
-                if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                    robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                    robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
+            if(robot.getCollector().hasValidBlockColor()) {
+                // opening grabber and lowering lift if at trough safety
+                if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+                    // need to open grabber each time bc if have failed transfer grabber stays closed (also why we reset hasBlock to false)
+                    if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+                        robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                        robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                    }
+                    // lowering lift once grabber is open
+                    else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
+                        robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                 }
-                else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
-            }
-            // closing onto block once lift is down
-            else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
-                robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
-                // waiting for grabber to close on block before raising lift
-                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                    robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                // closing onto block once lift is down
+                else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
+                    robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
+                    // waiting for grabber to close on block before raising lift
+                    if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+                        robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                    }
                 }
             }
-        }
+            else {
+                robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());
+            }
     }
 
     @Override
     public boolean canEnter() {
         // lift must properly be lowered and set before entering
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_TROUGH ||
-                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_TROUGH
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH;
     }
 
     // only can be overridden if lift is at trough safety and if grabber has block
@@ -71,7 +75,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean isDone() {
         // want to automatically transition to drop area state if block color held is equal to alliance color; only time when this function should evaluate to true
-        return robot.getGrabber().getBlockColorHeld() == robot.getColorFromAlliance()
+        return !robot.getCollector().hasValidBlockColor() && robot.getGrabber().hasBlock()
             && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 

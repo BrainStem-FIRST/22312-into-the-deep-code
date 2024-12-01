@@ -31,7 +31,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 0.8;
-    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.3;
+    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.5;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.8;

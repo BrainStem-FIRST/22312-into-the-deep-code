@@ -41,7 +41,6 @@ public class Hanger extends Subsystem {
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
-        // TODO: set power of hanging in states
         transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD);
         transitionState.setEncoderBounds(FULL_DOWN_TICK, UP_TICK);
         stateManager.addState(StateType.TRANSITION, transitionState);
