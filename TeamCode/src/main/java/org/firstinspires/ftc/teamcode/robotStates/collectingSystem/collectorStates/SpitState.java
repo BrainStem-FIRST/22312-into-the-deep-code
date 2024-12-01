@@ -18,11 +18,12 @@ public class SpitState extends RobotState<Collector.StateType> {
         // spit
         robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
 
-        // get the starting time to track safety
-        if (robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && startTime == 0)
+        // get the starting time to track safety to ensure block has enough buffer time to escape collector
+        if (!robot.getCollector().getBlockColorSensor().hasValidatedColor() && startTime == 0)
             startTime = time;
+
         // reset the starting time
-        if (robot.getCollector().getBlockColorSensor().getBlockColor() != BlockColor.NONE)
+        if (robot.getCollector().getBlockColorSensor().hasValidatedColor())
             startTime = 0;
     }
 
@@ -38,11 +39,11 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && time - startTime > Collector.SAFETY_SPIT_TIME;
+        return !robot.getCollector().getBlockColorSensor().hasValidatedColor() && time - startTime > Collector.SAFETY_SPIT_TIME;
     }
 
     @Override
     public Collector.StateType getNextStateType() {
-        return Collector.StateType.COLLECTING;
+        return Collector.StateType.NOTHING;
     }
 }

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -30,7 +31,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static final double MAX_SPIN_POWER = 0.8;
-    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.5;
+    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.3;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.8;
@@ -64,6 +65,7 @@ public class Collector extends Subsystem {
         nothingState.addMotor(spindleMotor);
         stateManager.addState(StateType.NOTHING, nothingState);
         stateManager.addState(StateType.COLLECTING, new CollectState());
+        stateManager.addState(StateType.COLLECTING_TEMP, new CollectTempState());
         stateManager.addState(StateType.SPITTING, new SpitState());
         stateManager.addState(StateType.SPITTING_TEMP, new SpitTempState());
         stateManager.addState(StateType.VALID_BLOCK, new NothingState<>(StateType.VALID_BLOCK));

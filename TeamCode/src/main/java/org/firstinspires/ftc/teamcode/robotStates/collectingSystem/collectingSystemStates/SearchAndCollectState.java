@@ -20,6 +20,10 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
         if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
+        // once spitting finishes, go to collecting
+        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING)
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
+
         // transitioning between collecting and spitting
         if (robot.getCollector().isCollecting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.DOWN)
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
@@ -29,7 +33,8 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH;
+        return (stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH || stateManager.getActiveStateType() == CollectingSystem.StateType.SHORT_EXTEND)
+                && robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.MIN_SEARCH_AND_COLLECT_POSITION;
     }
 
     @Override

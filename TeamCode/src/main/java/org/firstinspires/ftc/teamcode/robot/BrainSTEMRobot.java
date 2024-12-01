@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -51,11 +52,18 @@ public class BrainSTEMRobot {
 
     public void setup() {
         double start = System.currentTimeMillis() / 1000.0;
-        double time = 0;
+        double time = 0, liftDoneTime = 0;
 
-        while (!setupLiftingSystem(time) || !setupCollectingSystem()) {
+        while(true) {
             // setup lift first, then collection and extension
             // once both are set, stop
+            if (setupLiftingSystem(time)) {
+                if (liftDoneTime == 0)
+                    liftDoneTime = time;
+
+                if(setupCollectingSystem(time - liftDoneTime))
+                    break;
+            }
 
             telemetry.addData("robot status", "setting up");
             telemetry.addData("time", time);
@@ -71,13 +79,16 @@ public class BrainSTEMRobot {
             arm.getArmServo().setPosition(Arm.TRANSFER_POS);
         return arm.getArmServo().getPosition() == Arm.TRANSFER_POS && time > 1;
     }
-    private boolean setupCollectingSystem() {
-        // this allows the hinge to go to the up position
-        hinge.getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
+    private boolean setupCollectingSystem(double time) {
+        hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
 
-        // perform full retraction sequence to make sure collecting system is setup correctly
-        collectingSystem.getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
-        return collectingSystem.getStateManager().getActiveStateType() == CollectingSystem.StateType.IN;
+        if (time >= Hinge.FULL_ROTATION_TIME)
+            extension.setExtensionMotorPower(-0.5);
+        if (extension.hitRetractHardStop()) {
+            extension.setExtensionMotorPosition(0);
+            extension.getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        return extension.hitRetractHardStop();
     }
 
 
@@ -137,7 +148,7 @@ public class BrainSTEMRobot {
         return allianceColor == AllianceColor.BLUE ? BlockColor.BLUE : BlockColor.RED;
     }
     public boolean canCollect() {
-        return grabber.getBlockColorHeld() == BlockColor.NONE;
+        return !grabber.hasBlock();
     }
     public boolean canTransfer() {
         return canTransfer;

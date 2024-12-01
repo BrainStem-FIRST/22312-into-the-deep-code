@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 public class Grabber extends Subsystem {
     public static final int MIN_TICK = 1210, MAX_TICK = 2400;
     public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
-    public static final double FULL_ROTATION_TIME = 0.3;
+    public static final double FULL_ROTATION_TIME = 0.4;
     private BlockColor blockColorHeld;
     private boolean hasSpecimen;
 
@@ -97,8 +97,10 @@ public class Grabber extends Subsystem {
         hasSpecimen = false;
     }
     public void setHasSpecimen(boolean hasSpecimen) {
-        this.hasSpecimen = hasSpecimen;
         if(hasSpecimen)
             setBlockColorHeld(robot.getColorFromAlliance());
+        else
+            setBlockColorHeld(BlockColor.NONE);
+        this.hasSpecimen = hasSpecimen;
     }
 }

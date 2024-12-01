@@ -70,8 +70,10 @@ public class BlockColorSensor {
         // update validation time
         if (getBlockColor() == prevBlockColor && getBlockColor() != BlockColor.NONE)
             currentTime += dt;
-        else
+        else {
             currentTime = 0;
+            robot.getCollector().setBlockColorInTrough(BlockColor.NONE);
+        }
 
         prevBlockColor = getBlockColor();
 
@@ -79,7 +81,7 @@ public class BlockColorSensor {
         if(hasValidatedColor() && robot != null)
             robot.getCollector().setBlockColorInTrough(getBlockColor());
     }
-    public BlockColor getBlockColor() {
+    private BlockColor getBlockColor() {
         if (!updatedBlockColor) {
             updatedBlockColor = true;
 
@@ -95,6 +97,11 @@ public class BlockColorSensor {
             blockColor = BlockColor.NONE;
         }
         return blockColor;
+    }
+    public BlockColor getValidatedColor() {
+        if (hasValidatedColor())
+            return getBlockColor();
+        return BlockColor.NONE;
     }
     public boolean hasValidatedColor() {
         return currentTime > BLOCK_COLOR_VALIDATION_TIME;

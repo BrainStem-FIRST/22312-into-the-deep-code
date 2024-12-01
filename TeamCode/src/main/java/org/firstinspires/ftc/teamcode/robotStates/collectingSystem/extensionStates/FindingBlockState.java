@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionSta
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -13,13 +14,17 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        // resetting canTransfer to true every time we extend
-        if(isFirstTime())
+
+        // reset canTransfer so the actions of collecting and spitting temp of prev block do not affect
+        // this collection cycle
+        if (isFirstTime())
             robot.setCanTransfer(true);
+
         // hard stop
+        int minPos = robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT ? Extension.MIN_SEARCH_AND_COLLECT_POSITION : Extension.MIN_POSITION;
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
             robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_POSITION)
+        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < minPos)
             robot.getExtension().setTargetPower(Math.max(0, robot.getExtension().getTargetPower()));
 
         // move extension

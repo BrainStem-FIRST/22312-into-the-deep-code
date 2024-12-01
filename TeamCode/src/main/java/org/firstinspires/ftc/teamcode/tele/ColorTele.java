@@ -61,7 +61,7 @@ public class ColorTele extends LinearOpMode {
             telemetry.addData("r percent", r / sum);
             telemetry.addData("g percent", g / sum);
             telemetry.addData("b percent", b / sum);
-            telemetry.addData("block color", blockColorSensor.getBlockColor());
+            telemetry.addData("validated block color", blockColorSensor.getValidatedColor());
             telemetry.update();
         }
     }

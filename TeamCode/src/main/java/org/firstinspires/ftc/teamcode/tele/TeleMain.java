@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
-import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
@@ -86,8 +85,10 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
+            telemetry.addData("extension target power", robot.getExtension().getTargetPower());
+            telemetry.addData("extension actual power", robot.getExtension().getExtensionMotor().getPower());
             telemetry.addData("hitting extension hard stop", robot.getExtension().hitRetractHardStop());
-            telemetry.addData("block color sensor", robot.getCollector().getBlockColorSensor().getBlockColor());
+            telemetry.addData("validated block color sensor", robot.getCollector().getBlockColorSensor().getValidatedColor());
             telemetry.addData("magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
 
             telemetry.addData("", "");
@@ -103,7 +104,8 @@ public class TeleMain extends LinearOpMode {
         listenForHangingInput();
     }
     private void listenForDriveTrainInput() {
-        final double STRAFE_AMP = 0.2;
+        final double STRAFE_X_AMP = 0.3;
+        final double STRAFE_Y_AMP = 0.5;
         final double TURN_AMP = 0.8;
 
         int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
@@ -111,7 +113,7 @@ public class TeleMain extends LinearOpMode {
 
         if (strafeDirX != 0 || strafeDirY != 0)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(-strafeDirX * STRAFE_AMP, -strafeDirY * STRAFE_AMP),
+                    new Vector2d(strafeDirX * STRAFE_X_AMP, -strafeDirY * STRAFE_Y_AMP),
                     0
             ));
         else
@@ -139,8 +141,6 @@ public class TeleMain extends LinearOpMode {
                 robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
             else
                 robot.getExtension().setTargetPower(0);
-        else
-            robot.getExtension().setTargetPower(0);
 
         // right trigger toggle between (hinging down and collecting) and (hinging up and doing nothing)
         // or do a short extension and collection
@@ -164,13 +164,13 @@ public class TeleMain extends LinearOpMode {
 
         // force spit in case block gets stuck - spits as long as gamepad up is pressed
         if (input.getGamepadTracker2().isDpadUpPressed()) {
-            collectorManager.tryEnterState(Collector.StateType.SPITTING_TEMP);
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
             ((SpitTempState) collectorManager.getState(Collector.StateType.SPITTING_TEMP)).continueRunning();
         }
 
         // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
         if (input.getGamepadTracker2().isDpadDownPressed()) {
-            collectorManager.tryEnterState(Collector.StateType.COLLECTING_TEMP);
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
             ((CollectTempState) collectorManager.getState(Collector.StateType.COLLECTING_TEMP)).continueRunning();
         }
     }
@@ -228,11 +228,12 @@ public class TeleMain extends LinearOpMode {
 
         // button for "going back" a state
         else if(input.getGamepadTracker1().isFirstFrameB())
-            // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
-            if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS) {
-                robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
-            }
+            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA)
+                // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
+                if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS) {
+                    robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                    robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                }
     }
     private void listenForHangingInput() {
         //temp code

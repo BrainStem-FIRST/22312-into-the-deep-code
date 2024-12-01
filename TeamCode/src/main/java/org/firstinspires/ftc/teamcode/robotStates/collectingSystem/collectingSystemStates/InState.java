@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSy
 
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class InState extends RobotState<CollectingSystem.StateType> {
@@ -11,6 +12,9 @@ public class InState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
+        if(isFirstTime())
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.IN);
     }
 
     @Override

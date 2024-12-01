@@ -30,11 +30,16 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                     robot.getLift().getTransitionState().overrideGoalPosition(Lift.LOW_BASKET_POS);
                     // robot.telemetry.addData("basket overriding during transition", "");
                 }
+                /*
+                optimization does not work; i don't know why
                 // moves arm down once lift is within range of basket (not necessarily there yet)
                 else if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
                 && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getBasketDepositPos() + Lift.DESTINATION_THRESHOLD)
                     robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+                 */
             }
+            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
+                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         }
     }
 

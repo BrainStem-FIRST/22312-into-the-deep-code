@@ -71,9 +71,13 @@ public class MecanumDrive {
         public double trackWidthTicks = 13.3;
 
         // feedforward parameters (in tick units)
-        //kV: 0.12504742479896142, kS: 1.3485526249886965
-        public double kS = 1.3485526249886965;
-        public double kV = 0.12504742479896142;
+        //kV: 0.12504742479896142, kS: 1.3485526249886965 - old drive train wheel
+
+        //kV: 0.11317455989887892, kS: 1.8700713414390546
+        //kV: 0.1266521585226321, kS: 1.5614699855777028 - using this one
+        //kV: 0.1201806128479095, kS: 1.6376632409738496
+        public double kS = 1.5614699855777028;
+        public double kV = 0.1266521585226321;
         public double kA = 0.052;
 
         // path profile parameters (in inches)

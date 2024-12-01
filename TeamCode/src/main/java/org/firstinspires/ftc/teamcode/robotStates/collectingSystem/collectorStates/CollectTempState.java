@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -26,7 +27,8 @@ public class CollectTempState extends RobotState<Collector.StateType> {
         framesRunning++;
 
         // tell robot that block is not ready for transfer
-        robot.setCanTransfer(false);
+        if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
+            robot.setCanTransfer(false);
     }
 
     @Override

@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
-import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
 
@@ -13,8 +10,10 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
+        if (isFirstTime()) {
+            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
+            robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
+        }
     }
 
     @Override
@@ -30,9 +29,12 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
     @Override
     public boolean isDone() {
         boolean isDone = robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.SHORT_EXTEND_POSITION;
-        if (isDone)
+        if (isDone) {
             robot.getExtension().setTargetPower(0);
-        return isDone;
+            robot.getExtension().setExtensionMotorPower(0);
+            return true;
+        }
+        return false;
     }
 
     @Override
