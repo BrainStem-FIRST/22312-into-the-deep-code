@@ -136,6 +136,9 @@ public class BrainSTEMRobot {
     public BlockColor getColorFromAlliance() {
         return allianceColor == AllianceColor.BLUE ? BlockColor.BLUE : BlockColor.RED;
     }
+    public boolean canCollect() {
+        return grabber.getBlockColorHeld() == BlockColor.NONE;
+    }
     public boolean canTransfer() {
         return canTransfer;
     }

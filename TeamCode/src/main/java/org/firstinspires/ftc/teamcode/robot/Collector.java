@@ -96,9 +96,6 @@ public class Collector extends Subsystem {
     public void setBlockColorInTrough(BlockColor blockColorInTrough) {
         this.blockColorInTrough = blockColorInTrough;
     }
-    public boolean canCollect() {
-        return blockColorInTrough == BlockColor.NONE;
-    }
     public boolean isCollecting() {
         return stateManager.getActiveStateType() == StateType.COLLECTING || stateManager.getActiveStateType() == StateType.COLLECTING_TEMP;
     }

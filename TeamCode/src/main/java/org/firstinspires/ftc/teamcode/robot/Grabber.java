@@ -18,9 +18,9 @@ public class Grabber extends Subsystem {
     public static final int MIN_TICK = 1210, MAX_TICK = 2400;
     public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
     public static final double FULL_ROTATION_TIME = 0.3;
-    //private boolean hasBlock = false, hasSpecimen = false;
     private BlockColor blockColorHeld;
     private boolean hasSpecimen;
+
     public enum StateType {
         OPEN, CLOSED, TRANSITION
     }

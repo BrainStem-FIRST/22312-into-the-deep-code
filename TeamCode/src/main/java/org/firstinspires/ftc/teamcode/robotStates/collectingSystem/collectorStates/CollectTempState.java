@@ -31,7 +31,7 @@ public class CollectTempState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getCollector().canCollect();
+        return robot.canCollect();
     }
 
     @Override

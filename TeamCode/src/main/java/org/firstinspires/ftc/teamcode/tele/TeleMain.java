@@ -80,7 +80,7 @@ public class TeleMain extends LinearOpMode {
 
             telemetry.addData("", "");
             telemetry.addData("block color in trough", robot.getCollector().getBlockColorInTrough());
-            telemetry.addData("can collect", robot.getCollector().canCollect());
+            telemetry.addData("can collect", robot.canCollect());
             telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
