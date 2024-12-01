@@ -33,9 +33,7 @@ public class Collector extends Subsystem {
     public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.5;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
-
-    // number of seconds to spit for
-    public static final double SPITTING_TIME = 1;
+    public static double SAFETY_SPIT_TIME = 0.8;
 
     public enum StateType {
         NOTHING,
@@ -51,6 +49,7 @@ public class Collector extends Subsystem {
 
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private final BlockColorSensor blockColorSensor;
+    private BlockColor blockColorInTrough;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -58,6 +57,7 @@ public class Collector extends Subsystem {
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
 
         blockColorSensor = new BlockColorSensor(hwMap, robot);
+        blockColorInTrough = BlockColor.NONE;
 
         stateManager = new StateManager<>(StateType.NOTHING);
         NothingState<StateType> nothingState = new NothingState<>(StateType.NOTHING);
@@ -87,7 +87,18 @@ public class Collector extends Subsystem {
         blockColorSensor.update(dt);
         stateManager.update(dt);
     }
-
+    public BlockColor getBlockColorInTrough() {
+        return blockColorInTrough;
+    }
+    public boolean hasValidBlockColor() {
+        return blockColorInTrough == robot.getColorFromAlliance() || blockColorInTrough == BlockColor.YELLOW;
+    }
+    public void setBlockColorInTrough(BlockColor blockColorInTrough) {
+        this.blockColorInTrough = blockColorInTrough;
+    }
+    public boolean canCollect() {
+        return blockColorInTrough == BlockColor.NONE;
+    }
     public boolean isCollecting() {
         return stateManager.getActiveStateType() == StateType.COLLECTING || stateManager.getActiveStateType() == StateType.COLLECTING_TEMP;
     }
@@ -99,7 +110,7 @@ public class Collector extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setSpindleMotorPower(Collector.MAX_SPIN_POWER);
-                return !robot.hasValidBlockColor();
+                return !hasValidBlockColor();
             }
         };
     }

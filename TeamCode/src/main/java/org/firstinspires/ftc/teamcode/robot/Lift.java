@@ -25,7 +25,7 @@ public class Lift extends Subsystem {
         LOW_RAM_BEFORE_POS = 320,
         LOW_RAM_AFTER_POS = 595,
         HIGH_RAM_BEFORE_POS = 750,
-        HIGH_RAM_AFTER_POS = 1840,
+        HIGH_RAM_AFTER_POS = 1860,
 
         LOW_BASKET_POS = 1700,
         LOW_BASKET_SAFETY_POS = 1680,
@@ -113,10 +113,16 @@ public class Lift extends Subsystem {
     }
 
     public int getRamBeforePos() {
-        return getRobot().isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
+        return robot.isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
     }
     public int getRamAfterPos() {
-        return getRobot().isHighRam() ? HIGH_RAM_AFTER_POS : LOW_RAM_AFTER_POS;
+        return robot.isHighRam() ? HIGH_RAM_AFTER_POS : LOW_RAM_AFTER_POS;
+    }
+    public int getBasketSafetyPos() {
+        return robot.isHighDeposit() ? HIGH_BASKET_SAFETY_POS : LOW_BASKET_SAFETY_POS;
+    }
+    public int getBasketDepositPos() {
+        return robot.isHighDeposit() ? HIGH_BASKET_POS : LOW_BASKET_POS;
     }
     public boolean atHighBasket() {
         return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&

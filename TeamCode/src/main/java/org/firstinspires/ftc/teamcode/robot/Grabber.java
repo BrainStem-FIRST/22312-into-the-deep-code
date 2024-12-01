@@ -18,7 +18,9 @@ public class Grabber extends Subsystem {
     public static final int MIN_TICK = 1210, MAX_TICK = 2400;
     public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
     public static final double FULL_ROTATION_TIME = 0.3;
-    private boolean hasBlock = false, hasSpecimen = false;
+    //private boolean hasBlock = false, hasSpecimen = false;
+    private BlockColor blockColorHeld;
+    private boolean hasSpecimen;
     public enum StateType {
         OPEN, CLOSED, TRANSITION
     }
@@ -32,6 +34,9 @@ public class Grabber extends Subsystem {
 
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
         grabServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
+
+        blockColorHeld = BlockColor.NONE;
+        hasSpecimen = false;
 
         stateManager = new StateManager<>(StateType.OPEN);
 
@@ -57,7 +62,7 @@ public class Grabber extends Subsystem {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
                 grabServo.setPosition(OPEN_POS);
-                return getTime() > 0.2;
+                return getTime() > FULL_ROTATION_TIME;
             }
         };
     }
@@ -67,7 +72,7 @@ public class Grabber extends Subsystem {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
                 grabServo.setPosition(CLOSE_POS);
-                return getTime() > 0.2;
+                return getTime() > FULL_ROTATION_TIME;
             }
         };
     }
@@ -77,16 +82,23 @@ public class Grabber extends Subsystem {
     public ServoImplEx getGrabServo() {
         return grabServo;
     }
-    public boolean getHasBlock() {
-        return hasBlock;
+    public BlockColor getBlockColorHeld() {
+        return blockColorHeld;
     }
-    public void setHasBlock(boolean hasBlock) {
-        this.hasBlock = hasBlock;
+    public boolean hasBlock() {
+        return blockColorHeld != BlockColor.NONE;
     }
-    public boolean getHasSpecimen() {
+    public boolean hasSpecimen() {
         return hasSpecimen;
+    }
+
+    public void setBlockColorHeld(BlockColor blockColorHeld) {
+        this.blockColorHeld = blockColorHeld;
+        hasSpecimen = false;
     }
     public void setHasSpecimen(boolean hasSpecimen) {
         this.hasSpecimen = hasSpecimen;
+        if(hasSpecimen)
+            setBlockColorHeld(robot.getColorFromAlliance());
     }
 }

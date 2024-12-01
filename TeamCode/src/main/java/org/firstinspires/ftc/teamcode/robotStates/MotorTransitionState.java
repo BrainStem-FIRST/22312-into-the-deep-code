@@ -51,6 +51,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
             pid.reset();
             pid.setTarget(goalPosition);
         }
+        stateManager.tryEnterState(stateType);
     }
 
     @Override

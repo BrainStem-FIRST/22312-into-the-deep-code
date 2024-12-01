@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
-import org.firstinspires.ftc.teamcode.robot.BlockColor;
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class CollectTempState extends RobotState<Collector.StateType> {
@@ -29,12 +26,12 @@ public class CollectTempState extends RobotState<Collector.StateType> {
         framesRunning++;
 
         // tell robot that block is not ready for transfer
-        robot.setBlockReadyForTransfer(false);
+        robot.setCanTransfer(false);
     }
 
     @Override
     public boolean canEnter() {
-        return robot.canCollect();
+        return robot.getCollector().canCollect();
     }
 
     @Override

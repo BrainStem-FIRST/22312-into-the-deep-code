@@ -11,22 +11,19 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.telemetry.addData("inside execute of basket to basket state of lifting system", "");
         // accounting switching baskets after arm is already down
-        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
-            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+        if(robot.getArm().getTransitionState().getGoalStatePosition() == Arm.BLOCK_DROP_POS)
+            robot.getArm().getTransitionState().overrideGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
 
         // accounting switching baskets before arm is down/once arm not down
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
-
-            // setting lift to transition to high basket if not there and need to be there
+            // overriding lift to transition to high/low basket if not there and need to be there
             if (robot.isHighDeposit() && !robot.getLift().atHighBasket())
-                    robot.getLift().getTransitionState().setGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
-
+                robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
             else if (!robot.isHighDeposit() && !robot.getLift().atLowBasket())
-                robot.getLift().getTransitionState().setGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+                robot.getLift().getTransitionState().overrideGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
 
-            // setting arm to lower once lift done transitioning (should make sense bc this conditional is only checked if arm is up
+            // setting arm to lower once lift done transitioning (should make sense bc this conditional is only checked if arm is at basket safety pos
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
                 robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         }

@@ -37,7 +37,6 @@ public class LiftingSystem {
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
         stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
-        stateManager.addState(StateType.RAM_TO_DROP_AREA, new RamToDropAreaState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
         stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
@@ -67,17 +66,17 @@ public class LiftingSystem {
     }
     public Action depositHigh() {
         return new SequentialAction(
-            robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS),
+            robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Subsystem.getServoTime(robot.getArm().getArmServo().getPosition(), Arm.BASKET_SAFETY_POS, Arm.FULL_ROTATION_TIME)),
             robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
-            robot.getArm().rotateTo(Arm.BLOCK_DROP_POS),
+            robot.getArm().rotateTo(Arm.BLOCK_DROP_POS, Subsystem.getServoTime(robot.getArm().getArmServo().getPosition(), Arm.BLOCK_DROP_POS, Arm.FULL_ROTATION_TIME)),
             robot.getGrabber().open()
         );
     }
     public Action lowerFromDeposit() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS),
+                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, robot.getArm().timeToRotateTo(Arm.BASKET_SAFETY_POS)),
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                robot.getArm().rotateTo(Arm.TRANSFER_POS)
+                robot.getArm().rotateTo(Arm.TRANSFER_POS, robot.getArm().timeToRotateTo(Arm.TRANSFER_POS))
         );
     }
 
@@ -85,7 +84,7 @@ public class LiftingSystem {
     public Action getSetupHighSpecimenRamInitial() {
         return new ParallelAction(
                 robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS)
+                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS))
         );
     }
     public Action getSetupHighSpecimenRam() {
@@ -93,7 +92,7 @@ public class LiftingSystem {
             robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
             new ParallelAction(
                 robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS)
+                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS))
             )
         );
     }
@@ -105,13 +104,13 @@ public class LiftingSystem {
     }
     public Action getResetHighSpecimenRam() {
         return new ParallelAction(
-            robot.getArm().rotateTo(Arm.TRANSFER_POS),
+            robot.getArm().rotateTo(Arm.TRANSFER_POS, robot.getArm().timeToRotateTo(Arm.TRANSFER_POS)),
             robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
         );
     }
     public Action getDropOffBlock() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BLOCK_DROP_POS),
+                robot.getArm().rotateTo(Arm.BLOCK_DROP_POS, robot.getArm().timeToRotateTo(Arm.BLOCK_DROP_POS)),
                 new ParallelAction(
                     robot.getGrabber().open(),
                     robot.getLift().moveTo(Lift.DROP_AREA_POS)

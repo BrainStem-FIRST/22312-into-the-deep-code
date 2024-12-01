@@ -13,6 +13,9 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
+        // resetting canTransfer to true every time we extend
+        if(isFirstTime())
+            robot.setCanTransfer(true);
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
             robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));

@@ -18,10 +18,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
             // only want to set lift state to be in transition if in trough; not if its already going up
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                if(robot.isHighDeposit())
-                    robot.getLift().getTransitionState().setGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
-                else
-                    robot.getLift().getTransitionState().setGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+                robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
 
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
                 // if and else if below checks for basket overriding
@@ -34,14 +31,10 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                     // robot.telemetry.addData("basket overriding during transition", "");
                 }
                 // moves arm down once lift is within range of basket (not necessarily there yet)
-                else if(robot.getLift().getLiftMotor().getCurrentPosition() >= (robot.isHighDeposit() ? Lift.HIGH_BASKET_SAFETY_POS : Lift.LOW_BASKET_SAFETY_POS) &&
-                        robot.getLift().getLiftMotor().getCurrentPosition() <= (robot.isHighDeposit() ? Lift.HIGH_BASKET_POS : Lift.LOW_BASKET_POS))
+                else if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
+                && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getBasketDepositPos() + Lift.DESTINATION_THRESHOLD)
                     robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
             }
-
-            // NON OPTIMIZED CODE: moving arm down after lift reach desired basket height
-            //else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
-            //    robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
         }
     }
 

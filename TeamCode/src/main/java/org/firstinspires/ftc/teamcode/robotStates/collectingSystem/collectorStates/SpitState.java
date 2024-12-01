@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SpitState extends RobotState<Collector.StateType> {
-
-    // after the block color sensor stops detecting the block, still spit for 1 second
-    public static double SAFETY_TIME = 0.8;
     private double startTime;
     public SpitState() {
         super(Collector.StateType.SPITTING);
@@ -43,7 +38,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && time - startTime > SAFETY_TIME;
+        return robot.getCollector().getBlockColorSensor().getBlockColor() == BlockColor.NONE && time - startTime > Collector.SAFETY_SPIT_TIME;
     }
 
     @Override

@@ -33,8 +33,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA &&
-                robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP;
     }
 
     @Override

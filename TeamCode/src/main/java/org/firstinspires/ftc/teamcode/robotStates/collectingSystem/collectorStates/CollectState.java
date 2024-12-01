@@ -16,7 +16,7 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.canCollect();
+        return robot.getCollector().canCollect();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        if (robot.hasValidBlockColor())
+        if (robot.getCollector().hasValidBlockColor())
             return Collector.StateType.VALID_BLOCK;
         return Collector.StateType.SPITTING;
     }

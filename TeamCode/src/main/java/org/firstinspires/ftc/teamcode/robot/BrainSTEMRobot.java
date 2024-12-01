@@ -16,17 +16,14 @@ public class BrainSTEMRobot {
     private final Hinge hinge;
     private final Collector collector;
     private final CollectingSystem collectingSystem;
-
     private final Grabber grabber;
     private final Arm arm;
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private BlockColor blockColorHeld;
-    private boolean isBlockReadyForTransfer;
-    private boolean isHighDeposit = true;
-    private boolean isHighRam = true;
-    private boolean depositMode = true;
+    private boolean canTransfer;
+    private boolean isHighDeposit;
+    private boolean isHighRam;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -47,8 +44,9 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        blockColorHeld = BlockColor.NONE;
-        isBlockReadyForTransfer = true;
+        canTransfer = true;
+        isHighDeposit = true;
+        isHighRam = true;
     }
 
     public void setup() {
@@ -138,23 +136,11 @@ public class BrainSTEMRobot {
     public BlockColor getColorFromAlliance() {
         return allianceColor == AllianceColor.BLUE ? BlockColor.BLUE : BlockColor.RED;
     }
-    public BlockColor getBlockColorHeld() {
-        return blockColorHeld;
+    public boolean canTransfer() {
+        return canTransfer;
     }
-    public boolean hasValidBlockColor() {
-        return getBlockColorHeld() == getColorFromAlliance() || getBlockColorHeld() == BlockColor.YELLOW;
-    }
-    public void setBlockColorHeld(BlockColor blockColorHeld) {
-        this.blockColorHeld = blockColorHeld;
-    }
-    public boolean isBlockReadyForTransfer() {
-        return isBlockReadyForTransfer;
-    }
-    public boolean canCollect() {
-        return blockColorHeld == BlockColor.NONE;
-    }
-    public void setBlockReadyForTransfer(boolean isBlockReadyForTransfer) {
-        this.isBlockReadyForTransfer = isBlockReadyForTransfer;
+    public void setCanTransfer(boolean canTransfer) {
+        this.canTransfer = canTransfer;
     }
     public boolean isHighDeposit() {
         return isHighDeposit;
@@ -167,11 +153,5 @@ public class BrainSTEMRobot {
     }
     public void setIsHighRam(boolean isHighRam) {
         this.isHighRam = isHighRam;
-    }
-    public boolean getDepositMode() {
-        return depositMode;
-    }
-    public void setDepositMode(boolean depositMode) {
-        this.depositMode = depositMode;
     }
 }

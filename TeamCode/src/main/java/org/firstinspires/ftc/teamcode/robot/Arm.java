@@ -53,15 +53,18 @@ public class Arm extends Subsystem {
         stateManager.update(dt);
     }
 
-    public Action rotateTo(double pos) {
+    public Action rotateTo(double pos, double timeDone) {
         return new TimedAction() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
                 armServo.setPosition(pos);
-                return getTime() > 0.3;
+                return getTime() > timeDone;
             }
         };
+    }
+    public double timeToRotateTo(double goalPos) {
+        return Subsystem.getServoTime(armServo.getPosition(), goalPos, FULL_ROTATION_TIME);
     }
 
     public StateManager<StateType> getStateManager() {

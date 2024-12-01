@@ -62,7 +62,7 @@ public class CollectingSystemExtensionTele extends LinearOpMode {
             robot.update(dt);
 
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
-            telemetry.addData("robot color held", robot.getBlockColorHeld());
+            telemetry.addData("block color held in trough", robot.getCollector().getBlockColorInTrough());
             telemetry.addData("color sensor color", robot.getCollector().getBlockColorSensor().getBlockColor());
             telemetry.addData("", "");
             telemetry.addData("b pressed", input.getGamepadTracker1().isBPressed());

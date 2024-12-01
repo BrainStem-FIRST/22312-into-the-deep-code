@@ -22,10 +22,6 @@ import org.firstinspires.ftc.teamcode.util.Input;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
-
-    private final double STRAFE_AMP = 0.2;
-    private final double TURN_AMP = 0.8;
-
     private Input input;
     private BrainSTEMRobot robot;
 
@@ -33,7 +29,6 @@ public class TeleMain extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         input = new Input(gamepad1, gamepad2);
         robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, AllianceColor.RED);
 
@@ -47,7 +42,7 @@ public class TeleMain extends LinearOpMode {
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
-        timeSinceStart = 0; // time since start of match
+        timeSinceStart = 0; // time since start of match; need for hanging
 
         while (opModeIsActive()) {
             // update dt
@@ -64,7 +59,6 @@ public class TeleMain extends LinearOpMode {
             robot.update(dt);
 
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
-            telemetry.addData("robot color held", robot.getBlockColorHeld());
 
             telemetry.addData("", "");
             telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
@@ -72,6 +66,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
 
             telemetry.addData("", "");
+            telemetry.addData("can transfer", robot.canTransfer());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
@@ -80,10 +75,12 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("lift motor power", robot.getLift().getLiftMotor().getPower());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
-            telemetry.addData("grabber has specimen", robot.getGrabber().getHasSpecimen());
-            telemetry.addData("grabber has block", robot.getGrabber().getHasBlock());
+            telemetry.addData("grabber has specimen", robot.getGrabber().hasSpecimen());
+            telemetry.addData("grabber block color", robot.getGrabber().getBlockColorHeld());
 
             telemetry.addData("", "");
+            telemetry.addData("block color in trough", robot.getCollector().getBlockColorInTrough());
+            telemetry.addData("can collect", robot.getCollector().canCollect());
             telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
             telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
@@ -106,6 +103,9 @@ public class TeleMain extends LinearOpMode {
         listenForHangingInput();
     }
     private void listenForDriveTrainInput() {
+        final double STRAFE_AMP = 0.2;
+        final double TURN_AMP = 0.8;
+
         int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
         int strafeDirY = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
 
@@ -194,35 +194,28 @@ public class TeleMain extends LinearOpMode {
         if(input.getGamepadTracker1().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
-                    if(!robot.isBlockReadyForTransfer())
-                        robot.setBlockReadyForTransfer(true);
-                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        if(robot.getBlockColorHeld() == BlockColor.YELLOW)
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        else if(robot.getBlockColorHeld() == robot.getColorFromAlliance())
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
+                    if(!robot.canTransfer())
+                        // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
+                        robot.setCanTransfer(true);
+                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY && robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW)
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                     break;
-                case TROUGH_TO_BASKET:
-                case BASKET_TO_BASKET:
-                    if(robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.TRANSITION ||
-                        robot.getArm().getTransitionState().getGoalStatePosition() != Arm.BLOCK_DROP_POS)
-                        break;
                 case BASKET_DEPOSIT:
                     robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_TROUGH);
                     break;
-                case TROUGH_TO_DROP_AREA:
-                    // purpose of this is to also allow toggling of grabber while arm is in place; its just the lifting system is still in transition bc the lift has not fully lowered
-                    if(robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.BLOCK_DROP)
-                        break;
                 case DROP_AREA:
+                    // what to do if grabber is closed
                     if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                        if(robot.getGrabber().getHasSpecimen())
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
-                        else {
+                        // if doesn't have specimen (means has block) then open grabber to drop off block
+                        if(!robot.getGrabber().hasSpecimen()) {
                             robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                            robot.getGrabber().setHasBlock(false);
+                            robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                         }
+                        // if has specimen then proceed to prep for ram
+                        else
+                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
                     }
+                    // grabbing specimen if grabber is open
                     else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                         robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                         robot.getGrabber().setHasSpecimen(true);
@@ -235,23 +228,11 @@ public class TeleMain extends LinearOpMode {
 
         // button for "going back" a state
         else if(input.getGamepadTracker1().isFirstFrameB())
-            if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS) {
-                robot.getGrabber().getTransitionState().overrideGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
-                robot.getGrabber().setHasSpecimen(true);
-            }
-            else if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS) {
+            // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
+            if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS) {
                 robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                robot.getGrabber().setHasSpecimen(false);
-                robot.getGrabber().setHasBlock(false);
+                robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
             }
-            /*
-            // backtracking if fail to grab specimen
-            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.SPECIMEN_RAM &&
-                    robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE) {
-                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_DROP_AREA);
-                robot.getGrabber().setHasSpecimen(false);
-            }
-             */
     }
     private void listenForHangingInput() {
         //temp code

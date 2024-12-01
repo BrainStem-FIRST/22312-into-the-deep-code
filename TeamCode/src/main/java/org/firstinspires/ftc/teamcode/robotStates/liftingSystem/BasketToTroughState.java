@@ -18,12 +18,11 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
         // if lift still at position of basket depositing
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // releasing block
-            if(robot.getGrabber().getHasBlock()) {
+            if(robot.getGrabber().hasBlock()) {
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                robot.getGrabber().setHasBlock(false);
-                robot.setBlockColorHeld(BlockColor.NONE);
+                robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
             }
-            // resetting after block is released
+            // resetting after grabber is open
             else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                 // moving arm up if arm still at left position
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
