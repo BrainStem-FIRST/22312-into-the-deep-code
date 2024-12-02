@@ -5,16 +5,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToBasketState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToTroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaToRamState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaToTroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.RamToDropAreaState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.RamToTroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughToBasketState;
-import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.TroughToDropAreaState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class LiftingSystem {
@@ -38,10 +29,10 @@ public class LiftingSystem {
         stateManager.addState(StateType.BASKET_TO_TROUGH, new BasketToTroughState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
         stateManager.addState(StateType.DROP_AREA, new DropAreaState());
-        //stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
         stateManager.addState(StateType.DROP_AREA_TO_TROUGH, new DropAreaToTroughState());
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
+        // stateManager.addState(StateType.SPECIMEN_RAM, new SpecimenRamState());
         stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
         stateManager.setupStates(robot, stateManager);
