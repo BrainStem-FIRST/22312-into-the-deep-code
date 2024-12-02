@@ -45,20 +45,15 @@ public class Hanger extends Subsystem {
         transitionState.setEncoderBounds(FULL_DOWN_TICK, UP_TICK);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
-        stateManager.setupStates(getRobot(), stateManager);
+        stateManager.setupStates(robot, stateManager);
     }
 
     public StateManager<StateType> getStateManager() { return stateManager; }
-
     public DcMotorEx getHangMotor() {
         return hangMotor;
     }
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
-    }
-
-    public void setHangMotorPosition(int position) {
-        Subsystem.setMotorPosition(hangMotor, position);
     }
     public void setHangMotorPower(double power) {
         Subsystem.setMotorPower(hangMotor, power);

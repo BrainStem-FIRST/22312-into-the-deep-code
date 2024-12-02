@@ -14,17 +14,10 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-
-        // reset canTransfer so the actions of collecting and spitting temp of prev block do not affect
-        // this collection cycle
-        if (isFirstTime())
-            robot.setCanTransfer(true);
-
         // hard stop
-        int minPos = robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT ? Extension.MIN_SEARCH_AND_COLLECT_POSITION : Extension.MIN_POSITION;
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
             robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < minPos)
+        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)
             robot.getExtension().setTargetPower(Math.max(0, robot.getExtension().getTargetPower()));
 
         // move extension
@@ -33,7 +26,7 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.JUMP_TO_MIN;
     }
 
     @Override

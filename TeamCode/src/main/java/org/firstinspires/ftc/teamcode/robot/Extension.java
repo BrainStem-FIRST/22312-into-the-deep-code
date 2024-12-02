@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlockState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.JumpToMin;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -25,19 +26,18 @@ public class Extension extends Subsystem {
     // max position
     public static final int MAX_POSITION = 1680;
 
-    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 620;
+    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 500;
 
-    public static int SHORT_EXTEND_POSITION = 620;
+    public static int SHORT_EXTEND_POSITION = 500;
     // threshold whenever extension is going to a target position
     public static int GO_TO_THRESHOLD = 10;
 
-    // TODO - implement magnet sensor and encoder reset
     public static final double SEARCH_POWER = 0.55;
     public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.3, RETRACT_POWER_IN = -0.1;
     public static final int RETRACT_SLOW_POSITION = 300;
 
     public enum StateType {
-        IN, FINDING_BLOCK, RETRACTING
+        IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
     }
     private final PIDController pid;
     private final DcMotorEx extensionMotor;
@@ -65,6 +65,7 @@ public class Extension extends Subsystem {
         stateManager = new StateManager<>(StateType.IN);
 
         stateManager.addState(StateType.IN, new InState());
+        stateManager.addState(StateType.JUMP_TO_MIN, new JumpToMin());
         stateManager.addState(StateType.FINDING_BLOCK, new FindingBlockState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 

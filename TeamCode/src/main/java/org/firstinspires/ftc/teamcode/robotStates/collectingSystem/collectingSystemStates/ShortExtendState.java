@@ -10,10 +10,8 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if (isFirstTime()) {
-            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
-            robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-        }
+        if (isFirstTime())
+            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.JUMP_TO_MIN);
     }
 
     @Override
@@ -28,13 +26,7 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        boolean isDone = robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.SHORT_EXTEND_POSITION;
-        if (isDone) {
-            robot.getExtension().setTargetPower(0);
-            robot.getExtension().setExtensionMotorPower(0);
-            return true;
-        }
-        return false;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.FINDING_BLOCK;
     }
 
     @Override
