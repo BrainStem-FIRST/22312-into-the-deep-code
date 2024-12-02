@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
+
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchAndCollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
@@ -63,16 +66,32 @@ public class CollectingSystem {
     }
 
     public Action extendAndCollectAction(int extendMotorTick) {
-        return new SequentialAction(
-                getRobot().getExtension().extendAction(extendMotorTick),
-                getRobot().getHinge().hingeDownAction(),
-                getRobot().getCollector().collectAction()
+        return new ParallelAction(
+                new SequentialAction(
+                        getRobot().getExtension().extendAction(extendMotorTick)//,
+                        //getRobot().getExtension().slowExtendAction()
+                ),
+
+                getRobot().getCollector().collectAction(),
+
+                new SequentialAction(
+                        new SleepAction(0.1),
+                        new ParallelAction(
+                                new SequentialAction(
+                                        getRobot().getHinge().hingeDownAction(),
+                                        getRobot().getHinge().shakeHingeDown()
+                                )
+                        )
+                )
+
         );
     }
     public Action retractAction() {
-        return new SequentialAction(
+        return new ParallelAction(
+            getRobot().getCollector().collectUntilHardStop(),
+            new SequentialAction(
                 getRobot().getHinge().hingeUpAction(),
                 getRobot().getExtension().retractAction()
-        );
+        ));
     }
 }

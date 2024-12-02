@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
@@ -49,72 +50,64 @@ public class LiftingSystem {
         return stateManager;
     }
 
-    // depositing actions
     public Action transferBlock() {
         return new SequentialAction(
-            new ParallelAction(
-                robot.getLift().moveTo(Lift.TROUGH_POS),
-                robot.getGrabber().open()),
+            robot.getLift().moveTo(Lift.TROUGH_POS),
             robot.getGrabber().close(),
             robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
         );
     }
+    public Action transferToDropOff() {
+        return new SequentialAction(
+                robot.getArm().rotateTo(Arm.DROP_OFF_POS, robot.getArm().timeToRotateTo(Arm.DROP_OFF_POS)),
+                robot.getLift().moveTo(Lift.DROP_AREA_POS)
+        );
+    }
     public Action depositHigh() {
         return new SequentialAction(
-            robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Subsystem.getServoTime(robot.getArm().getArmServo().getPosition(), Arm.BASKET_SAFETY_POS, Arm.FULL_ROTATION_TIME)),
-            robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
-            robot.getArm().rotateTo(Arm.BLOCK_DROP_POS, Subsystem.getServoTime(robot.getArm().getArmServo().getPosition(), Arm.BLOCK_DROP_POS, Arm.FULL_ROTATION_TIME)),
-            robot.getGrabber().open()
+            robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, 0.4),
+            robot.getLift().moveTo(Lift.HIGH_BASKET_SAFETY_POS),
+            new ParallelAction(
+                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0.4),
+                    robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
+                    new SequentialAction(
+                            new SleepAction(0.2),
+                            robot.getGrabber().open()
+                    )
+            )
         );
     }
     public Action lowerFromDeposit() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, robot.getArm().timeToRotateTo(Arm.BASKET_SAFETY_POS)),
+                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, 0.3),
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
                 robot.getArm().rotateTo(Arm.TRANSFER_POS, robot.getArm().timeToRotateTo(Arm.TRANSFER_POS))
         );
     }
 
     // specimen actions
-    public Action getSetupHighSpecimenRamInitial() {
-        return new ParallelAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS))
-        );
-    }
-    public Action getSetupHighSpecimenRam() {
+    public Action setupHighSpecimenRam() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
+            new ParallelAction(
+                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
+                robot.getGrabber().close()),
             new ParallelAction(
                 robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS))
-            )
+                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS)))
         );
     }
-    public Action getRamHighSpecimen() {
+    public Action ramHighSpecimen() {
         return new SequentialAction(
                 robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS),
                 robot.getGrabber().open()
         );
     }
-    public Action getResetHighSpecimenRam() {
+    public Action resetSpecimenRam() {
         return new SequentialAction(
-            robot.getArm().rotateTo(Arm.TRANSFER_POS, robot.getArm().timeToRotateTo(Arm.TRANSFER_POS)),
-            robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
-        );
-    }
-    public Action getDropOffBlock() {
-        return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BLOCK_DROP_POS, robot.getArm().timeToRotateTo(Arm.BLOCK_DROP_POS)),
-                new ParallelAction(
-                    robot.getGrabber().open(),
-                    robot.getLift().moveTo(Lift.DROP_AREA_POS)
-                )
-        );
-    }
-    public Action getPickUpSpecimen() {
-        return new SequentialAction(
-                robot.getGrabber().close()
+            robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_HANG_TO_UP_TIME),
+            new ParallelAction(
+                robot.getArm().rotateTo(Arm.TRANSFER_POS, robot.getArm().timeToRotateTo(Arm.TRANSFER_POS)),
+                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS))
         );
     }
 }

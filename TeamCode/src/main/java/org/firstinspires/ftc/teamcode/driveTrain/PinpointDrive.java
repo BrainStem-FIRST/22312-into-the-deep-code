@@ -2,8 +2,16 @@ package org.firstinspires.ftc.teamcode.driveTrain;
 
 
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Trajectory;
+import com.acmerobotics.roadrunner.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
@@ -138,5 +146,52 @@ public class PinpointDrive extends MecanumDrive {
     }
 
 
+    // moves in spline with constant heading
+    public Action splineToConstantHeading(Vector2d pos, double heading) {
+        updatePoseEstimate();
+        return actionBuilder(pose)
+                .splineToConstantHeading(pos, heading)
+                .build();
+    }
+    public Action lineToX(double x) {
+        updatePoseEstimate();
+        if (x == pose.position.x)
+            return telemetryPacket -> false;
 
+        return actionBuilder(pose).
+                lineToX(x)
+                .build();
+    }
+    public Action lineToY(double y) {
+        updatePoseEstimate();
+        if (y == pose.position.y)
+            return telemetryPacket -> false;
+
+        return actionBuilder(pose).
+                lineToY(y)
+                .build();
+    }
+    public Action turnTo(double heading) {
+        updatePoseEstimate();
+        if (heading == pose.heading.toDouble())
+            return telemetryPacket -> false;
+
+        return actionBuilder(pose)
+                .turnTo(heading)
+                .build();
+    }
+    // moves in a straight line to a target position and heading
+    public Action lineToPos(Vector2d pos, double heading) {
+        return new ParallelAction(
+                lineToX(pos.x),
+                lineToY(pos.y),
+                turnTo(heading)
+        );
+    }
+    public Action lineToPos(Vector2d pos) {
+        return new ParallelAction(
+                lineToX(pos.x),
+                lineToY(pos.y)
+        );
+    }
 }

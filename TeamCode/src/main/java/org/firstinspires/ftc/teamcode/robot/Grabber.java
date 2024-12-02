@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -57,22 +59,32 @@ public class Grabber extends Subsystem {
     }
 
     public Action open() {
-        return new TimedAction() {
+        return new SequentialAction(
+                openServo(),
+                new SleepAction(FULL_ROTATION_TIME)
+        );
+    }
+    public Action close() {
+        return new SequentialAction(
+                closeServo(),
+                new SleepAction(FULL_ROTATION_TIME)
+        );
+    }
+    private Action openServo() {
+        return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
                 grabServo.setPosition(OPEN_POS);
-                return getTime() > FULL_ROTATION_TIME;
+                return false;
             }
         };
     }
-    public Action close() {
-        return new TimedAction() {
+    private Action closeServo() {
+        return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
                 grabServo.setPosition(CLOSE_POS);
-                return getTime() > FULL_ROTATION_TIME;
+                return false;
             }
         };
     }

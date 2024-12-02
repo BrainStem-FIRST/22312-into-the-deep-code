@@ -16,9 +16,10 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
         // if lift in safety pos
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
             // moving arm from down to left
-            robot.getArm().getTransitionState().overrideGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+            if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
+                robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF);
             // moving lift to drop area once arm is done
-            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
+            else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF)
                 robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
     }
 
@@ -30,7 +31,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

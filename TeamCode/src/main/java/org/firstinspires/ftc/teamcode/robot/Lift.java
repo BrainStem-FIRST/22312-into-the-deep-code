@@ -20,7 +20,7 @@ public class Lift extends Subsystem {
     private final PIDController pid;
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
     public static int ABSOLUTE_MIN = -5, TROUGH_POS = ABSOLUTE_MIN;
-    public static final int TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
+    public static final int TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 5,
         DROP_AREA_AFTER_POS = 30,
         LOW_RAM_BEFORE_POS = 320,
@@ -28,10 +28,10 @@ public class Lift extends Subsystem {
         HIGH_RAM_BEFORE_POS = 750,
         HIGH_RAM_AFTER_POS = 1860,
 
-        LOW_BASKET_POS = 1700,
-        LOW_BASKET_SAFETY_POS = 1650,
-        HIGH_BASKET_POS = 3400,
-        HIGH_BASKET_SAFETY_POS = 3350,
+        LOW_BASKET_POS = 1418,
+        LOW_BASKET_SAFETY_POS = 1134,
+        HIGH_BASKET_POS = 3230,
+        HIGH_BASKET_SAFETY_POS = 2900,
         ABSOLUTE_MAX = 3420;
 
     public static final int DESTINATION_THRESHOLD = 20;
@@ -74,14 +74,11 @@ public class Lift extends Subsystem {
     }
 
     public Action moveTo(int target) {
-        return new TimedAction() {
+        return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
-                int dif = target - liftMotor.getCurrentPosition();
-                liftMotor.setPower(Math.signum(dif) * FULL_POWER);
-
-                return Subsystem.inRange(liftMotor, target, DESTINATION_THRESHOLD);
+                Subsystem.setMotorPosition(liftMotor, target);
+                return !Subsystem.inRange(liftMotor, target, DESTINATION_THRESHOLD);
             }
         };
     }

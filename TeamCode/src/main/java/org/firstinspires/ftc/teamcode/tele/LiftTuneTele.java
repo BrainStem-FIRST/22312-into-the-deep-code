@@ -37,7 +37,7 @@ public class LiftTuneTele extends LinearOpMode {
             else if(gamepad1.y)
                 armServo.setPosition(Arm.BASKET_SAFETY_POS);
             else if(gamepad1.x)
-                armServo.setPosition(Arm.BLOCK_DROP_POS);
+                armServo.setPosition(Arm.DROP_OFF_POS);
 
             if(gamepad1.dpad_left)
                 grabberServo.setPosition(0.99);

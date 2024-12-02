@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -16,9 +18,12 @@ import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class Hinge extends Subsystem {
+    public static final int AUTO_SHAKE_FRAMES = 10;
+    private boolean isFullyDown;
+    public static final double HINGE_SHAKE_DOWN_POSITION = 0.6;
     public static final int HINGE_UP_TICK = 2150, HINGE_DOWN_TICK = 1480;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.5;
-    public static double FULL_ROTATION_TIME = 0.3;
+    public static double FULL_ROTATION_TIME = 0.2;
 
     public enum StateType {
         UP,
@@ -30,6 +35,7 @@ public class Hinge extends Subsystem {
     private final StateManager<StateType> stateManager;
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx hingeServo;
+
     public Hinge(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
 
@@ -65,21 +71,45 @@ public class Hinge extends Subsystem {
         stateManager.update(dt);
     }
 
-    public Action hingeUpAction() {
-        return new TimedAction() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setHingeServoPosition(HINGE_UP_POSITION);
-                return getTime() < FULL_ROTATION_TIME;
-            }
+    private Action hingeServoUp() {
+        return telemetryPacket -> {
+            setHingeServoPosition(HINGE_UP_POSITION);
+            return false;
         };
     }
+    private Action hingeServoDown() {
+        return telemetryPacket -> {
+            setHingeServoPosition(HINGE_DOWN_POSITION);
+            return false;
+        };
+    }
+    public Action hingeUpAction() {
+        return new SequentialAction(
+                hingeServoUp(),
+                new SleepAction(FULL_ROTATION_TIME)
+        );
+    }
     public Action hingeDownAction() {
+        return new SequentialAction(
+                hingeServoDown(),
+                new SleepAction(FULL_ROTATION_TIME)
+        );
+    }
+
+    public Action shakeHingeDown() {
         return new TimedAction() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setHingeServoPosition(HINGE_DOWN_POSITION);
-                return getTime() < FULL_ROTATION_TIME;
+                updateFramesRunning();
+                if (getFramesRunning() % AUTO_SHAKE_FRAMES == 0) {
+                    isFullyDown = !isFullyDown;
+
+                    if (isFullyDown)
+                        setHingeServoPosition(HINGE_DOWN_POSITION);
+                    else
+                        setHingeServoPosition(HINGE_SHAKE_DOWN_POSITION);
+                }
+                return getRobot().getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE;
             }
         };
     }

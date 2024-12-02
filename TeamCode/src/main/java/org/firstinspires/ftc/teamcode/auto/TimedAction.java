@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class TimedAction implements Action {
     
-    private ElapsedTime timer;
+    private final ElapsedTime timer;
     private int framesRunning;
 
     public TimedAction() {

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -33,6 +35,29 @@ public class BrainSTEMRobot {
         this.allianceColor = allianceColor;
 
         driveTrain = new PinpointDrive(hwMap, new Pose2d(0, 0, 0));
+
+        collector = new Collector(hwMap, telemetry, allianceColor, this);
+        extension = new Extension(hwMap, telemetry, allianceColor, this);
+        hinge = new Hinge(hwMap, telemetry, allianceColor, this);
+        collectingSystem = new CollectingSystem(this);
+
+        grabber = new Grabber(hwMap, telemetry, allianceColor, this);
+        arm = new Arm(hwMap, telemetry, allianceColor, this);
+        lift = new Lift(hwMap, telemetry, allianceColor, this);
+        liftingSystem = new LiftingSystem(this);
+
+        hanger = new Hanger(hwMap, telemetry, allianceColor, this);
+
+        canTransfer = true;
+        isHighDeposit = true;
+        isHighRam = true;
+        isDepositing = true;
+    }
+    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, Pose2d beginPose) {
+        this.telemetry = telemetry;
+        this.allianceColor = allianceColor;
+
+        driveTrain = new PinpointDrive(hwMap, beginPose);
 
         collector = new Collector(hwMap, telemetry, allianceColor, this);
         extension = new Extension(hwMap, telemetry, allianceColor, this);
@@ -175,5 +200,14 @@ public class BrainSTEMRobot {
     }
     public void setIsDepositing(boolean isDepositing) {
         this.isDepositing = isDepositing;
+    }
+
+    public Action retractAndTransferAndDeposit() {
+        return new SequentialAction(
+                getCollectingSystem().retractAction(),
+                getCollector().stopCollector(),
+                getLiftingSystem().transferBlock(),
+                getLiftingSystem().depositHigh()
+        );
     }
 }

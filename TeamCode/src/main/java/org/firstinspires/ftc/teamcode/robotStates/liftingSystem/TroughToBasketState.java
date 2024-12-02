@@ -34,10 +34,10 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 // moves arm down once lift is within range of basket (not necessarily there yet)
                 if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
                 && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
-                    robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
             }
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
-                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
         }
     }
 
@@ -53,7 +53,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP;
     }
 
     @Override

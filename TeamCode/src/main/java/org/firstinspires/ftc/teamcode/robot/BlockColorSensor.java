@@ -107,6 +107,10 @@ public class BlockColorSensor {
         return currentTime > BLOCK_COLOR_VALIDATION_TIME;
     }
 
+    public BlockColor getRawBlockColor() {
+        updatedBlockColor = false;
+        return getBlockColor();
+    }
 
     private int red() {
         return colorSensor.red();

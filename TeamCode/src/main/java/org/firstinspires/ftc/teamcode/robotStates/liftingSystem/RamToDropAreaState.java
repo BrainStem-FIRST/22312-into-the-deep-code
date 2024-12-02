@@ -12,7 +12,7 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+        robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF);
         robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
         robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
     }
@@ -31,7 +31,7 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean isDone() {
         return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA &&
-                robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP &&
+                robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF &&
                 robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN;
     }
 

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,11 +21,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 public class Extension extends Subsystem {
+    public static final double AUTO_SLOW_EXTEND_POWER = 0.3;
 
     // TODO: find extension encoder ticks for these 3
     public static final int MIN_POSITION = 5;
     // max position
-    public static final int MAX_POSITION = 1680;
+    public static final int MAX_POSITION = 1880;
 
     public static final int MIN_SEARCH_AND_COLLECT_POSITION = 500;
 
@@ -33,8 +35,8 @@ public class Extension extends Subsystem {
     public static int GO_TO_THRESHOLD = 10;
 
     public static final double SEARCH_POWER = 0.55;
-    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.3, RETRACT_POWER_IN = -0.1;
-    public static final int RETRACT_SLOW_POSITION = 300;
+    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.6, RETRACT_POWER_IN = -0.1;
+    public static final int RETRACT_SLOW_POSITION = 200;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
@@ -114,8 +116,35 @@ public class Extension extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setExtensionMotorPosition(targetPosition);
-                return Subsystem.inRange(getExtensionMotor(), targetPosition, GO_TO_THRESHOLD);
+                return !Subsystem.inRange(getExtensionMotor(), targetPosition, GO_TO_THRESHOLD);
                 //return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
+            }
+        };
+    }
+    public Action slowExtendAction() {
+        return new SequentialAction(
+                slowExtensionAction(),
+                stopExtensionAction()
+        );
+    }
+    private Action slowExtensionAction() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (getExtensionMotor().getCurrentPosition() < Extension.MAX_POSITION)
+                    setExtensionMotorPower(Extension.AUTO_SLOW_EXTEND_POWER);
+                else
+                    return false;
+                return getRobot().getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE;
+            }
+        };
+    }
+    public Action stopExtensionAction() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setExtensionMotorPower(0);
+                return false;
             }
         };
     }
@@ -133,7 +162,7 @@ public class Extension extends Subsystem {
                 //  setExtensionMotorPower(Extension.RETRACT_POWER_FAST);
                 retractExtensionMotor();
 
-                if (isMagnetSwitchActivated()) {
+                if (hitRetractHardStop()) {
                     setExtensionMotorPower(0);
                     return false;
                 }

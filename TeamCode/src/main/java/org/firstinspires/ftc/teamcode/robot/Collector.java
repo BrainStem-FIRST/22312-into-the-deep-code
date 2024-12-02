@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
@@ -30,8 +31,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Collector extends Subsystem {
 
-    public static final double MAX_SPIN_POWER = 0.8;
-    public static final double COLLECT_TEMP_POWER = 0.5, SPIT_TEMP_POWER = 0.5;
+    public static final int AUTO_COLOR_VALIDATION_REQUIRED = 3;
+    public static final double MAX_SPIN_POWER = 0.85;
+    public static final double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = 0.5;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.8;
@@ -51,6 +53,7 @@ public class Collector extends Subsystem {
     // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private final BlockColorSensor blockColorSensor;
     private BlockColor blockColorInTrough;
+    private int autoColorValidationFrames;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -103,11 +106,43 @@ public class Collector extends Subsystem {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
     public Action collectAction() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateFramesRunning();
+                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+                if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
+                    autoColorValidationFrames++;
+                else
+                    autoColorValidationFrames = 0;
+                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED && getFramesRunning() < 30;
+            }
+        };
+    }
+    public Action collectUntilHardStop() {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
-                return !hasValidBlockColor();
+                setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
+                return !robot.getExtension().hitRetractHardStop();
+            }
+        };
+    }
+    public Action spit() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
+                return false;
+            }
+        };
+    }
+    public Action stopCollector() {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                setSpindleMotorPower(0);
+                return false;
             }
         };
     }

@@ -76,7 +76,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     // only can be overridden if lift is at trough safety and if grabber has block
     @Override
     public boolean canBeOverridden() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY && robot.getGrabber().hasBlock();
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override

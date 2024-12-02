@@ -68,6 +68,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
 
             telemetry.addData("", "");
+            telemetry.addData("is depositing", robot.isDepositing());
             telemetry.addData("can transfer", robot.canTransfer());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
@@ -204,15 +205,8 @@ public class TeleMain extends LinearOpMode {
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
                     else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                         // activating transition to deposit in basket
-                        if(robot.isDepositing())
+                        if(robot.isDepositing() && robot.getGrabber().hasBlock())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                        // transitioning to drop area state (if need to pick up specimen)
-                        else
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
-                    break;
-
-                case DROP_AREA_TO_TROUGH:
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                     break;
 
                 case BASKET_DEPOSIT:
@@ -250,12 +244,18 @@ public class TeleMain extends LinearOpMode {
         // button for "going back" a state
         else if(input.getGamepadTracker1().isFirstFrameB())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
-
+                case TROUGH:
+                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
                 case DROP_AREA:
                     // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
                     if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS) {
-                        robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                        robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                        if(!robot.getGrabber().hasSpecimen())
+                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+                        else {
+                            robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                            robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                        }
                     }
                     // resetting lifting system to trough for transfer again
                     else if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS)
