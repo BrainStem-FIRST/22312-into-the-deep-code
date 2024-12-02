@@ -25,6 +25,7 @@ public class BrainSTEMRobot {
     private boolean canTransfer;
     private boolean isHighDeposit;
     private boolean isHighRam;
+    private boolean isDepositing;
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -48,6 +49,7 @@ public class BrainSTEMRobot {
         canTransfer = true;
         isHighDeposit = true;
         isHighRam = true;
+        isDepositing = true;
     }
 
     public void setup() {
@@ -167,5 +169,11 @@ public class BrainSTEMRobot {
     }
     public void setIsHighRam(boolean isHighRam) {
         this.isHighRam = isHighRam;
+    }
+    public boolean isDepositing() {
+        return isDepositing;
+    }
+    public void setIsDepositing(boolean isDepositing) {
+        this.isDepositing = isDepositing;
     }
 }

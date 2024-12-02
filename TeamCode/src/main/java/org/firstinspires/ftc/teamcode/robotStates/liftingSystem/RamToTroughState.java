@@ -12,22 +12,15 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        // checks the position bc with optimization, the lift does not need to be done transitioning to move on from TroughToRamState (only arm needs to be set)
-        if(robot.getLift().getTransitionState().getGoalStatePosition() == robot.getLift().getRamBeforePos())
-            robot.getLift().getTransitionState().overrideGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
-        // resetting lifting system once specimen on bar
-        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER) {
-            // opening grabber once ram is done
-            if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                robot.getGrabber().setHasSpecimen(false);
-            }
-            // resetting lift and arm once release specimen
-            else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
-                if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_HANG)
-                    robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
-                else if(robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_HANG_TO_UP_TIME)
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+        // resetting lifting system once grabber lets go of specimen (which happens on user input)
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER
+            && robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+            robot.getGrabber().setHasSpecimen(false);
+            if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_HANG)
+                robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
+            else if (robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_HANG_TO_UP_TIME)
+                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+
         }
     }
 

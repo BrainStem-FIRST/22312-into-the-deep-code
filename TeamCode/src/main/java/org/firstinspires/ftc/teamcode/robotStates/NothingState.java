@@ -14,6 +14,11 @@ public class NothingState<StateType extends Enum<StateType>> extends RobotState<
         super(stateType);
         motorList = new ArrayList<>();
     }
+    public NothingState(StateType stateType, DcMotorEx motor) {
+        super(stateType);
+        motorList = new ArrayList<>();
+        motorList.add(motor);
+    }
 
     public void addMotor(DcMotorEx motor) {
         motorList.add(motor);

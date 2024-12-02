@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToBasketState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.BasketToTroughState;
+import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaToRamState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.DropAreaToTroughState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.RamToDropAreaState;
@@ -36,7 +37,8 @@ public class LiftingSystem {
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
         stateManager.addState(StateType.BASKET_TO_TROUGH, new BasketToTroughState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
-        stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
+        stateManager.addState(StateType.DROP_AREA, new DropAreaState());
+        //stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA));
         stateManager.addState(StateType.DROP_AREA_TO_TROUGH, new DropAreaToTroughState());
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));

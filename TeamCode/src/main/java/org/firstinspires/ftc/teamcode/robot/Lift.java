@@ -19,8 +19,8 @@ public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
-    public static final int TROUGH_POS = -5,
-        TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
+    public static int ABSOLUTE_MIN = -5, TROUGH_POS = ABSOLUTE_MIN;
+    public static final int TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 5,
         DROP_AREA_AFTER_POS = 30,
         LOW_RAM_BEFORE_POS = 320,
@@ -32,12 +32,11 @@ public class Lift extends Subsystem {
         LOW_BASKET_SAFETY_POS = 1680,
         HIGH_BASKET_POS = 3400,
         HIGH_BASKET_SAFETY_POS = 3380,
-        ABSOLUTE_MAX = 3420,
-        ABSOLUTE_MIN = -5;
+        ABSOLUTE_MAX = 3420;
 
     public static final int DESTINATION_THRESHOLD = 20;
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
+        TROUGH, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
     private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
@@ -48,35 +47,19 @@ public class Lift extends Subsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
-
-        NothingState<StateType> troughState = new NothingState<>(StateType.TROUGH);
-        troughState.addMotor(liftMotor);
-        stateManager.addState(StateType.TROUGH, troughState);
-
         pid = new PIDController(0.01, 0, 0);
         pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         pid.setOutputBounds(-1, 1);
 
-        NothingState<StateType> troughSafetyState = new NothingState<>(StateType.TROUGH_SAFETY);
-        troughSafetyState.addMotor(liftMotor);
-        stateManager.addState(StateType.TROUGH_SAFETY, troughSafetyState);
+        stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
-        NothingState<StateType> dropAreaState = new NothingState<>(StateType.DROP_AREA);
-        dropAreaState.addMotor(liftMotor);
-        stateManager.addState(StateType.DROP_AREA, dropAreaState);
-
-        NothingState<StateType> ramBeforeState = new NothingState<>(StateType.RAM_BEFORE);
-        ramBeforeState.addMotor(liftMotor);
-        stateManager.addState(StateType.RAM_BEFORE, ramBeforeState);
-
-        NothingState<StateType> ramAfterState = new NothingState<>(StateType.RAM_AFTER);
-        ramAfterState.addMotor(liftMotor);
-        stateManager.addState(StateType.RAM_AFTER, ramAfterState);
-
-        NothingState<StateType> basketState = new NothingState<>(StateType.BASKET_DEPOSIT);
-        basketState.addMotor(liftMotor);
-        stateManager.addState(StateType.BASKET_DEPOSIT, basketState);
+        stateManager.addState(StateType.TROUGH, new NothingState<>(StateType.TROUGH, liftMotor));
+        stateManager.addState(StateType.TROUGH_SAFETY, new NothingState<>(StateType.TROUGH_SAFETY, liftMotor));
+        stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA, liftMotor));
+        stateManager.addState(StateType.DROP_AREA_AFTER, new NothingState<>(StateType.DROP_AREA_AFTER, liftMotor));
+        stateManager.addState(StateType.RAM_BEFORE, new NothingState<>(StateType.RAM_BEFORE, liftMotor));
+        stateManager.addState(StateType.RAM_AFTER, new NothingState<>(StateType.RAM_AFTER, liftMotor));
+        stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT, liftMotor));
 
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD);
         this.transitionState.setEncoderBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);

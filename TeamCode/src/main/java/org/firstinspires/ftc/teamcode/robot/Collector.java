@@ -61,9 +61,7 @@ public class Collector extends Subsystem {
         blockColorInTrough = BlockColor.NONE;
 
         stateManager = new StateManager<>(StateType.NOTHING);
-        NothingState<StateType> nothingState = new NothingState<>(StateType.NOTHING);
-        nothingState.addMotor(spindleMotor);
-        stateManager.addState(StateType.NOTHING, nothingState);
+        stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING, spindleMotor));
         stateManager.addState(StateType.COLLECTING, new CollectState());
         stateManager.addState(StateType.COLLECTING_TEMP, new CollectTempState());
         stateManager.addState(StateType.SPITTING, new SpitState());

@@ -11,11 +11,12 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
+        if(isFirstTime())
+            robot.setIsDepositing(false);
         // if lift in safety pos
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
             // moving arm from down to left
-            if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
-                robot.getArm().getTransitionState().setGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
+            robot.getArm().getTransitionState().overrideGoalState(Arm.BLOCK_DROP_POS, Arm.StateType.BLOCK_DROP);
             // moving lift to drop area once arm is done
             else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
                 robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
@@ -23,12 +24,13 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override
