@@ -7,16 +7,15 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
-// TODO: fix so ends when lift goes to trought safety state, not trough (bc changd it)
-// TODO: do same for ram_to_troughState
 public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
     public BasketToTroughState() {
         super(LiftingSystem.StateType.BASKET_TO_TROUGH);
     }
     @Override
     public void execute() {
-        // if lift still at position of basket depositing
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
+        // if lift is still at/trying to reach position to deposit
+        if(robot.getLift().getTransitionState().getGoalStatePosition() == robot.getLift().getBasketDepositPos()) {
+        //OLD CODE (but it works): if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // releasing block
             if(robot.getGrabber().hasBlock()) {
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
@@ -27,9 +26,11 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
                 // moving arm up if arm still at left position
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BLOCK_DROP)
                     robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
-                // moving lift down when arm done rotating
-                else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                // moving lift down when arm either passes up position or finishes rotating
+                else if(robot.getArm().getTransitionState().getTime() >= Arm.BLOCK_DROP_TO_UP_TIME
+                || robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
+                // OLD CODE (but it works): else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
+                    robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY); // I override goal state in case lift still in transition to meet position of basket_deposit
             }
         }
         // once lift reach safety threshold, move arm down

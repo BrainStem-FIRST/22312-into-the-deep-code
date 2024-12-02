@@ -29,9 +29,9 @@ public class Lift extends Subsystem {
         HIGH_RAM_AFTER_POS = 1860,
 
         LOW_BASKET_POS = 1700,
-        LOW_BASKET_SAFETY_POS = 1680,
+        LOW_BASKET_SAFETY_POS = 1650,
         HIGH_BASKET_POS = 3400,
-        HIGH_BASKET_SAFETY_POS = 3380,
+        HIGH_BASKET_SAFETY_POS = 3350,
         ABSOLUTE_MAX = 3420;
 
     public static final int DESTINATION_THRESHOLD = 20;
