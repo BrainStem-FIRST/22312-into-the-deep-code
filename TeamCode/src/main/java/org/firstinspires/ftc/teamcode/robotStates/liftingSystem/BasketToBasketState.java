@@ -43,8 +43,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP &&
-                ((robot.isHighDeposit() && robot.getLift().atHighBasket()) || (!robot.isHighDeposit() && robot.getLift().atLowBasket()));
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP;
     }
 
     @Override

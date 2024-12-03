@@ -5,21 +5,29 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
+import org.firstinspires.ftc.teamcode.util.Input;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "LiftTuneTele")
 public class LiftTuneTele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        Input input = new Input(gamepad1, gamepad2);
+        // time for tracking servo transition times
+        ElapsedTime transitionTime = new ElapsedTime();
+        double lastTransitionDuration = 0;
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
-        waitForStart();
+
+        PIDController liftPid = new PIDController(0.03, 0, 0.005);
 
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -29,34 +37,69 @@ public class LiftTuneTele extends LinearOpMode {
 
         ServoImplEx grabberServo = hardwareMap.get(ServoImplEx.class, "LiftGrabServo");
         grabberServo.setPwmRange(new PwmControl.PwmRange(Grabber.MIN_TICK, Grabber.MAX_TICK));
-        while(opModeIsActive()) {
-            if(gamepad1.a)
-                armServo.setPosition(Arm.TRANSFER_POS);
-            else if(gamepad1.b)
-                armServo.setPosition(Arm.SPECIMEN_HANG_POS);
-            else if(gamepad1.y)
-                armServo.setPosition(Arm.BASKET_SAFETY_POS);
-            else if(gamepad1.x)
-                armServo.setPosition(Arm.DROP_OFF_POS);
 
-            if(gamepad1.dpad_left)
-                grabberServo.setPosition(0.99);
-            else if(gamepad1.dpad_right)
-                grabberServo.setPosition(0.01);
+
+        waitForStart();
+        while(opModeIsActive()) {
+            // control to stop timer (should manually be pressed to signal end of servo transition)
+            if(input.getGamepadTracker1().isFirstFrameLeftBumper())
+                lastTransitionDuration = transitionTime.seconds();
+
+            // note: I chain together all grabber and arm inputs to only allow one servo movement at a time (for timer)
+            if(input.getGamepadTracker1().isFirstFrameA()) {
+                armServo.setPosition(Arm.TRANSFER_POS);
+                transitionTime.reset();
+            }
+            else if(input.getGamepadTracker1().isFirstFrameB()) {
+                armServo.setPosition(Arm.SPECIMEN_HANG_POS);
+                transitionTime.reset();
+            }
+            else if(input.getGamepadTracker1().isFirstFrameY()) {
+                armServo.setPosition(Arm.BASKET_SAFETY_POS);
+                transitionTime.reset();
+            }
+            else if(input.getGamepadTracker1().isFirstFrameX()) {
+                armServo.setPosition(Arm.BASKET_DROP_POS);
+                transitionTime.reset();
+            }
+            else if(input.getGamepadTracker1().isFirstFrameDpadLeft()) {
+                grabberServo.setPosition(Grabber.OPEN_POS);
+                transitionTime.reset();
+            }
+            else if(input.getGamepadTracker1().isFirstFrameDpadRight()) {
+                grabberServo.setPosition(Grabber.CLOSE_POS);
+                transitionTime.reset();
+            }
+
 
             if((gamepad1.left_stick_y > 0.2 && motor.getCurrentPosition() > Lift.ABSOLUTE_MIN + 10) || // checking down movement
                 (gamepad1.left_stick_y < -0.2 && motor.getCurrentPosition() < Lift.ABSOLUTE_MAX - 10)) // checking up movement
                 Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
+            // giving small power so lift doesn't lower during static stage
             else
                 Subsystem.setMotorPower(motor, 0.05);
 
-            telemetry.addData("a", gamepad1.a);
-            telemetry.addData("left stick y", gamepad1.left_stick_y);
-            telemetry.addData("dpad up", gamepad1.dpad_up);
-            telemetry.addData("dpad down", gamepad1.dpad_down);
+            telemetry.addData("current elapsed time", transitionTime.seconds());
+            telemetry.addData("last transition time", lastTransitionDuration);
+            telemetry.addData("", "");
+
             telemetry.addData("arm servo current pwm", armServo.getPosition());
             telemetry.addData("grabber servo current pwm", grabberServo.getPosition());
             telemetry.addData("motor current encoder: ", motor.getCurrentPosition());
+            telemetry.addData("", "");
+
+            telemetry.addData("controls below", "");
+            telemetry.addData("  lift", "");
+            telemetry.addData("  left stick y", "moves lift up and down");
+            telemetry.addData("arm", "");
+            telemetry.addData("  a", "move arm to transfer");
+            telemetry.addData("  b", "move arm to specimen hang");
+            telemetry.addData("  y", "move arm to basket safety");
+            telemetry.addData("  x", "move arm to basket drop");
+            telemetry.addData("grabber", "");
+            telemetry.addData("  dpad left", "open grabber");
+            telemetry.addData("  dpad right", "close grabber");
+
             telemetry.update();
 
 

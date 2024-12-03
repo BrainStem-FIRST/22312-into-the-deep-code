@@ -30,6 +30,17 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
             stateManager.tryEnterState(stateType);
         }
     }
+
+    // allows for manual setting of time to finish
+    public void setGoalState(double goalPosition, StateType goalStateType, double timeDone) {
+        // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
+        if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
+            this.timeDone = timeDone;
+            this.goalPosition = goalPosition;
+            this.goalStateType = goalStateType;
+            stateManager.tryEnterState(stateType);
+        }
+    }
     @Override
     public void execute() {
         servo.setPosition(goalPosition);
