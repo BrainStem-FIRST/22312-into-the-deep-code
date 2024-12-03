@@ -21,17 +21,17 @@ public class Lift extends Subsystem {
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
     public static int ABSOLUTE_MIN = -5, TROUGH_POS = ABSOLUTE_MIN;
     public static final int TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
-        DROP_AREA_POS = 5,
-        DROP_AREA_AFTER_POS = 30,
-        LOW_RAM_BEFORE_POS = 320,
-        LOW_RAM_AFTER_POS = 595,
-        HIGH_RAM_BEFORE_POS = 750,
-        HIGH_RAM_AFTER_POS = 1860,
+        DROP_AREA_POS = 5, // position where grabber can grab onto specimen
+        DROP_AREA_AFTER_POS = 50, // position to go to after grabber has specimen (to clear specimen off wall)
+        LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
+        LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
+        HIGH_RAM_BEFORE_POS = 750, // position to go to to setup for high bar ram
+        HIGH_RAM_AFTER_POS = 1860, // position to go to after ramming high bar
 
-        LOW_BASKET_POS = 1418,
-        LOW_BASKET_SAFETY_POS = 1134,
-        HIGH_BASKET_POS = 3230,
-        HIGH_BASKET_SAFETY_POS = 2900,
+        LOW_BASKET_POS = 1700, // position to go to so arm and grabber can deposit block on low basket
+        LOW_BASKET_SAFETY_POS = 1600, // position where arm can start rotating into position to deposit on low basket
+        HIGH_BASKET_POS = 3350, // position to go to so arm and grabber can deposit block on high basket
+        HIGH_BASKET_SAFETY_POS = 3200, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
     public static final int DESTINATION_THRESHOLD = 20;

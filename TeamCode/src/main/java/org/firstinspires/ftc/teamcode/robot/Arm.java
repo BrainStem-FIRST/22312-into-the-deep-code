@@ -23,7 +23,7 @@ public class Arm extends Subsystem {
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
     public static final double FULL_ROTATION_TIME = 0.8;
-    public static final double TRANSFER_POS = 0.01, DROP_OFF_POS = 0.20, BASKET_DROP_POS = 0.5, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
+    public static final double TRANSFER_POS = 0.01, DROP_OFF_POS = 0.33, BASKET_DROP_POS = 0.25, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
     public static final double SPECIMEN_HANG_TO_UP_TIME = Subsystem.getServoTime(SPECIMEN_HANG_POS, UP_POS, FULL_ROTATION_TIME);
     public enum StateType {
         TRANSFER, DROP_OFF, BASKET_DROP, UP, BASKET_SAFETY, SPECIMEN_HANG, TRANSITION
