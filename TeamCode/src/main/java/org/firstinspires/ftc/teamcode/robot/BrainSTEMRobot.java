@@ -133,7 +133,7 @@ public class BrainSTEMRobot {
         arm.update(dt);
         lift.update(dt);
 
-        //hanger.update(dt);
+        hanger.update(dt);
 
         driveTrain.updatePoseEstimate();
     }

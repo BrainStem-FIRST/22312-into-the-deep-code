@@ -15,7 +15,7 @@ public class Hanger extends Subsystem {
 
     // TODO: find down and up tick values and threshold
     // down refers to the position the hanging goes to after it is on the bar
-    public final static int FULL_DOWN_TICK = 0, HANG_DOWN_TICK = 2076, UP_TICK = 33000, DESTINATION_THRESHOLD = 20;
+    public final static int FULL_DOWN_TICK = 0, HANG_DOWN_TICK = 2076, UP_TICK = 33000, DESTINATION_THRESHOLD = 30;
     public final static double HANG_HOLD_POWER = -0.3;
 
     public enum StateType {

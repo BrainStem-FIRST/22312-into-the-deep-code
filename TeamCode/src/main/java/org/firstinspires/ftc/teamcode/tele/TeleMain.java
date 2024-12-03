@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -24,8 +25,10 @@ import org.firstinspires.ftc.teamcode.util.Input;
 public class TeleMain extends LinearOpMode {
     public static class Params {
         public AllianceColor allianceColor = AllianceColor.RED;
+        public double timeToHang = 110;
     }
     public Params PARAMS = new Params();
+    private double timeSinceStart;
     private Input input;
     private BrainSTEMRobot robot;
     @Override
@@ -43,7 +46,7 @@ public class TeleMain extends LinearOpMode {
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
-        double timeSinceStart = 0; // time since start of match; need for hanging
+        timeSinceStart = 0; // time since start of match; need for hanging
 
         while (opModeIsActive()) {
             // update dt
@@ -264,13 +267,10 @@ public class TeleMain extends LinearOpMode {
             }
     }
     private void listenForHangingInput() {
-        //temp code
-        //if (input.getGamepadTracker1().isBPressed() && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-        //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
-
         // automatically start raising hanging at 2:20
-        //if (timeSinceStart >= 140 && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-        //    robot.getHanger().getStateManager().tryEnterState(Hanger.StateType.GOING_UP);
+        if (timeSinceStart >= PARAMS.timeToHang && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
+            robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
+
         // lower hanging to raise robot
         if (input.getGamepadTracker2().isFirstFrameX())
             if(robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
