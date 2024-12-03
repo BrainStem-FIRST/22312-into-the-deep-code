@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class JumpToMin extends RobotState<Extension.StateType> {
@@ -39,7 +40,7 @@ public class JumpToMin extends RobotState<Extension.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getExtension().getExtensionMotor().getCurrentPosition() - Extension.MIN_SEARCH_AND_COLLECT_POSITION < THRESHOLD
+        return Subsystem.inRange(robot.getExtension().getExtensionMotor(), Extension.MIN_SEARCH_AND_COLLECT_POSITION, THRESHOLD)
                 || robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION;
     }
 
