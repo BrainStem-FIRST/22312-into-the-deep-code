@@ -261,11 +261,6 @@ public class TeleMain extends LinearOpMode {
                     else if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS)
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
                     break;
-
-                // allows for resetting of lifting system to trough during transition from trough
-                case TROUGH_TO_DROP_AREA:
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
-                    break;
             }
     }
     private void listenForHangingInput() {

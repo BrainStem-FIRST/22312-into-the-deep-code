@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 
 @Autonomous(name="AutoYellow")
 @Config
-public class AutoYellowRedTeam extends LinearOpMode {
+public class AutoYellow extends LinearOpMode {
     public static class Params {
         public double beginX = -39, beginY = -64, beginA = 0;
         public double depositX = -59.4, depositY = -59.4, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
@@ -33,7 +34,6 @@ public class AutoYellowRedTeam extends LinearOpMode {
 
         public double rightBlockDriveForwardDistance = 8;
         public double midBlockDriveForwardDistance = 8;
-        public double leftBlockDriveForwardDistance = 8;
         public double leftBlockXCollected = -57.5;
         public double leftBlockYCollected = -32;
     }
@@ -85,7 +85,8 @@ public class AutoYellowRedTeam extends LinearOpMode {
         TrajectoryActionBuilder leftBlockTrajectory = drive.actionBuilder(depositPose)
                 .splineToLinearHeading(leftBlockPose, params.leftBlockT);
         TrajectoryActionBuilder leftBlockDriveThroughTrajectory = drive.actionBuilder(leftBlockPose)
-                .lineToYConstantHeading(params.leftBlockYCollected + params.leftBlockDriveForwardDistance);
+                .strafeTo(new Vector2d(params.leftBlockXCollected, params.leftBlockYCollected));
+                //.lineToYConstantHeading(params.leftBlockYCollected + params.leftBlockDriveForwardDistance);
             //.splineToConstantHeading(new Vector2d(params.leftBlockXCollected, params.leftBlockYCollected), Math.PI / 2);
 
         TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose)

@@ -23,8 +23,7 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA
-                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA;
     }
 
     @Override

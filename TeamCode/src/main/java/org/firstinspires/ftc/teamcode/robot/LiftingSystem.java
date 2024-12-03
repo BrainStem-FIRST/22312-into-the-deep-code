@@ -88,12 +88,10 @@ public class LiftingSystem {
     // specimen actions
     public Action setupHighSpecimenRam() {
         return new SequentialAction(
-            new ParallelAction(
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                robot.getGrabber().close()),
-            new ParallelAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS)))
+                new ParallelAction(
+                    robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
+                    robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, robot.getArm().timeToRotateTo(Arm.SPECIMEN_HANG_POS)))
         );
     }
     public Action ramHighSpecimen() {
