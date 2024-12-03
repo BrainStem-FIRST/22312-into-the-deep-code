@@ -12,7 +12,7 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public void execute() {
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA)
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER)
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
         else if(robot.getLift().getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS)
             robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_HANG_POS, Arm.StateType.SPECIMEN_HANG);
