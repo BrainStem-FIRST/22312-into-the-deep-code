@@ -8,14 +8,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Lift extends Subsystem {
-    public final static double FULL_POWER = 0.9;
     private final DcMotorEx liftMotor;
     private final PIDController pid;
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
@@ -74,12 +72,9 @@ public class Lift extends Subsystem {
     }
 
     public Action moveTo(int target) {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+        return (@NonNull TelemetryPacket telemetryPacket) -> {
                 Subsystem.setMotorPosition(liftMotor, target);
                 return !Subsystem.inRange(liftMotor, target, DESTINATION_THRESHOLD);
-            }
         };
     }
 

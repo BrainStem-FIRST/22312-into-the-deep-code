@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.hangingStates.HoldHang;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Hanger extends Subsystem {
 
@@ -26,7 +27,7 @@ public class Hanger extends Subsystem {
     }
     private final MotorTransitionState<StateType> transitionState;
     private final DcMotorEx hangMotor;
-
+    private final PIDController pid;
     private final StateManager<StateType> stateManager;
     public Hanger(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -35,6 +36,8 @@ public class Hanger extends Subsystem {
         hangMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hangMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        pid = new PIDController(0.01, 0, 0);
 
         stateManager = new StateManager<>(StateType.FULL_DOWN);
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));

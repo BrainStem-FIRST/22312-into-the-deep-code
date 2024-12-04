@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
+import org.firstinspires.ftc.teamcode.util.Helper;
 
 // should only be called when lift is in trough position
 public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
@@ -15,7 +16,9 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
             robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
 
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
+        // can simultaneously raise lift during raising of arm if state is triggered when robot is far enough away from basket
+        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
+        || LiftingSystem.DEPOSIT_SAFETY_DIST < Helper.dist(LiftingSystem.DEPOSIT_CORNER, robot.getDriveTrain().pose.position)) {
             // only want to set lift state to be in transition if in trough; not if its already going up
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                 robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
@@ -36,6 +39,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
                     robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
             }
+            // lowers arm once lift reach destination
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
                 robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
         }
@@ -58,6 +62,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
-        return LiftingSystem.StateType.BASKET_DEPOSIT;
+        // automatically drops and resets lift if button already cued; else goes to state in which waits for user input
+        return robot.getLiftingSystem().getButtonACued() ? LiftingSystem.StateType.BASKET_TO_TROUGH : LiftingSystem.StateType.BASKET_DEPOSIT;
     }
 }

@@ -120,6 +120,7 @@ public class BrainSTEMRobot {
 
 
     public void update(double dt) {
+        driveTrain.updatePoseEstimate();
         // system managers
         collectingSystem.update(dt);
         liftingSystem.update(dt);
@@ -134,8 +135,6 @@ public class BrainSTEMRobot {
         lift.update(dt);
 
         hanger.update(dt);
-
-        driveTrain.updatePoseEstimate();
     }
 
     public PinpointDrive getDriveTrain() {

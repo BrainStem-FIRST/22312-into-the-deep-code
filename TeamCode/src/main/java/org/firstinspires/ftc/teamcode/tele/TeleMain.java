@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.tele;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,11 +31,11 @@ public class TeleMain extends LinearOpMode {
     private double timeSinceStart;
     private Input input;
     private BrainSTEMRobot robot;
+    private final Pose2d BEGIN_POSE = new Pose2d(-24, 0, 0);
     @Override
     public void runOpMode() throws InterruptedException {
         input = new Input(gamepad1, gamepad2);
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, PARAMS.allianceColor);
-
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, PARAMS.allianceColor, BEGIN_POSE);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -74,14 +75,14 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("can transfer", robot.canTransfer());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
-            telemetry.addData("lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
-            telemetry.addData("lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
-            telemetry.addData("lift error", robot.getLift().getPid().getTarget() - robot.getLift().getLiftMotor().getCurrentPosition());
-            telemetry.addData("lift motor power", robot.getLift().getLiftMotor().getPower());
+            telemetry.addData("  lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
+            telemetry.addData("  lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
+            telemetry.addData("  lift motor power", robot.getLift().getLiftMotor().getPower());
+            telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
-            telemetry.addData("grabber has specimen", robot.getGrabber().hasSpecimen());
-            telemetry.addData("grabber block color", robot.getGrabber().getBlockColorHeld());
+            telemetry.addData("  grabber has specimen", robot.getGrabber().hasSpecimen());
+            telemetry.addData("  grabber block color", robot.getGrabber().getBlockColorHeld());
 
             telemetry.addData("", "");
             telemetry.addData("block color in trough", robot.getCollector().getBlockColorInTrough());
@@ -99,7 +100,8 @@ public class TeleMain extends LinearOpMode {
 
             telemetry.addData("", "");
             telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
-            telemetry.addData("hanging motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
+            telemetry.addData("  hanging motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
+            telemetry.addData("  hanging transition pid", robot.getHanger().getTransitionState().getPid().toString());
             telemetry.update();
         }
     }
@@ -205,10 +207,14 @@ public class TeleMain extends LinearOpMode {
                     // activating manual transfer
                     if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
-                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        // activating transition to deposit in basket
-                        if(robot.isDepositing() && robot.getGrabber().hasBlock())
+                    // activating transition to deposit in basket once transfer is complete
+                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                    && robot.isDepositing() && robot.getGrabber().hasBlock())
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
+                    break;
+
+                case TROUGH_TO_BASKET:
+                    robot.getLiftingSystem().setButtonACued(true);
                     break;
 
                 case BASKET_DEPOSIT:

@@ -89,4 +89,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     public StateType getNextStateType() {
         return goalStateType;
     }
+    public PIDController getPid() {
+        return pid;
+    }
 }

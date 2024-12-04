@@ -4,10 +4,12 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Vector2d;
 
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.Helper;
 
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
@@ -16,6 +18,10 @@ public class LiftingSystem {
         TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
         TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
+    public static final Vector2d DEPOSIT_SAFETY_POS = new Vector2d(-48, -48);
+    public static final Vector2d DEPOSIT_CORNER = new Vector2d(-72, -72);
+    public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
+    private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -48,6 +54,12 @@ public class LiftingSystem {
 
     public StateManager<StateType> getStateManager() {
         return stateManager;
+    }
+    public boolean getButtonACued() {
+        return buttonACued;
+    }
+    public void setButtonACued(boolean buttonACued) {
+        this.buttonACued = buttonACued;
     }
 
     public Action transferBlock() {

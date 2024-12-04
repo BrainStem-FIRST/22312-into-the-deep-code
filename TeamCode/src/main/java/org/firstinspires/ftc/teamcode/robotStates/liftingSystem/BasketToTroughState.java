@@ -13,11 +13,13 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
+
         // if lift is still at/trying to reach position to deposit
         if(robot.getLift().getTransitionState().getGoalStatePosition() == robot.getLift().getBasketDepositPos()) {
         //OLD CODE (but it works): if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // releasing block
             if(robot.getGrabber().hasBlock()) {
+                robot.getLiftingSystem().setButtonACued(false); // resets button cuing to be set for next time
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                 robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
             }

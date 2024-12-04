@@ -120,4 +120,7 @@ public class PIDController {
     public void setTarget(double target) {
         this.target = target;
     }
+    public String toString() {
+        return "kp:" + kP + " | ki: " + kI + " | kd: " + kD;
+    }
 }
