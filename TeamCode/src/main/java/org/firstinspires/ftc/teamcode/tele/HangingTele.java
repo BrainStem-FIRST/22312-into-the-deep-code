@@ -68,7 +68,7 @@ public class HangingTele extends LinearOpMode {
             // update custom input
             input.update();
 
-            Subsystem.setMotorPower(motor, gamepad1.left_stick_y);
+            Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
             //if (motor.getCurrentPosition() <= 0)
             //    Subsystem.setMotorPower(motor, 0);
 

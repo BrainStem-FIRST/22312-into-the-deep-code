@@ -10,6 +10,8 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     private PIDController pid;
     public final int DESTINATION_THRESHOLD;
 
+    private int startEncoder;
+
     private int absoluteMin;
     private int absoluteMax;
 
@@ -18,12 +20,14 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
+        startEncoder = motor.getCurrentPosition();
     }
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         this.pid = pid;
+        startEncoder = motor.getCurrentPosition();
     }
     public void setEncoderBounds(int min, int max) {
         absoluteMin = min;
@@ -38,6 +42,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
                 pid.reset();
                 pid.setTarget(goalPosition);
             }
+            startEncoder = motor.getCurrentPosition();
             this.goalPosition = goalPosition;
             this.goalStateType = goalStateType;
             stateManager.tryEnterState(stateType);
@@ -45,12 +50,13 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public void overrideGoalState(double goalPosition, StateType goalStateType) {
-        this.goalPosition = goalPosition;
-        this.goalStateType = goalStateType;
         if(pid != null) {
             pid.reset();
             pid.setTarget(goalPosition);
         }
+        startEncoder = motor.getCurrentPosition();
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
         stateManager.tryEnterState(stateType);
     }
 
@@ -82,7 +88,11 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
+        int motorPos = motor.getCurrentPosition();
+        int totalDif = motorPos - startEncoder;
+        int goalDif = (int)goalPosition - motorPos;
+        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD)
+                || Math.signum(totalDif) == Math.signum(goalDif); // checking if moving up, if difference is positive, vice versa for moving down
     }
 
     @Override
