@@ -241,11 +241,7 @@ public class TeleMain extends LinearOpMode {
 
                 case SPECIMEN_RAM:
                     // moving lift to ram specimen into bar
-                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
-                        robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
-                    // resetting lifting system
-                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)
-                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
                     break;
             }
 

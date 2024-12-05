@@ -12,7 +12,7 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         // checking if grabber has specimen (means need to move lift up to clear specimen from wall)
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA && robot.getGrabber().hasSpecimen())
-            robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_AFTER_POS, Lift.StateType.DROP_AREA_AFTER);
+            robot.getLift().getTransitionState().setGoalStateWithoutPid(Lift.DROP_AREA_AFTER_POS, Lift.StateType.DROP_AREA_AFTER);
 
         // checking if grabber does not have specimen but lift is setup as if it does (means need to lower lift so grabber can grab onto specimen)
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER && !robot.getGrabber().hasSpecimen())

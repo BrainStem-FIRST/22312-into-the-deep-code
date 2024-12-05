@@ -19,7 +19,7 @@ public class Lift extends Subsystem {
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
     public static int ABSOLUTE_MIN = 0, TROUGH_POS = ABSOLUTE_MIN;
     public static final int TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
-        DROP_AREA_POS = 10, // position where grabber can grab onto specimen
+        DROP_AREA_POS = 80, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar

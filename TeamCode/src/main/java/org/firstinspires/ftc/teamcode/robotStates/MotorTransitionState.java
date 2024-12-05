@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class MotorTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final DcMotorEx motor;
     private PIDController pid;
+    private boolean usingPid;
     public final int DESTINATION_THRESHOLD;
 
     private int startEncoder;
@@ -21,12 +22,14 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         startEncoder = motor.getCurrentPosition();
+        usingPid = false;
     }
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         this.pid = pid;
+        usingPid = true;
         startEncoder = motor.getCurrentPosition();
     }
     public void setEncoderBounds(int min, int max) {
@@ -39,9 +42,20 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
         if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
             if(pid != null) {
+                usingPid = true;
                 pid.reset();
                 pid.setTarget(goalPosition);
             }
+            startEncoder = motor.getCurrentPosition();
+            this.goalPosition = goalPosition;
+            this.goalStateType = goalStateType;
+            stateManager.tryEnterState(stateType);
+        }
+    }
+    public void setGoalStateWithoutPid(double goalPosition, StateType goalStateType) {
+        // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
+        if(stateManager.getActiveStateType() != stateType & goalStateType != this.goalStateType) {
+            usingPid = false;
             startEncoder = motor.getCurrentPosition();
             this.goalPosition = goalPosition;
             this.goalStateType = goalStateType;
@@ -70,7 +84,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
         // running regular motor
         else
-            if(pid == null)
+            if(pid == null || !usingPid)
                 Subsystem.setMotorPosition(motor, (int) goalPosition);
             else
                 Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
@@ -89,10 +103,10 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     @Override
     public boolean isDone() {
         int motorPos = motor.getCurrentPosition();
-        int totalDif = motorPos - startEncoder;
-        int goalDif = (int)goalPosition - motorPos;
+        int desiredDir = (int)goalPosition - startEncoder;
+        int curDif = (int)goalPosition - motorPos;
         return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD)
-                || Math.signum(totalDif) == Math.signum(goalDif); // checking if moving up, if difference is positive, vice versa for moving down
+                || Math.signum(desiredDir) != Math.signum(curDif); // checking if moving up, if difference is positive, vice versa for moving down
     }
 
     @Override
