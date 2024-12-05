@@ -22,15 +22,10 @@ public class Arm extends Subsystem {
 
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
-    public static final double TRANSFER_TO_BASKET_SAFETY_TIME = 0.67,
-            BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.55,
-            BASKET_DROP_TO_UP_TIME = 0.29,
-            UP_TO_BASKET_SAFETY_TIME = 0.42,
-            SPECIMEN_HANG_TO_UP_TIME = 0.28,
-            TRANSFER_TO_DROP_AREA_TIME = 0.28,
-            DROP_AREA_TO_RAM_TIME = 0.66,
-            UP_TO_TRANSFER_TIME = 0.55;
-    public static final double TRANSFER_POS = 0.01, DROP_OFF_POS = 0.33, BASKET_DROP_POS = 0.30, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
+    public static final double FULL_ROTATION_TIME = 0.8;
+    public static final double TRANSFER_POS = 0.01, DROP_OFF_POS = 0.33, BASKET_DROP_POS = 0.28, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
+    public static final double SPECIMEN_HANG_TO_UP_TIME = Subsystem.getServoTime(SPECIMEN_HANG_POS, UP_POS, FULL_ROTATION_TIME);
+
     public enum StateType {
         TRANSFER, DROP_OFF, BASKET_DROP, UP, BASKET_SAFETY, SPECIMEN_HANG, TRANSITION
     }
@@ -53,7 +48,7 @@ public class Arm extends Subsystem {
         stateManager.addState(StateType.BASKET_SAFETY, new NothingState<>(StateType.BASKET_SAFETY));
         stateManager.addState(StateType.SPECIMEN_HANG, new NothingState<>(StateType.SPECIMEN_HANG));
 
-        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo);
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, armServo, FULL_ROTATION_TIME);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
@@ -78,6 +73,9 @@ public class Arm extends Subsystem {
                 return false;
             }
         };
+    }
+    public double timeToRotateTo(double goalPos) {
+        return Subsystem.getServoTime(armServo.getPosition(), goalPos, FULL_ROTATION_TIME);
     }
 
     public StateManager<StateType> getStateManager() {

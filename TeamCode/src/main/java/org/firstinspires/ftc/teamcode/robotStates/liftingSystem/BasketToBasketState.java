@@ -27,7 +27,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT
             || (robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
                     && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getBasketDepositPos() + Lift.DESTINATION_THRESHOLD))
-                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
         }
     }
 

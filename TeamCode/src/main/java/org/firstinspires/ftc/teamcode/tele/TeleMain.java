@@ -78,7 +78,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
             telemetry.addData("  lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("  lift motor power", robot.getLift().getLiftMotor().getPower());
-            //telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
+            telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("  grabber has specimen", robot.getGrabber().hasSpecimen());
@@ -101,7 +101,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("", "");
             telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
             telemetry.addData("  hanging motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
-            //telemetry.addData("  hanging transition pid", robot.getHanger().getTransitionState().getPid().toString());
+            telemetry.addData("  hanging transition pid", robot.getHanger().getTransitionState().getPid().toString());
             telemetry.update();
         }
     }
@@ -269,8 +269,8 @@ public class TeleMain extends LinearOpMode {
     }
     private void listenForHangingInput() {
         // automatically start raising hanging at 2:20
-        //if (timeSinceStart >= PARAMS.timeToHang && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-            //robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
+        if (timeSinceStart >= PARAMS.timeToHang && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
+            robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
 
         // lower hanging to raise robot
         if (input.getGamepadTracker2().isFirstFrameX())

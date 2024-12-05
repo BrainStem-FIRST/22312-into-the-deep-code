@@ -41,7 +41,6 @@ public class LiftTuneTele extends LinearOpMode {
 
         waitForStart();
         while(opModeIsActive()) {
-            input.update();
             // control to stop timer (should manually be pressed to signal end of servo transition)
             if(input.getGamepadTracker1().isFirstFrameLeftBumper())
                 lastTransitionDuration = transitionTime.seconds();
@@ -90,7 +89,6 @@ public class LiftTuneTele extends LinearOpMode {
             telemetry.addData("", "");
 
             telemetry.addData("controls below", "");
-            telemetry.addData("left bumper", "stop timer");
             telemetry.addData("  lift", "");
             telemetry.addData("  left stick y", "moves lift up and down");
             telemetry.addData("arm", "");
