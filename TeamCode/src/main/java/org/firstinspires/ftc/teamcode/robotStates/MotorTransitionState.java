@@ -65,9 +65,17 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     @Override
     public void overrideGoalState(double goalPosition, StateType goalStateType) {
         if(pid != null) {
+            usingPid = true;
             pid.reset();
             pid.setTarget(goalPosition);
         }
+        startEncoder = motor.getCurrentPosition();
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
+        stateManager.tryEnterState(stateType);
+    }
+    public void overrideGoalStateWithoutPid(double goalPosition, StateType goalStateType) {
+        usingPid = false;
         startEncoder = motor.getCurrentPosition();
         this.goalPosition = goalPosition;
         this.goalStateType = goalStateType;
@@ -115,5 +123,8 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     public PIDController getPid() {
         return pid;
+    }
+    public boolean isUsingPid() {
+        return usingPid;
     }
 }

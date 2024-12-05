@@ -27,12 +27,17 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
             // resetting lifting system once grabber lets go of specimen
             else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
-                robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.DROP_OFF_TO_SPECIMEN_RAM_TIME);
+                if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_RAM)
+                    robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.DROP_OFF_TO_SPECIMEN_RAM_TIME);
 
                 // resetting lift to drop off position once arm clears ramming bar or finishes transition (in case the transition time doesn't work)
-                if(robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_RAM_TO_UP_TIME
+                else if(robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_RAM_TO_UP_TIME
                 || robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.TRANSITION)
-                    robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
+                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER)
+                        robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
+                    // adding kI to lift pid once below/at trough safety
+                    else if(robot.getLift().getLiftMotor().getCurrentPosition() <= Lift.TROUGH_SAFETY_POS)
+                        robot.getLift().getTransitionState().getPid().setTempKI(Lift.TRANSFER_KI);
             }
         }
     }
@@ -49,7 +54,7 @@ public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_RAM && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA);
+        return (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA);
     }
 
     @Override

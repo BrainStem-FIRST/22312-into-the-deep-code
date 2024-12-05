@@ -76,7 +76,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
             telemetry.addData("  lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("  lift motor power", robot.getLift().getLiftMotor().getPower());
-            //telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
+            telemetry.addData("  lift using pid", robot.getLift().getTransitionState().isUsingPid());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("  grabber has specimen", robot.getGrabber().hasSpecimen());

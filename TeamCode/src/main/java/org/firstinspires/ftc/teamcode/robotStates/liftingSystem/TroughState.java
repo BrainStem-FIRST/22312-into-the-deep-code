@@ -50,8 +50,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                     robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                 }
                 // lowering lift once grabber is open
-                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
+                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+                    robot.getLift().getTransitionState().getPid().setTempKI(Lift.TRANSFER_KI);
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                }
             }
             // closing onto block once lift is down
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {

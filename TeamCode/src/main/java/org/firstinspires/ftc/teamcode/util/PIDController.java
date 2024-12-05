@@ -96,26 +96,25 @@ public class PIDController {
 
 
     // getters/setters
-    public double getkP() {
+    public double getTempKP() {
         return kP;
     }
-    public double getkI() {
+    public double getTempKI() {
         return kI;
     }
-    public double getkD() {
+    public double getTempKD() {
         return kD;
     }
-    // the target position of motor
     public double getTarget() {
         return target;
     }
-    public void setTempkP(double kP) {
+    public void setTempKP(double kP) {
         this.kP = kP;
     }
-    public void setTempkI(double kI) {
+    public void setTempKI(double kI) {
         this.kI = kI;
     }
-    public void setTempkD(double kD) {
+    public void setTempKD(double kD) {
         this.kD = kD;
     }
     public void setTarget(double target) {
