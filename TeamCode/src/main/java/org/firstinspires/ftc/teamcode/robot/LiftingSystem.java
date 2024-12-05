@@ -15,8 +15,8 @@ public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
         TROUGH, TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, // "default states"
-        TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_RESETTING, // depositing block in basket states
-        DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_RESETTING // ramming specimen on bar states
+        TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_DROP_AREA, // depositing block in basket states
+        DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_TO_DROP_AREA // ramming specimen on bar states
     }
 
     // for depositing can have radial safety check from basket (bc only approach from one corner)
@@ -36,13 +36,13 @@ public class LiftingSystem {
         stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState());
         stateManager.addState(StateType.BASKET_TO_BASKET, new BasketToBasketState());
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
-        stateManager.addState(StateType.BASKET_RESETTING, new BasketResettingState());
+        stateManager.addState(StateType.BASKET_TO_DROP_AREA, new BasketToDropAreaState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
         stateManager.addState(StateType.DROP_AREA, new DropAreaState());
         stateManager.addState(StateType.DROP_AREA_TO_TROUGH, new DropAreaToTroughState());
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
-        stateManager.addState(StateType.RAM_RESETTING, new RamResettingState());
+        stateManager.addState(StateType.RAM_TO_DROP_AREA, new RamToDropAreaState());
 
         stateManager.setupStates(robot, stateManager);
 

@@ -212,7 +212,7 @@ public class TeleMain extends LinearOpMode {
                     break;
 
                 case BASKET_DEPOSIT:
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_RESETTING);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_DROP_AREA);
                     break;
 
                 case DROP_AREA:
@@ -235,7 +235,7 @@ public class TeleMain extends LinearOpMode {
 
                 case SPECIMEN_RAM:
                     // moving lift to ram specimen into bar
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_RESETTING);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_DROP_AREA);
                     break;
             }
 

@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
@@ -26,8 +25,8 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean canEnter() {
         return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_DROP_AREA ||
-                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_RESETTING ||
-                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_RESETTING;
+                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_DROP_AREA ||
+                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_DROP_AREA;
     }
 
     @Override

@@ -8,9 +8,9 @@ import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 import org.firstinspires.ftc.teamcode.util.Helper;
 
-public class BasketResettingState extends RobotState<LiftingSystem.StateType> {
-    public BasketResettingState() {
-        super(LiftingSystem.StateType.BASKET_RESETTING);
+public class BasketToDropAreaState extends RobotState<LiftingSystem.StateType> {
+    public BasketToDropAreaState() {
+        super(LiftingSystem.StateType.BASKET_TO_DROP_AREA);
     }
     @Override
     public void execute() {

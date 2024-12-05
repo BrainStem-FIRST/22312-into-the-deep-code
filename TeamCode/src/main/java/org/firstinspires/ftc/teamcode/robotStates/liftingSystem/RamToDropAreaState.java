@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
-public class RamResettingState extends RobotState<LiftingSystem.StateType> {
-    public RamResettingState() {
-        super(LiftingSystem.StateType.RAM_RESETTING);
+public class RamToDropAreaState extends RobotState<LiftingSystem.StateType> {
+    public RamToDropAreaState() {
+        super(LiftingSystem.StateType.RAM_TO_DROP_AREA);
     }
     @Override
     public void execute() {
