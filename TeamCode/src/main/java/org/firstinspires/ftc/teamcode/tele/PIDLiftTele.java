@@ -15,8 +15,9 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class PIDLiftTele extends LinearOpMode {
 
     public static class Params {
-        public double kP = 0.01, kI = 0, kD = 0;
+        public double kP = 0.005, kI = 0, kD = 0;
     }
+    public static Params PARAMS = new Params();
     Input input;
 
     @Override
@@ -26,76 +27,38 @@ public class PIDLiftTele extends LinearOpMode {
         DcMotorEx liftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        Params params = new Params();
-        PIDController pid = new PIDController(params.kP, params.kI, params.kD);
+        PIDController pid = new PIDController(PARAMS.kP, PARAMS.kI, PARAMS.kD);
 
-        pid.setInputBounds(0, 2000);
+        pid.setInputBounds(0, 3400);
         pid.setOutputBounds(-1, 1);
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
         waitForStart();
 
-
-        long currentTime = System.currentTimeMillis();
-        long prevTime;
-        double dt;
-        double interval = 1000/60.; // 60 FPS
-        double timeSinceLastUpdate = 0;
-
-
         while (opModeIsActive()) {
-            // update dt
-            prevTime = currentTime;
-            currentTime = System.currentTimeMillis();
-            dt = (currentTime - prevTime) / 1000.;
-            timeSinceLastUpdate += dt;
 
             // update custom input
             input.update();
 
             if(input.getGamepadTracker1().isFirstFrameLeftBumper()) {
-                pid.setTarget(2000);
+                pid.setTarget(2500);
                 pid.reset();
             }
             if(input.getGamepadTracker1().isFirstFrameLeftTrigger()) {
-                pid.setTarget(0);
+                pid.setTarget(500);
                 pid.reset();
             }
 
-            doPrimitive(pid, liftMotor);
+            double power = pid.update(liftMotor.getCurrentPosition());
+
+            telemetry.addData("power", power);
+            telemetry.addData("motor encoder", liftMotor.getCurrentPosition());
+            telemetry.addData("pid target", pid.getTarget());
+            telemetry.addData("left bumper to set target to 2500", "");
+            telemetry.addData("left trigger to set target to 500", "");
+            telemetry.update();
+            Subsystem.setMotorPower(liftMotor, power);
         }
-    }
-    public void doPrimitive(PIDController pid, DcMotorEx liftMotor) {
-        double error = pid.getTarget() - liftMotor.getCurrentPosition();
-        double kp = 0.005;
-        double power = Range.clip(error * kp, -1, 1);
-
-        Subsystem.setMotorPower(liftMotor, power);
-
-        // checking for adjusting k values
-        //if(input.getGamepadTracker2().isFirstFrameDpadUp())
-
-        //else if(input.getGamepadTracker2().isFirstFrameDpadDown())
-
-        telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
-        telemetry.addData("lift power", liftMotor.getPower());
-        telemetry.addData("theoretical power", power);
-        telemetry.addData("error", error);
-        telemetry.addData("pid target", pid.getTarget());
-
-        telemetry.update();
-    }
-    public void doActual(PIDController pid, DcMotorEx liftMotor) {
-        double power = pid.update(liftMotor.getCurrentPosition());
-        Subsystem.setMotorPower(liftMotor, power);
-
-        telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
-        telemetry.addData("actual lift power", liftMotor.getPower());
-        telemetry.addData("calculated power", power);
-        telemetry.addData("error", pid.getTarget() - liftMotor.getCurrentPosition());
-        telemetry.addData("pid target", pid.getTarget());
-
-        telemetry.update();
     }
 }

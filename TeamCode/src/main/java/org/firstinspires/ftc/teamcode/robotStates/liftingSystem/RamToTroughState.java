@@ -12,7 +12,6 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-<<<<<<< HEAD
         // actually ramming using lift
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
@@ -33,18 +32,6 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
                     robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.UP_TO_TRANSFER_TIME);
                 }
             }
-=======
-        if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-            robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-            robot.getGrabber().setHasSpecimen(false);
-        }
-        // resetting lifting system once grabber lets go of specimen (which happens on user input)
-        else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
-            if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_HANG)
-                robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
-            else if (robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_HANG_TO_UP_TIME)
-                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
->>>>>>> parent of 99e2e8c (tuned lift, added lift pid and fixed bugs)
         }
     }
 

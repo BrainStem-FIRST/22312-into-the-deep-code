@@ -14,7 +14,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute() {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
-            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
 
         // can simultaneously raise lift during raising of arm if state is triggered when robot is far enough away from basket
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
@@ -37,11 +37,11 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 // moves arm down once lift is within range of basket (not necessarily there yet)
                 if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
                 && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
-                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
             }
             // lowers arm once lift reach destination
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
-                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP);
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
         }
     }
 

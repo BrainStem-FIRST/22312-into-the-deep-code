@@ -27,23 +27,24 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
             else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                 // moving arm up if arm still at left position
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP)
-                    robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP);
+                    robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP, Arm.BASKET_DROP_TO_UP_TIME);
                 // moving lift down when arm either passes up position or finishes rotating
                 else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.UP_TO_BASKET_SAFETY_TIME);
                 }
             }
         }
         // once lift reach safety threshold, move arm down
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
+            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
         }
     }
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_DEPOSIT;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_DEPOSIT
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_BASKET;
     }
 
     @Override

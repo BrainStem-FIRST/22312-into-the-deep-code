@@ -11,6 +11,8 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     private boolean usingPid;
     public final int DESTINATION_THRESHOLD;
 
+    private int startEncoder;
+
     private int absoluteMin;
     private int absoluteMax;
 
@@ -19,22 +21,16 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
-<<<<<<< HEAD
         startEncoder = motor.getCurrentPosition();
         usingPid = false;
-=======
->>>>>>> parent of 99e2e8c (tuned lift, added lift pid and fixed bugs)
     }
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         this.pid = pid;
-<<<<<<< HEAD
         usingPid = true;
         startEncoder = motor.getCurrentPosition();
-=======
->>>>>>> parent of 99e2e8c (tuned lift, added lift pid and fixed bugs)
     }
     public void setEncoderBounds(int min, int max) {
         absoluteMin = min;
@@ -50,6 +46,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
                 pid.reset();
                 pid.setTarget(goalPosition);
             }
+            startEncoder = motor.getCurrentPosition();
             this.goalPosition = goalPosition;
             this.goalStateType = goalStateType;
             stateManager.tryEnterState(stateType);
@@ -67,12 +64,13 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public void overrideGoalState(double goalPosition, StateType goalStateType) {
-        this.goalPosition = goalPosition;
-        this.goalStateType = goalStateType;
         if(pid != null) {
             pid.reset();
             pid.setTarget(goalPosition);
         }
+        startEncoder = motor.getCurrentPosition();
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
         stateManager.tryEnterState(stateType);
     }
 
@@ -104,15 +102,11 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-<<<<<<< HEAD
         int motorPos = motor.getCurrentPosition();
         int desiredDir = (int)goalPosition - startEncoder;
         int curDif = (int)goalPosition - motorPos;
         return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD)
                 || Math.signum(desiredDir) != Math.signum(curDif); // checking if moving up, if difference is positive, vice versa for moving down
-=======
-        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
->>>>>>> parent of 99e2e8c (tuned lift, added lift pid and fixed bugs)
     }
 
     @Override
