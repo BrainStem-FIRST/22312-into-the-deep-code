@@ -13,9 +13,9 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         if(isFirstTime())
             robot.setIsDepositing(true);
-        // note: i use overrideGoalState here in case this state is entered while lift/arm is in transition (to make it quicker)
+
         if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
-            robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            robot.getLift().getTransitionState().setGoalStateWithoutPid(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
 
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
             robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);

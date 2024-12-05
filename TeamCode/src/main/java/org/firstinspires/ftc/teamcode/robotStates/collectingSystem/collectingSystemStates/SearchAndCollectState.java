@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 
 public class SearchAndCollectState extends RobotState<CollectingSystem.StateType> {
 
@@ -13,6 +14,8 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     @Override
     public void execute() {
         if (isFirstTime()) {
+            // telling lifting system to transition to trough state to prepare for transfer
+            robot.getLiftingSystem().setResetToTrough(true);
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
         }
@@ -25,10 +28,10 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
         // transitioning between collecting and spitting
-        if (robot.getCollector().isCollecting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.DOWN)
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
-        else if (robot.getCollector().isSpitting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.MIDDLE)
+        if (robot.getCollectingSystem().shouldHingeMiddleForSpit())
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
+        else
+            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
     }
 
     @Override

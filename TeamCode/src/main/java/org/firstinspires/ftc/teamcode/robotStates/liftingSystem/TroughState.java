@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
 
+import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -14,6 +15,14 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
+        if(isFirstTime())
+            robot.getLiftingSystem().setResetToTrough(false);
+        // checking if lifting system stuck on ramp of transfer (if so, need to set canTransfer to false to reset lift); disabled bc cannot differentiate between getting stuck on trough or not having enough power to reach destination
+        //if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION
+        //&& robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_POS
+        //&& robot.getLift().getTransitionState().getTime() >= Lift.BUFFER_TROUGH_TO_TROUGH_SAFETY_TIME)
+        //    robot.setCanTransfer(false);
+
         // handling override of transfer if suddenly cannot transfer
         if(!robot.canTransfer()) {
             // handling the resetting of lift if suddenly cannot transfer
@@ -38,11 +47,6 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 // need to open grabber each time bc if have failed transfer grabber stays closed (also why we reset hasBlock to false)
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                    // forcing lift to lower more if have failed transfer
-                    if (robot.getGrabber().hasBlock()) {
-                        Lift.ABSOLUTE_MIN -= 5;
-                        Lift.TROUGH_POS -= 5;
-                    }
                     robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                 }
                 // lowering lift once grabber is open
@@ -63,33 +67,38 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 }
             }
         }
+
+        // moving arm to basket safety if predicted to deposit
+        // exiting state and going to drop area if block collected if not predicted to deposit
+        if(!robot.getCollector().hasValidBlockColor() && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+            if (robot.isDepositing())
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+            else
+                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
+        }
     }
 
     @Override
     public boolean canEnter() {
         // lift must properly be lowered and set before entering
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_TROUGH
-                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH
-                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH;
     }
 
     // only can be overridden if lift is at trough safety and if grabber has block
     @Override
     public boolean canBeOverridden() {
-        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
+        return true;
     }
 
     @Override
     public boolean isDone() {
         // want to automatically transition to drop area state if not depositing; only time when this function should evaluate to true
-        return !robot.getCollector().hasValidBlockColor()
-                && !robot.isDepositing()
-                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
+        return false;
     }
 
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // always want to transition to drop area bc if block is yellow then isDone will never be true and this state will be overridden when gamepad1 presses a
-        return LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        return null;
     }
 }

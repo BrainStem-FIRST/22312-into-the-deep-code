@@ -31,6 +31,7 @@ public abstract class BaseState<StateType extends Enum<StateType>> implements St
         time += dt;
     }
     public void incrementFramesRunning() { framesRunning++; }
+    public int getFramesRunning() { return framesRunning; }
     public boolean isFirstTime() {
         return framesRunning == 1;
     }

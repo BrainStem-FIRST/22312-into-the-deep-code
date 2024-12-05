@@ -35,7 +35,7 @@ public class Extension extends Subsystem {
     public static int GO_TO_THRESHOLD = 10;
 
     public static final double SEARCH_POWER = 0.55;
-    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.6, RETRACT_POWER_IN = -0.1;
+    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.6, RETRACT_POWER_IN = -0.1, RETRACT_POWER_TRANSFER = -0.2;
     public static final int RETRACT_SLOW_POSITION = 200;
 
     public enum StateType {

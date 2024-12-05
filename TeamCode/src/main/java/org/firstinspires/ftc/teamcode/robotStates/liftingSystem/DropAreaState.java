@@ -18,13 +18,16 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER && !robot.getGrabber().hasSpecimen())
             robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
 
-        if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
+        // exiting this state and transitioning to trough if robot is collecting block
+        if(robot.getLiftingSystem().isResetToTrough())
             stateManager.tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
     }
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_DROP_AREA;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_DROP_AREA ||
+                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_RESETTING ||
+                robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_RESETTING;
     }
 
     @Override

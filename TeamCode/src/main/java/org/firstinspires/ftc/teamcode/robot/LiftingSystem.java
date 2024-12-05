@@ -14,35 +14,40 @@ import org.firstinspires.ftc.teamcode.util.Helper;
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
-        TROUGH,
-        TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
-        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
+        TROUGH, TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, // "default states"
+        TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_RESETTING, // depositing block in basket states
+        DROP_AREA_TO_RAM, SPECIMEN_RAM, RAM_RESETTING // ramming specimen on bar states
     }
-    public static final Vector2d DEPOSIT_SAFETY_POS = new Vector2d(-48, -48);
+
+    // for depositing can have radial safety check from basket (bc only approach from one corner)
+    public static final Vector2d DEPOSIT_SAFETY_POS = new Vector2d(-53, -53);
     public static final Vector2d DEPOSIT_CORNER = new Vector2d(-72, -72);
     public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
+    private boolean resetToTrough;
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
         this.robot = robot;
 
-        stateManager = new StateManager<>(StateType.TROUGH);
+        stateManager = new StateManager<>(StateType.DROP_AREA);
 
         stateManager.addState(StateType.TROUGH, new TroughState());
         stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState());
         stateManager.addState(StateType.BASKET_TO_BASKET, new BasketToBasketState());
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
-        stateManager.addState(StateType.BASKET_TO_TROUGH, new BasketToTroughState());
+        stateManager.addState(StateType.BASKET_RESETTING, new BasketResettingState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
         stateManager.addState(StateType.DROP_AREA, new DropAreaState());
         stateManager.addState(StateType.DROP_AREA_TO_TROUGH, new DropAreaToTroughState());
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
         stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
-        // stateManager.addState(StateType.SPECIMEN_RAM, new SpecimenRamState());
-        stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
+        stateManager.addState(StateType.RAM_RESETTING, new RamResettingState());
 
         stateManager.setupStates(robot, stateManager);
+
+        resetToTrough = false;
+        buttonACued = false;
     }
 
     public void update(double dt) {
@@ -55,11 +60,26 @@ public class LiftingSystem {
     public StateManager<StateType> getStateManager() {
         return stateManager;
     }
-    public boolean getButtonACued() {
+    public boolean isResetToTrough() {
+        return resetToTrough;
+    }
+    public void setResetToTrough(boolean resetToTrough) {
+        this.resetToTrough = resetToTrough;
+    }
+    public boolean isButtonACued() {
         return buttonACued;
     }
     public void setButtonACued(boolean buttonACued) {
         this.buttonACued = buttonACued;
+    }
+
+    public boolean subsystemsAtDropArea() {
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA
+                && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF;
+    }
+    public boolean subsystemsAtTrough() {
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER;
     }
 
     public Action transferBlock() {
@@ -71,7 +91,7 @@ public class LiftingSystem {
     }
     public Action transferToDropOff() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.TRANSFER_TO_DROP_AREA_TIME),
+                robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.TRANSFER_TO_DROP_OFF_TIME),
                 robot.getLift().moveTo(Lift.DROP_AREA_POS)
         );
     }
@@ -103,7 +123,7 @@ public class LiftingSystem {
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
                 new ParallelAction(
                     robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                    robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.UP_TO_TRANSFER_TIME + Arm.SPECIMEN_HANG_TO_UP_TIME)
+                    robot.getArm().rotateTo(Arm.SPECIMEN_RAM_POS, Arm.UP_TO_TRANSFER_TIME + Arm.SPECIMEN_RAM_TO_UP_TIME)
                 )
         );
     }
@@ -115,7 +135,7 @@ public class LiftingSystem {
     }
     public Action resetSpecimenRam() {
         return new SequentialAction(
-            robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_HANG_TO_UP_TIME),
+            robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_RAM_TO_UP_TIME),
             new ParallelAction(
                 robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.UP_TO_TRANSFER_TIME),
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS))

@@ -101,10 +101,10 @@ public class BrainSTEMRobot {
     }
     private boolean setupLiftingSystem(double time) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
-        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
+        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.DROP_AREA_POS);
         if(lift.getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
-            arm.getArmServo().setPosition(Arm.TRANSFER_POS);
-        return arm.getArmServo().getPosition() == Arm.TRANSFER_POS && time > 1;
+            arm.getArmServo().setPosition(Arm.DROP_OFF_POS);
+        return Subsystem.inRange(lift.getLiftMotor(), Lift.DROP_AREA_POS, Lift.DESTINATION_THRESHOLD);
     }
     private boolean setupCollectingSystem(double time) {
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);

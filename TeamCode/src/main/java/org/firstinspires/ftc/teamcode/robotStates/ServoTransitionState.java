@@ -20,6 +20,7 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
         this.FULL_ROTATION_TIME = fullRotationTime;
     }
 
+    // need this override to calculate theoretical time to finish servo transition
     @Override
     public void setGoalState(double goalPosition, StateType goalStateType) {
         // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state
@@ -40,6 +41,13 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
             this.goalStateType = goalStateType;
             stateManager.tryEnterState(stateType);
         }
+    }
+    // allows manual redefinition of when to finish
+    public void overrideGoalState(double goalPosition, StateType goalStateType, double timeDone) {
+        this.timeDone = timeDone;
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
+        stateManager.tryEnterState(stateType); // safeguard to enter state if not in transition
     }
     @Override
     public void execute() {

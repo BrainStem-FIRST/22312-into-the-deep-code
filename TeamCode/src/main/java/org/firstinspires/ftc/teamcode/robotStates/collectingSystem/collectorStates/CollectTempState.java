@@ -6,25 +6,14 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class CollectTempState extends RobotState<Collector.StateType> {
 
-    // keeps track of how many frames - not based on time - it has been running for
-    private int framesRunning;
-
     public CollectTempState() {
         super(Collector.StateType.COLLECTING_TEMP);
-        framesRunning = 0;
-    }
-
-    // resets framesRunning - meant to be called continuously
-    // as soon as you stop calling it, the state will stop
-    public void continueRunning() {
-        framesRunning = 0;
     }
 
     @Override
     public void execute() {
         // collect
         robot.getCollector().setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
-        framesRunning++;
 
         // tell robot that block is not ready for transfer
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)

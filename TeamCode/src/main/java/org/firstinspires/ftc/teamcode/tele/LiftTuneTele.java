@@ -52,7 +52,7 @@ public class LiftTuneTele extends LinearOpMode {
                 transitionTime.reset();
             }
             else if(input.getGamepadTracker1().isFirstFrameB()) {
-                armServo.setPosition(Arm.SPECIMEN_HANG_POS);
+                armServo.setPosition(Arm.SPECIMEN_RAM_POS);
                 transitionTime.reset();
             }
             else if(input.getGamepadTracker1().isFirstFrameY()) {

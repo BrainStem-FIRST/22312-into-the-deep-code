@@ -63,6 +63,6 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // automatically drops and resets lift if button already cued; else goes to state in which waits for user input
-        return robot.getLiftingSystem().getButtonACued() ? LiftingSystem.StateType.BASKET_TO_TROUGH : LiftingSystem.StateType.BASKET_DEPOSIT;
+        return robot.getLiftingSystem().isButtonACued() ? LiftingSystem.StateType.BASKET_RESETTING : LiftingSystem.StateType.BASKET_DEPOSIT;
     }
 }

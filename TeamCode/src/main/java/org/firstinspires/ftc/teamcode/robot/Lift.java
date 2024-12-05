@@ -17,20 +17,21 @@ public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
-    public static int ABSOLUTE_MIN = 0, TROUGH_POS = ABSOLUTE_MIN;
-    public static final int TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
+    public static final int ABSOLUTE_MIN = 0,
+        TROUGH_POS = ABSOLUTE_MIN,
+        TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 80, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
         HIGH_RAM_BEFORE_POS = 1350, // position to go to to setup for high bar ram
         HIGH_RAM_AFTER_POS = 1860, // position to go to after ramming high bar
-
-        LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
-        HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
+        LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         HIGH_BASKET_SAFETY_POS = 2880, // position where arm can start rotating into position to deposit on high basket
+        HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
         ABSOLUTE_MAX = 3420;
+    public static final double BUFFER_TROUGH_TO_TROUGH_SAFETY_TIME = 0.5;
 
     public static final int DESTINATION_THRESHOLD = 20;
     public enum StateType {

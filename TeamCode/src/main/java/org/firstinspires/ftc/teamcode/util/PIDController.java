@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.Range;
 public class PIDController {
 
     protected double target;
+    public final double KP, KI, KD;
     protected double kP, kI, kD;
     protected double proportional, integral, derivative;
     protected boolean shouldReset;
@@ -14,17 +15,14 @@ public class PIDController {
     protected double lowerOutputBound = Double.NEGATIVE_INFINITY, higherOutputBound = Double.POSITIVE_INFINITY;
 
     public PIDController(double kP, double kI, double kD) {
+        KP = kP;
+        KI = kI;
+        KD = kD;
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
 
         shouldReset = true;
-    }
-
-    public void setPIDValues(double kP, double kI, double kD){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
     }
 
     public void setInputBounds(double lowerInputBound, double higherInputBound) {
@@ -48,6 +46,9 @@ public class PIDController {
 
     public void reset() {
         shouldReset = true;
+        this.kP = KP;
+        this.kI = KI;
+        this.kD = KD;
     }
 
 
@@ -108,19 +109,16 @@ public class PIDController {
     public double getTarget() {
         return target;
     }
-    public void setkP(double kP) {
+    public void setTempkP(double kP) {
         this.kP = kP;
     }
-    public void setkI(double kI) {
+    public void setTempkI(double kI) {
         this.kI = kI;
     }
-    public void setkD(double kD) {
+    public void setTempkD(double kD) {
         this.kD = kD;
     }
     public void setTarget(double target) {
         this.target = target;
-    }
-    public String toString() {
-        return "kp:" + kP + " | ki: " + kI + " | kd: " + kD;
     }
 }

@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSys
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.RetractingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.ShortExtendState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
+import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 public class CollectingSystem {
@@ -20,6 +22,9 @@ public class CollectingSystem {
 
     // same as force hinge up from middle but for down position
     public static final int FORCE_HINGE_UP_FROM_DOWN_POSITION = Extension.MAX_POSITION;
+
+    // hinge down for 0.4 seconds when spitting, then go middle
+    public static final double SPIT_TEMP_HINGE_TIME = 0.4; // TODO - find this
 
     public enum StateType {
         IN, SEARCH, SEARCH_AND_COLLECT, RETRACTING, SHORT_EXTEND
@@ -63,6 +68,11 @@ public class CollectingSystem {
     }
     public BrainSTEMRobot getRobot() {
         return robot;
+    }
+
+    public boolean shouldHingeMiddleForSpit() {
+        return robot.getCollector().isSpitting()
+        || robot.getCollector().getStateManager().getState(Collector.StateType.SPITTING_TEMP).getTime() > SPIT_TEMP_HINGE_TIME;
     }
 
     public Action extendAndCollectAction(int extendMotorTick) {

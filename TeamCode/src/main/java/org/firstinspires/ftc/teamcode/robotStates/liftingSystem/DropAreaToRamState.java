@@ -12,25 +12,26 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public void execute() {
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER)
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER) {
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
-        else if(robot.getLift().getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS)
-            robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_HANG_POS, Arm.StateType.SPECIMEN_HANG, Arm.DROP_AREA_TO_RAM_TIME);
+            robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_RAM_POS, Arm.StateType.SPECIMEN_RAM, Arm.DROP_OFF_TO_SPECIMEN_RAM_TIME);
+        }
     }
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA
+                && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_RAM;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_HANG;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.SPECIMEN_RAM;
     }
 
     @Override
