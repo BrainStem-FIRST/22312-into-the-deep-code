@@ -85,24 +85,31 @@ public class LiftingSystem {
                 robot.getLift().moveTo(Lift.DROP_AREA_POS)
         );
     }
-    public Action depositHigh() {
+    public Action depositHighInitial() {
         return new SequentialAction(
-            robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, 0.4),
-            robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
+            robot.getLift().moveTo(Lift.AUTO_HIGH_BASKET_POS, Lift.HIGH_BASKET_SAFETY_POS),
             new ParallelAction(
-                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
+                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0),
                     new SequentialAction(
-                            new SleepAction(0.2),
+                            new SleepAction(0.15),
                             robot.getGrabber().open()
                     )
             )
         );
     }
+    public Action depositHigh() {
+        return new SequentialAction(
+                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME),
+                depositHighInitial()
+        );
+    }
     public Action lowerFromDeposit() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, 0.3),
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
+                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_DROP_TO_UP_TIME),
+                new ParallelAction(
+                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
+                        robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
+                )
         );
     }
 

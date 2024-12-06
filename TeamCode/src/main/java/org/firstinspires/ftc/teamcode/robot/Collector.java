@@ -32,6 +32,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static final int AUTO_COLOR_VALIDATION_REQUIRED = 3;
+    public static final int MAX_AUTO_COLLECT_FRAMES = 100, MAX_AUTO_SPIT_FRAMES = 10;
     public static final double MAX_SPIN_POWER = 0.85;
     public static final double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = 0.5;
 
@@ -110,7 +111,12 @@ public class Collector extends Subsystem {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 updateFramesRunning();
-                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+                if(getFramesRunning() >= Collector.MAX_AUTO_COLLECT_FRAMES
+                && getFramesRunning() <= Collector.MAX_AUTO_SPIT_FRAMES)
+                    setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
+                else
+                    setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+
                 if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
                     autoColorValidationFrames++;
                 else
