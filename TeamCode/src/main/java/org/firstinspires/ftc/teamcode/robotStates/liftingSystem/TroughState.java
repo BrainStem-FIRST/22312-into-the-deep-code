@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
 
+import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
@@ -38,16 +39,12 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 // need to open grabber each time bc if have failed transfer grabber stays closed (also why we reset hasBlock to false)
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                    // forcing lift to lower more if have failed transfer
-                    if (robot.getGrabber().hasBlock()) {
-                        Lift.ABSOLUTE_MIN -= 5;
-                        Lift.TROUGH_POS -= 5;
-                    }
                     robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                 }
                 // lowering lift once grabber is open
-                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN)
+                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                }
             }
             // closing onto block once lift is down
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
@@ -63,6 +60,13 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 }
             }
         }
+        else if(!robot.getCollector().hasValidBlockColor()
+                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+            if(robot.getGrabber().hasBlock()
+                && robot.isDepositing())
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
+            else if(!robot.getLiftingSystem().getStayInTrough())
+                robot.setIsDepositing(false);
     }
 
     @Override

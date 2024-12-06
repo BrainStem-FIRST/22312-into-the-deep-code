@@ -25,7 +25,7 @@ public class AutoYellow extends LinearOpMode {
         public double depositX = -59.4, depositY = -59.4, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
         public double rightBlockX = -48, rightBlockY = -45, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
         public double midBlockX = -60, midBlockY = -45, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
-        public double leftBlockX = -57.5, leftBlockY = -40, leftBlockA = 135, leftBlockT = Math.toRadians(135);
+        public double leftBlockX = -58.5, leftBlockY = -40, leftBlockA = 135, leftBlockT = Math.toRadians(135);
         public double parkX = -24, parkY = 0, parkA = Math.toRadians(90);
 
         public int leftBlockExtensionAmount = 935;

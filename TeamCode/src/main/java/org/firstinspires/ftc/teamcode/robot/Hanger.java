@@ -37,14 +37,14 @@ public class Hanger extends Subsystem {
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hangMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        pid = new PIDController(0.01, 0, 0);
+        pid = new PIDController(0.04, 0, 0);
 
         stateManager = new StateManager<>(StateType.FULL_DOWN);
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
-        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD);
+        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD, pid);
         transitionState.setEncoderBounds(FULL_DOWN_TICK, UP_TICK);
         stateManager.addState(StateType.TRANSITION, transitionState);
 

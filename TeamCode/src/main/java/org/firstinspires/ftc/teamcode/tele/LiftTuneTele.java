@@ -73,12 +73,7 @@ public class LiftTuneTele extends LinearOpMode {
             }
 
 
-            if((gamepad1.left_stick_y > 0.2 && motor.getCurrentPosition() > Lift.ABSOLUTE_MIN + 10) || // checking down movement
-                (gamepad1.left_stick_y < -0.2 && motor.getCurrentPosition() < Lift.ABSOLUTE_MAX - 10)) // checking up movement
-                Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
-            // giving small power so lift doesn't lower during static stage
-            else
-                Subsystem.setMotorPower(motor, 0.05);
+            Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
 
             telemetry.addData("current elapsed time", transitionTime.seconds());
             telemetry.addData("last transition time", lastTransitionDuration);

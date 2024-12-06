@@ -23,10 +23,10 @@ public class Arm extends Subsystem {
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
     public static final double TRANSFER_TO_BASKET_SAFETY_TIME = 0.67,
-            BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.55,
-            BASKET_DROP_TO_UP_TIME = 0.29,
+            BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
+            BASKET_DROP_TO_UP_TIME = 0.18,
             UP_TO_BASKET_SAFETY_TIME = 0.42,
-            SPECIMEN_HANG_TO_UP_TIME = 0.28,
+            SPECIMEN_HANG_TO_UP_TIME = 0.18,
             TRANSFER_TO_DROP_AREA_TIME = 0.28,
             DROP_AREA_TO_RAM_TIME = 0.66,
             UP_TO_TRANSFER_TIME = 0.55;

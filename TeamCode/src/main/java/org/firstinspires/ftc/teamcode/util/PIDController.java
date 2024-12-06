@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.Range;
 public class PIDController {
 
     protected double target;
+    public final double KP, KI, KD;
     protected double kP, kI, kD;
     protected double proportional, integral, derivative;
     protected boolean shouldReset;
@@ -14,17 +15,14 @@ public class PIDController {
     protected double lowerOutputBound = Double.NEGATIVE_INFINITY, higherOutputBound = Double.POSITIVE_INFINITY;
 
     public PIDController(double kP, double kI, double kD) {
+        KP = kP;
+        KI = kI;
+        KD = kD;
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
 
         shouldReset = true;
-    }
-
-    public void setPIDValues(double kP, double kI, double kD){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
     }
 
     public void setInputBounds(double lowerInputBound, double higherInputBound) {
@@ -48,6 +46,9 @@ public class PIDController {
 
     public void reset() {
         shouldReset = true;
+        kP = KP;
+        kI = KI;
+        kD = KD;
     }
 
 

@@ -16,14 +16,15 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
+    public static final double LOWERING_KP = 0.002;
     // TODO: find low and high basket safety positions for lift (determines when arm can start rotating into basket deposit position)
-    public static int ABSOLUTE_MIN = 0, TROUGH_POS = ABSOLUTE_MIN;
-    public static final int TROUGH_SAFETY_POS = 270, // position where arm can safely raise without colliding with collector
-        DROP_AREA_POS = 80, // position where grabber can grab onto specimen
+    public static int ABSOLUTE_MIN = -50, TROUGH_POS = 0;
+    public static final int TROUGH_SAFETY_POS = 300, // position where arm can safely raise without colliding with collector
+        DROP_AREA_POS = 50, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
-        HIGH_RAM_BEFORE_POS = 1350, // position to go to to setup for high bar ram
+        HIGH_RAM_BEFORE_POS = 1150, // position to go to to setup for high bar ram
         HIGH_RAM_AFTER_POS = 1860, // position to go to after ramming high bar
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
@@ -32,7 +33,7 @@ public class Lift extends Subsystem {
         HIGH_BASKET_SAFETY_POS = 2880, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
-    public static final int DESTINATION_THRESHOLD = 20;
+    public static final int DESTINATION_THRESHOLD = 25, AUTO_DESTINATION_THRESHOLD = 15;
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
@@ -45,7 +46,7 @@ public class Lift extends Subsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        pid = new PIDController(0.004, 0, 0);
+        pid = new PIDController(0.003, 0.0008, 0);
         pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         pid.setOutputBounds(-1, 1);
 
@@ -74,7 +75,14 @@ public class Lift extends Subsystem {
     public Action moveTo(int target) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
                 Subsystem.setMotorPosition(liftMotor, target);
-                return !Subsystem.inRange(liftMotor, target, DESTINATION_THRESHOLD);
+                return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
+        };
+    }
+    public Action moveTo(int target, int posToPass) {
+        return (@NonNull TelemetryPacket telemetryPacket) -> {
+            Subsystem.setMotorPosition(liftMotor, target);
+            return !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD)
+                    && !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
         };
     }
 

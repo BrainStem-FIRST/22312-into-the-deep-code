@@ -22,6 +22,7 @@ public class LiftingSystem {
     public static final Vector2d DEPOSIT_CORNER = new Vector2d(-72, -72);
     public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
+    private boolean stayInTrough;
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -43,6 +44,9 @@ public class LiftingSystem {
         stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
 
         stateManager.setupStates(robot, stateManager);
+
+        buttonACued = false;
+        stayInTrough = true;
     }
 
     public void update(double dt) {
@@ -61,10 +65,16 @@ public class LiftingSystem {
     public void setButtonACued(boolean buttonACued) {
         this.buttonACued = buttonACued;
     }
+    public boolean getStayInTrough() {
+        return stayInTrough;
+    }
+    public void setStayInTrough(boolean stayInTrough) {
+        this.stayInTrough = stayInTrough;
+    }
 
     public Action transferBlock() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.TROUGH_POS),
+            robot.getLift().moveTo(Lift.TROUGH_POS - 5),
             robot.getGrabber().close(),
             robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
         );
@@ -78,10 +88,9 @@ public class LiftingSystem {
     public Action depositHigh() {
         return new SequentialAction(
             robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, 0.4),
-            robot.getLift().moveTo(Lift.HIGH_BASKET_SAFETY_POS),
+            robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
             new ParallelAction(
-                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0.4),
-                    robot.getLift().moveTo(Lift.HIGH_BASKET_POS),
+                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
                     new SequentialAction(
                             new SleepAction(0.2),
                             robot.getGrabber().open()

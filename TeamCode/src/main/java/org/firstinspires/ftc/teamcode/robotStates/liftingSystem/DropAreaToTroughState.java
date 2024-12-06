@@ -11,13 +11,18 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if(isFirstTime())
+        if(isFirstTime()) {
             robot.setIsDepositing(true);
+            robot.getLiftingSystem().setStayInTrough(true);
+        }
         // note: i use overrideGoalState here in case this state is entered while lift/arm is in transition (to make it quicker)
-        if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
+        if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
             robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            if(robot.getGrabber().hasBlock())
+                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+        }
 
-        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF)
             robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
     }
 
@@ -33,7 +38,7 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER;
+        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER || robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY;
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
+import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
@@ -73,12 +74,13 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("", "");
             telemetry.addData("is depositing", robot.isDepositing());
             telemetry.addData("can transfer", robot.canTransfer());
+            telemetry.addData("stay in trough", robot.getLiftingSystem().getStayInTrough());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("  lift goal position", robot.getLift().getTransitionState().getGoalStatePosition());
             telemetry.addData("  lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("  lift motor power", robot.getLift().getLiftMotor().getPower());
-            //telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
+            telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
             telemetry.addData("arm state", robot.getArm().getStateManager().getActiveStateType());
             telemetry.addData("grabber state", robot.getGrabber().getStateManager().getActiveStateType());
             telemetry.addData("  grabber has specimen", robot.getGrabber().hasSpecimen());
@@ -204,8 +206,17 @@ public class TeleMain extends LinearOpMode {
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
 
                 case TROUGH:
+                    // checking for bad transfer going down (resets lift back to trough pos)
+                    if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_POS
+                    && robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
+                        robot.setCanTransfer(false);
+                    // checking for bad transfer going up (manually provides power)
+                    else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION
+                    && robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_SAFETY_POS)
+                        Subsystem.setMotorPower(robot.getLift().getLiftMotor(), 1);
+
                     // activating manual transfer
-                    if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
+                    else if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
                     // activating transition to deposit in basket once transfer is complete
                     else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
@@ -262,8 +273,12 @@ public class TeleMain extends LinearOpMode {
                         }
                     }
                     // resetting lifting system to trough for transfer again
-                    else if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS)
+                    else if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS) {
+                        telemetry.addData("", "");
+                        telemetry.addData("transitioning to drop area to trough", "");
+                        telemetry.addData("", "");
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+                    }
                     break;
             }
     }
