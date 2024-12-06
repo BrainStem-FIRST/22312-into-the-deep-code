@@ -7,18 +7,8 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SpitTempState extends RobotState<Collector.StateType> {
 
-    // keeps track of how many frames - not based on time - it has been running for
-    private int framesRunning;
-
     public SpitTempState() {
         super(Collector.StateType.SPITTING_TEMP);
-        framesRunning = 0;
-    }
-
-    // resets framesRunning - meant to be called continuously
-    // as soon as you stop calling it, the state will stop
-    public void continueRunning() {
-        framesRunning = 0;
     }
 
     @Override

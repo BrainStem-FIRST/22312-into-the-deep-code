@@ -107,21 +107,17 @@ public class Collector extends Subsystem {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
     public Action collectAction() {
-        return new TimedAction() {
+        return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
-                if(getFramesRunning() >= Collector.MAX_AUTO_COLLECT_FRAMES
-                && getFramesRunning() <= Collector.MAX_AUTO_SPIT_FRAMES)
-                    setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
-                else
-                    setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
 
                 if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
                     autoColorValidationFrames++;
                 else
                     autoColorValidationFrames = 0;
-                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED && getFramesRunning() < 30;
+                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
             }
         };
     }
