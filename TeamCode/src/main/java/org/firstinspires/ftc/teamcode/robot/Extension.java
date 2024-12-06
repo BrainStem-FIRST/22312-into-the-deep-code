@@ -28,11 +28,11 @@ public class Extension extends Subsystem {
     // max position
     public static final int MAX_POSITION = 1880;
 
-    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 500;
+    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 500,
+        EXTRA_MIN_SAFETY_DIST = 50;
+    public static final double RETRACT_FROM_MIN_EXTEND_WAIT_TIME = 0.1;
 
-    public static int SHORT_EXTEND_POSITION = 500;
-    // threshold whenever extension is going to a target position
-    public static int GO_TO_THRESHOLD = 10;
+    public static int GO_TO_THRESHOLD = 10; // threshold whenever extension is going to a target position
 
     public static final double SEARCH_POWER = 0.55;
     public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.6, RETRACT_POWER_IN = -0.1;

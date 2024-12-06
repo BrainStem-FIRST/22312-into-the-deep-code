@@ -23,7 +23,7 @@ public class Hinge extends Subsystem {
     public static final double HINGE_SHAKE_DOWN_POSITION = 0.6;
     public static final int HINGE_UP_TICK = 2150, HINGE_DOWN_TICK = 1480;
     public static final double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.5;
-    public static double FULL_ROTATION_TIME = 0.2;
+    public static double FULL_ROTATION_TIME = 0.1;
 
     public enum StateType {
         UP,

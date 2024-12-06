@@ -5,15 +5,18 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.MotorPowerJamTracker;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -31,13 +34,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Collector extends Subsystem {
 
-    public static final int AUTO_COLOR_VALIDATION_REQUIRED = 3;
-    public static final int MAX_AUTO_COLLECT_FRAMES = 100, MAX_AUTO_SPIT_FRAMES = 10;
-    public static final double MAX_SPIN_POWER = 0.85;
-    public static final double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = 0.5;
+    public static final int AUTO_COLOR_VALIDATION_REQUIRED = 1;
+    public static final double COLLECT_POWER = 1, SPIT_POWER = -1;
+    public static final double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.8;
+    // # encoder ticks the spindle motor must travel in 1 frame to not be considered jammed
+    public static int JAM_ENCODER_TICK_REQUIREMENT = 10;
+    // number of tries the spindle motor gets to travel jam encoder ticks before it is considered jammed
+    // i.e. the collector gets 4 frame to try and travel at least 10 encoder ticks per frame before it is considered jammed
+    public static int JAM_FRAME_REQUIREMENT = 4;
+
 
     public enum StateType {
         NOTHING,
@@ -50,8 +58,8 @@ public class Collector extends Subsystem {
 
     private final StateManager<StateType> stateManager;
     private final DcMotorEx spindleMotor;
+    //private final MotorPowerJamTracker spindleMotorJamTracker;
 
-    // IN PROGRESS: replace touch sensor w color sensor and implement spitting state
     private final BlockColorSensor blockColorSensor;
     private BlockColor blockColorInTrough;
     private int autoColorValidationFrames;
@@ -60,9 +68,12 @@ public class Collector extends Subsystem {
         super(hwMap, telemetry, allianceColor, robot);
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
+        spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //resetJamTracking();
 
         blockColorSensor = new BlockColorSensor(hwMap, robot);
         blockColorInTrough = BlockColor.NONE;
+
 
         stateManager = new StateManager<>(StateType.NOTHING);
         stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING, spindleMotor));
@@ -90,6 +101,7 @@ public class Collector extends Subsystem {
     public void update(double dt) {
         blockColorSensor.update(dt);
         stateManager.update(dt);
+        //updateSpindleJamTracking();
     }
     public BlockColor getBlockColorInTrough() {
         return blockColorInTrough;
@@ -106,46 +118,50 @@ public class Collector extends Subsystem {
     public boolean isSpitting() {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
-    public Action collectAction() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setSpindleMotorPower(Collector.MAX_SPIN_POWER);
 
-                if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
-                    autoColorValidationFrames++;
-                else
-                    autoColorValidationFrames = 0;
-                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
-                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
-            }
-        };
+    public Action collectAction() {
+        return new SequentialAction(
+                telemetryPacket -> {
+                    //resetJamTracking();
+                    return false;
+                },
+                telemetryPacket -> {
+                    //updateSpindleJamTracking();
+
+                    // this should automatically resolve itself
+                    // once the block gets unjammed, the motor will start moving by enough encoders so that isJammed() -> false
+                    // TODO: this is temp code: tell justin to fix
+                    if(false)
+                    //if (isJammed())
+                        setSpindleMotorPower(Collector.AUTO_SPIT_SLOW_POWER);
+                    else
+                        setSpindleMotorPower(Collector.COLLECT_POWER);
+
+                    if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
+                        autoColorValidationFrames++;
+                    else
+                        autoColorValidationFrames = 0;
+                    return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                            && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+                }
+        );
     }
     public Action collectUntilHardStop() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
-                return !robot.getExtension().hitRetractHardStop();
-            }
+        return telemetryPacket -> {
+            setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
+            return !robot.getExtension().hitRetractHardStop();
         };
     }
     public Action spit() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
-                return false;
-            }
+        return telemetryPacket -> {
+            setSpindleMotorPower(Collector.SPIT_POWER);
+            return false;
         };
     }
     public Action stopCollector() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setSpindleMotorPower(0);
-                return false;
-            }
+        return telemetryPacket -> {
+            setSpindleMotorPower(0);
+            return false;
         };
     }
 }

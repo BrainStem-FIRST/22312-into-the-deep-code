@@ -24,7 +24,7 @@ public class JumpToMin extends RobotState<Extension.StateType> {
             robot.setCanTransfer(true);
 
         // go to min position
-        robot.getExtension().setExtensionMotorPosition(Extension.MIN_SEARCH_AND_COLLECT_POSITION + 50);
+        robot.getExtension().setExtensionMotorPosition(Extension.MIN_SEARCH_AND_COLLECT_POSITION + Extension.EXTRA_MIN_SAFETY_DIST);
     }
 
     @Override
@@ -40,8 +40,7 @@ public class JumpToMin extends RobotState<Extension.StateType> {
 
     @Override
     public boolean isDone() {
-        return Subsystem.inRange(robot.getExtension().getExtensionMotor(), Extension.MIN_SEARCH_AND_COLLECT_POSITION, THRESHOLD)
-                || robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION;
+        return robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION + Extension.MIN_SEARCH_AND_COLLECT_POSITION;
     }
 
     @Override

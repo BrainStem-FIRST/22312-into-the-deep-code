@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
-import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -16,7 +15,7 @@ public class SpitState extends RobotState<Collector.StateType> {
     public void execute() {
 
         // spit
-        robot.getCollector().setSpindleMotorPower(-Collector.MAX_SPIN_POWER);
+        robot.getCollector().setSpindleMotorPower(Collector.SPIT_POWER);
 
         // get the starting time to track safety to ensure block has enough buffer time to escape collector
         if (!robot.getCollector().getBlockColorSensor().hasValidatedColor() && startTime == 0)

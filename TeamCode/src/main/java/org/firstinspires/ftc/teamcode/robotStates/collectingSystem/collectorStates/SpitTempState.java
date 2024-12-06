@@ -14,7 +14,7 @@ public class SpitTempState extends RobotState<Collector.StateType> {
     @Override
     public void execute() {
         // spit
-        robot.getCollector().setSpindleMotorPower(-Collector.SPIT_TEMP_POWER);
+        robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
         framesRunning++;
 
         // tell robot that block is not ready for transfer

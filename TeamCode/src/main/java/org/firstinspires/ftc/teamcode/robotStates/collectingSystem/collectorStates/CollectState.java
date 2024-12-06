@@ -11,7 +11,13 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        robot.getCollector().setSpindleMotorPower(Collector.MAX_SPIN_POWER);
+        if (isFirstTime())
+            robot.getCollector().resetJamTracking();
+
+        if (robot.getCollector().isJammed())
+            robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+        else
+            robot.getCollector().setSpindleMotorPower(Collector.COLLECT_POWER);
     }
 
     @Override
