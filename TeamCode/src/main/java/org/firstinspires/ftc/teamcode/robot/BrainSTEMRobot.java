@@ -119,21 +119,24 @@ public class BrainSTEMRobot {
     }
 
 
+    //  NOTE: COLLECTING SYSTEM NEEDS TO BE UPDATED BEFORE LIFTING SYSTEM TO ENSURE COLOR SENSOR VALUES ARE UP TO DATE WHEN LIFTING SYSTEM USES THEM
     public void update(double dt) {
+        // drive train
         driveTrain.updatePoseEstimate();
-        // system managers
-        collectingSystem.update(dt);
-        liftingSystem.update(dt);
 
-        // update individual subsystems
+        // collecting system
+        collectingSystem.update(dt);
         collector.update(dt);
         hinge.update(dt);
         extension.update(dt);
 
+        // lifting system
+        liftingSystem.update(dt);
         grabber.update(dt);
         arm.update(dt);
         lift.update(dt);
 
+        // hanging system
         hanger.update(dt);
     }
 

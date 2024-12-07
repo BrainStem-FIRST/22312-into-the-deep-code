@@ -40,7 +40,7 @@ public class JumpToMin extends RobotState<Extension.StateType> {
 
     @Override
     public boolean isDone() {
-        return robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION + Extension.MIN_SEARCH_AND_COLLECT_POSITION;
+        return robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION;
     }
 
     @Override

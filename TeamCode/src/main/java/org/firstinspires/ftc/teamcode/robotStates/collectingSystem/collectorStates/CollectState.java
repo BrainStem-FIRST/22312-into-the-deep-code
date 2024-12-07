@@ -11,12 +11,13 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        if (isFirstTime())
-            robot.getCollector().resetJamTracking();
+        //if (isFirstTime())
+            //robot.getCollector().resetJamTracking();
 
-        if (robot.getCollector().isJammed())
-            robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
-        else
+        //if (robot.getCollector().isJammed())
+        //    robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+        //if(false)
+        //else
             robot.getCollector().setSpindleMotorPower(Collector.COLLECT_POWER);
     }
 

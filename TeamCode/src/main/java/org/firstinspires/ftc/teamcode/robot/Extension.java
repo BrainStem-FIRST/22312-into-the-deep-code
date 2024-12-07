@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -19,24 +20,23 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-
+@Config
 public class Extension extends Subsystem {
-    public static final double AUTO_SLOW_EXTEND_POWER = 0.3;
+    public static double AUTO_SLOW_EXTEND_POWER = 0.3;
 
     // TODO: find extension encoder ticks for these 3
-    public static final int MIN_POSITION = 5;
+    public static int MIN_POSITION = 5;
     // max position
-    public static final int MAX_POSITION = 1880;
+    public static int MAX_POSITION = 1880;
 
-    public static final int MIN_SEARCH_AND_COLLECT_POSITION = 500,
+    public static int MIN_SEARCH_AND_COLLECT_POSITION = 400,
         EXTRA_MIN_SAFETY_DIST = 50;
-    public static final double RETRACT_FROM_MIN_EXTEND_WAIT_TIME = 0.1;
 
     public static int GO_TO_THRESHOLD = 10; // threshold whenever extension is going to a target position
 
-    public static final double SEARCH_POWER = 0.55;
-    public static final double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.6, RETRACT_POWER_IN = -0.1;
-    public static final int RETRACT_SLOW_POSITION = 200;
+    public static double SEARCH_POWER = 0.6;
+    public static double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.7, RETRACT_POWER_IN = -0.1;
+    public static int RETRACT_SLOW_POSITION = 100;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING

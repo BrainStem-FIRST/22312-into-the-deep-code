@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 import org.firstinspires.ftc.teamcode.util.MotorPowerJamTracker;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -47,6 +48,7 @@ public class Collector extends Subsystem {
     public static int JAM_FRAME_REQUIREMENT = 4;
 
 
+    private final StateManager<StateType> stateManager;
     public enum StateType {
         NOTHING,
         COLLECTING,
@@ -55,10 +57,10 @@ public class Collector extends Subsystem {
         SPITTING_TEMP, // stops next frame unless called continuously
         VALID_BLOCK
     }
-
-    private final StateManager<StateType> stateManager;
+    public static int JAM_CURRENT_THRESHOLD = 6000;
+    public static int JAM_VALIDATION_FRAMES = 1;
+    private final MotorCurrentTracker motorCurrentTracker;
     private final DcMotorEx spindleMotor;
-    //private final MotorPowerJamTracker spindleMotorJamTracker;
 
     private final BlockColorSensor blockColorSensor;
     private BlockColor blockColorInTrough;
@@ -69,11 +71,11 @@ public class Collector extends Subsystem {
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
         spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //resetJamTracking();
+
+        motorCurrentTracker = new MotorCurrentTracker(spindleMotor, JAM_CURRENT_THRESHOLD, JAM_VALIDATION_FRAMES);
 
         blockColorSensor = new BlockColorSensor(hwMap, robot);
         blockColorInTrough = BlockColor.NONE;
-
 
         stateManager = new StateManager<>(StateType.NOTHING);
         stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING, spindleMotor));
@@ -101,7 +103,6 @@ public class Collector extends Subsystem {
     public void update(double dt) {
         blockColorSensor.update(dt);
         stateManager.update(dt);
-        //updateSpindleJamTracking();
     }
     public BlockColor getBlockColorInTrough() {
         return blockColorInTrough;
@@ -118,44 +119,29 @@ public class Collector extends Subsystem {
     public boolean isSpitting() {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
-
     public Action collectAction() {
-        return new SequentialAction(
-                telemetryPacket -> {
-                    //resetJamTracking();
-                    return false;
-                },
-                telemetryPacket -> {
-                    //updateSpindleJamTracking();
+        return telemetryPacket -> {
+            // updating motor current check
+            motorCurrentTracker.updateCurrentTracking();
+            if(motorCurrentTracker.hasValidatedAbnormalCurrent())
+                setSpindleMotorPower(Collector.SPIT_POWER);
+            else
+                setSpindleMotorPower(Collector.COLLECT_POWER);
 
-                    // this should automatically resolve itself
-                    // once the block gets unjammed, the motor will start moving by enough encoders so that isJammed() -> false
-                    // TODO: this is temp code: tell justin to fix
-                    if(false)
-                    //if (isJammed())
-                        setSpindleMotorPower(Collector.AUTO_SPIT_SLOW_POWER);
-                    else
-                        setSpindleMotorPower(Collector.COLLECT_POWER);
+            // checking for color sensor validation
+            if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
+                autoColorValidationFrames++;
+            else
+                autoColorValidationFrames = 0;
 
-                    if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
-                        autoColorValidationFrames++;
-                    else
-                        autoColorValidationFrames = 0;
-                    return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
-                            && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
-                }
-        );
+            return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                    && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+        };
     }
     public Action collectUntilHardStop() {
         return telemetryPacket -> {
             setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
             return !robot.getExtension().hitRetractHardStop();
-        };
-    }
-    public Action spit() {
-        return telemetryPacket -> {
-            setSpindleMotorPower(Collector.SPIT_POWER);
-            return false;
         };
     }
     public Action stopCollector() {

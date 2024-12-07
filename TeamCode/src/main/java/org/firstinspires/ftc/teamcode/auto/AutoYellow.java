@@ -23,20 +23,19 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 @Config
 public class AutoYellow extends LinearOpMode {
     public static class Params {
-        public double beginX = -39, beginY = -64, beginA = 0;
+        public double beginX = -40.5, beginY = -64.5, beginA = 0;
         public double depositX = -58, depositY = -58, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
-        public double rightBlockX = -48, rightBlockY = -40, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
-        public double midBlockX = -59, midBlockY = -39, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
-        public double leftBlockX = -45, leftBlockY = -28, leftBlockA = Math.toRadians(170), leftBlockT = Math.toRadians(180);
+        public double rightBlockX = -48.5, rightBlockY = -40, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
+        public double midBlockX = -60.5, midBlockY = -40, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
+        public double leftBlockX2 = -40, leftBlockY2 = -32.5, leftBlockX1 = -54, leftBlockY1 = -37.5, leftBlockA = Math.toRadians(135), leftBlockT = Math.toRadians(135);
         public double parkX = -12, parkY = 0, parkA = Math.toRadians(90);
 
-        public int rightBlockExtensionAmount = 540;
-        public int midBlockExtensionAmount = 540;
-        public int leftBlockExtensionAmount = 1100;
+        public int rightBlockExtensionAmount = 400;
+        public int midBlockExtensionAmount = 400;
+        public int leftBlockExtensionAmount = 400;
 
         public double rightBlockDriveForwardDistance = 8;
-        public double midBlockDriveForwardDistance = 10;
-        public double leftBlockDriveForwardDistance = 8;
+        public double midBlockDriveForwardDistance = 8;
     }
     public static Params params = new Params();
     @Override
@@ -48,8 +47,8 @@ public class AutoYellow extends LinearOpMode {
         Pose2d rightBlockCollectedPose = new Pose2d(params.rightBlockX, params.rightBlockY + params.rightBlockDriveForwardDistance, params.rightBlockA);
         Pose2d midBlockPose = new Pose2d(params.midBlockX, params.midBlockY, params.midBlockA);
         Pose2d midBlockCollectedPose = new Pose2d(params.rightBlockX, params.rightBlockY + params.midBlockDriveForwardDistance, params.midBlockA);
-        Pose2d leftBlockPose = new Pose2d(params.leftBlockX, params.leftBlockY, params.leftBlockA);
-        Pose2d leftBlockCollectedPose = new Pose2d(params.leftBlockX - params.leftBlockDriveForwardDistance, params.leftBlockY, params.leftBlockA);
+        Pose2d leftBlockPose = new Pose2d(params.leftBlockX1, params.leftBlockY1, params.leftBlockA);
+        Pose2d leftBlockCollectedPose = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.leftBlockA);
         Pose2d parkPose = new Pose2d(params.parkX, params.parkY, params.parkA);
 
         BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
@@ -84,11 +83,11 @@ public class AutoYellow extends LinearOpMode {
                 .lineToY(params.midBlockY + params.midBlockDriveForwardDistance);
 
         TrajectoryActionBuilder leftBlockTrajectory = drive.actionBuilder(depositPose)
-                .splineToLinearHeading(leftBlockPose, params.leftBlockT);
+                .strafeToLinearHeading(new Vector2d(params.leftBlockX1, params.leftBlockY1), params.leftBlockA);
+                //.splineToLinearHeading(leftBlockPose, params.leftBlockT);
         TrajectoryActionBuilder leftBlockDriveThroughTrajectory = drive.actionBuilder(leftBlockPose)
-                .lineToX(params.leftBlockX - params.leftBlockDriveForwardDistance);
-                //.lineToYConstantHeading(params.leftBlockYCollected + params.leftBlockDriveForwardDistance);
-            //.splineToConstantHeading(new Vector2d(params.leftBlockXCollected, params.leftBlockYCollected), Math.PI / 2);
+                .strafeToConstantHeading(new Vector2d(params.leftBlockX2, params.leftBlockY2));
+                //.lineToX(params.leftBlockX - params.leftBlockDriveForwardDistance);
 
         TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose)
                 .splineToLinearHeading(parkPose, Math.toRadians(0));
@@ -116,7 +115,7 @@ public class AutoYellow extends LinearOpMode {
                                 robot.getGrabber().close(),
                                 new SequentialAction(
                                         robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                                        robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME)
+                                        robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_TRANSFER_TIME)
                                 )
                         )
                 )
@@ -134,6 +133,7 @@ public class AutoYellow extends LinearOpMode {
                         new ParallelAction(
                                 robot.getExtension().retractAction(),
                                 firstDeposit,
+                                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME),
                                 robot.getLiftingSystem().depositHighInitial()
                         ),
                         // GET AND DEPOSIT RIGHT BLOCK

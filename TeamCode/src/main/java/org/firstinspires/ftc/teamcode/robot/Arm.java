@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -16,13 +17,15 @@ import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
+
+@Config
 public class Arm extends Subsystem {
     public static final int MIN_TICK = 935, MAX_TICK = 2450;
 
 
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
-    public static final double TRANSFER_TO_BASKET_SAFETY_TIME = 0.67,
+    public static double TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
             BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
             BASKET_DROP_TO_UP_TIME = 0.18,
             UP_TO_BASKET_SAFETY_TIME = 0.42,

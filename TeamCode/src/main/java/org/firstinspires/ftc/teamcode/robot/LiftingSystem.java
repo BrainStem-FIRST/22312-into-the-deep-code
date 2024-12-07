@@ -91,7 +91,7 @@ public class LiftingSystem {
             new ParallelAction(
                     robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0),
                     new SequentialAction(
-                            new SleepAction(0.15),
+                            new SleepAction(Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME - Grabber.FULL_ROTATION_TIME/2),
                             robot.getGrabber().open()
                     )
             )

@@ -12,8 +12,8 @@ public class CollectTempState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        if (isFirstTime())
-            robot.getCollector().resetJamTracking();
+        //if (isFirstTime())
+            //robot.getCollector().resetJamTracking();
 
         // collect
         robot.getCollector().setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
