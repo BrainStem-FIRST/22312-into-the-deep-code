@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
@@ -17,8 +13,6 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
-import org.firstinspires.ftc.teamcode.util.MotorPowerJamTracker;
-
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
@@ -32,21 +26,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 // if block is good, signal for de-extension
 // if block not good, spin wheels in opposite direction and run collect motor in opposite direction
 // then would need to adjust robot (and potentially extension) position to search new area for block
-
+@Config
 public class Collector extends Subsystem {
 
-    public static final int AUTO_COLOR_VALIDATION_REQUIRED = 1;
-    public static final double COLLECT_POWER = 1, SPIT_POWER = -1;
-    public static final double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
+    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
+    public static double COLLECT_POWER = 1, SPIT_POWER = -1;
+    public static double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
-    public static double SAFETY_SPIT_TIME = 0.8;
-    // # encoder ticks the spindle motor must travel in 1 frame to not be considered jammed
-    public static int JAM_ENCODER_TICK_REQUIREMENT = 10;
-    // number of tries the spindle motor gets to travel jam encoder ticks before it is considered jammed
-    // i.e. the collector gets 4 frame to try and travel at least 10 encoder ticks per frame before it is considered jammed
-    public static int JAM_FRAME_REQUIREMENT = 4;
-
+    public static double SAFETY_SPIT_TIME = 0.4;
 
     private final StateManager<StateType> stateManager;
     public enum StateType {
@@ -119,7 +107,7 @@ public class Collector extends Subsystem {
     public boolean isSpitting() {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
-    public Action collectAction() {
+    public Action collect() {
         return telemetryPacket -> {
             // updating motor current check
             motorCurrentTracker.updateCurrentTracking();
@@ -144,7 +132,7 @@ public class Collector extends Subsystem {
             return !robot.getExtension().hitRetractHardStop();
         };
     }
-    public Action stopCollector() {
+    public Action stopCollect() {
         return telemetryPacket -> {
             setSpindleMotorPower(0);
             return false;

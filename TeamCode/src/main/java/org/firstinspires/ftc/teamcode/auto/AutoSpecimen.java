@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -15,27 +17,29 @@ import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 
+import java.util.Arrays;
+
 @Autonomous
 @Config
-public class AutoSpecimenRedTeam extends LinearOpMode {
+public class AutoSpecimen extends LinearOpMode {
     public static class Params {
-        public double beginX = 0, beginY = -64, beginA = Math.toRadians(90);
-        public double hang1Y = -21.8; // first hang is a straight orthogonal line
+        public double beginX = 7.5, beginY = -64.5, beginA = Math.toRadians(90);
+        public double hang1X = 0, hang1Y = -21.8; // first hang is a strafe to
 
-        public double leftBlockX1 = 36, leftBlockY1 = -24, leftBlockA1 = Math.toRadians(90), leftBlockT1 = Math.toRadians(45);
-        public double leftBlockX2 = 46, leftBlockY2 = -15, leftBlockA2 = Math.toRadians(90), leftBlockT2 = Math.toRadians(315);
+        public double leftBlockX1 = 17.5, leftBlockY1 = -39, leftBlockA1 = Math.toRadians(180);
+        public double leftBlockX2 = 47, leftBlockY2 = -13, leftBlockA2 = Math.toRadians(90), leftBlockT2 = Math.toRadians(270);
         public double leftBlockPushDistance = 40;
         public double hangLeftX = 5, hangLeftY = -21.8, hangLeftA = Math.toRadians(90);
 
         public double midBlockX = 60, midBlockY = -15, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90); // try to make it so the block can go in the divet in the back of the robot??:
         public double midBlockPushDistance = 40;
     }
-    Params params = new Params();
+    public static Params params = new Params();
 
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d beginPose = new Pose2d(params.beginX, params.beginY, params.beginA);
-        Pose2d hang1Pose = new Pose2d(params.beginX, params.hang1Y, params.beginA);
+        Pose2d hang1Pose = new Pose2d(params.hang1X, params.hang1Y, params.beginA);
 
         Pose2d leftBlockPose1 = new Pose2d(params.leftBlockX1, params.leftBlockY1, params.leftBlockA1);
         Pose2d leftBlockPose2 = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.leftBlockA2);
@@ -50,11 +54,12 @@ public class AutoSpecimenRedTeam extends LinearOpMode {
 
         // hang first specimen
         TrajectoryActionBuilder driveToSpecimen1HangTrajectory = drive.actionBuilder(beginPose)
-                .lineToY(params.hang1Y);
+                .strafeTo(new Vector2d(params.hang1X, params.hang1Y));
 
         // push first block into human player area
         TrajectoryActionBuilder pushLeftBlockTrajectory = drive.actionBuilder(hang1Pose)
-                .splineToLinearHeading(leftBlockPose1, params.leftBlockT1)
+                .strafeTo(new Vector2d(params.leftBlockX1, params.leftBlockY1))
+                .setReversed(true)
                 .splineToLinearHeading(leftBlockPose2, params.leftBlockT2)
                 .lineToY(leftBlockAfterPose.position.y);
 
@@ -90,21 +95,23 @@ public class AutoSpecimenRedTeam extends LinearOpMode {
                 new ParallelAction(
                         robot.getLiftingSystem().resetSpecimenRam(),
                         pushLeftBlock
-                ),
+                )
 
+                /*
                 // push second block into human player
                 new ParallelAction(
-                        pushMidBlock,
-                        robot.getLiftingSystem().transferToDropOff()
+                        pushMidBlock
+                        //robot.getLiftingSystem().transferToDropOff()
                 ),
 
                 //get first specimen from wall and hang it on bar
-                robot.getGrabber().close(),
+                //robot.getGrabber().close(),
                 new ParallelAction(
-                        driveToLeftSpecimenHang,
-                        robot.getLiftingSystem().setupHighSpecimenRam()
-                ),
-                robot.getLiftingSystem().ramHighSpecimen()
+                        driveToLeftSpecimenHang
+                        //robot.getLiftingSystem().setupHighSpecimenRam()
+                )
+                //robot.getLiftingSystem().ramHighSpecimen()
+                 */
         ));
 
     }

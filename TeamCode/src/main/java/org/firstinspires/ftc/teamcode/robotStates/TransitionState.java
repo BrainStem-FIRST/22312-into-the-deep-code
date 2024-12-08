@@ -35,4 +35,7 @@ public abstract class TransitionState<StateType extends Enum<StateType>> extends
     public double getGoalStatePosition() {
         return goalPosition;
     }
+    public StateType getGoalStateType() {
+        return goalStateType;
+    }
 }

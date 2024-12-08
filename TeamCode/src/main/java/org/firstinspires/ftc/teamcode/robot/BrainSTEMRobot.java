@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.auto.AutoYellow;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 
 public class BrainSTEMRobot {
@@ -24,7 +26,7 @@ public class BrainSTEMRobot {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean canTransfer;
+    private boolean canTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
     private boolean isDepositing;
@@ -204,10 +206,21 @@ public class BrainSTEMRobot {
         this.isDepositing = isDepositing;
     }
 
-    public Action retractAndTransferAndDeposit() {
+    public Action retractAndDepositAndExtend(int extensionTick) {
         return new SequentialAction(
                 getCollectingSystem().retractAction(),
-                getCollector().stopCollector(),
+                getLiftingSystem().transferBlock(),
+                getCollector().stopCollect(),
+                new ParallelAction(
+                        getCollectingSystem().startCollectSequence(extensionTick),
+                        getLiftingSystem().depositHigh()
+                )
+        );
+    }
+    public Action retractAndDeposit() {
+        return new SequentialAction(
+                getCollectingSystem().retractAction(),
+                getCollector().stopCollect(),
                 getLiftingSystem().transferBlock(),
                 getLiftingSystem().depositHigh()
         );

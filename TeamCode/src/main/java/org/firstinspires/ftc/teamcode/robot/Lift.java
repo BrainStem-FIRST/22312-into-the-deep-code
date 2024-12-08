@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
-    public static final double NORMAL_KP = 0.003, NORMAL_KI = 0.0008, NORMAL_KD = 0, LOWERING_KP = 0.002, LOWERING_KI = 0;
+    public static double NORMAL_KP = 0.003, NORMAL_KI = 0.0008, NORMAL_KD = 0, LOWERING_KP = 0.002, LOWERING_KI = 0.0008;
     public static int ABSOLUTE_MIN = -50, TROUGH_POS = -5;
     public static int TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 50, // position where grabber can grab onto specimen
@@ -30,13 +30,12 @@ public class Lift extends Subsystem {
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
         HIGH_RAM_BEFORE_POS = 1300, // position to go to to setup for high bar ram
-        HIGH_RAM_AFTER_POS = 1860, // position to go to after ramming high bar
+        HIGH_RAM_AFTER_POS = 1820, // position to go to after ramming high bar
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
-        AUTO_HIGH_BASKET_POS = 3300,
         HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
-        HIGH_BASKET_SAFETY_POS = 2800, // position where arm can start rotating into position to deposit on high basket
+        HIGH_BASKET_SAFETY_POS = 2900, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
     public static int DESTINATION_THRESHOLD = 30, // threshold in which I consider a lift transition done during tele
@@ -96,8 +95,8 @@ public class Lift extends Subsystem {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
             Subsystem.setMotorPosition(liftMotor, target);
             //updateLiftAutoMovement(target);
-            return !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD)
-                    && !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
+            return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
+                    && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
         };
     }
 

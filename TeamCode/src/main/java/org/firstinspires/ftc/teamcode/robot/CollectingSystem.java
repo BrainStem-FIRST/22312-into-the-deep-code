@@ -65,25 +65,22 @@ public class CollectingSystem {
         return robot;
     }
 
-    public Action extendAndCollectAction(int extendMotorTick) {
+    public Action startCollectSequence(int extendMotorTick) {
         return new ParallelAction(
-                new SequentialAction(
-                        getRobot().getExtension().extendAction(extendMotorTick)//,
-                        //getRobot().getExtension().slowExtendAction()
-                ),
-
-                getRobot().getCollector().collectAction(),
+                getRobot().getExtension().extendAction(extendMotorTick),
 
                 new SequentialAction(
                         new SleepAction(0.1),
-                        new ParallelAction(
-                                new SequentialAction(
-                                        getRobot().getHinge().hingeDownAction(),
-                                        getRobot().getHinge().shakeHingeDown()
-                                )
-                        )
+                        getRobot().getHinge().hingeDownAction()
                 )
 
+        );
+    }
+
+    public Action startCollect() {
+        return new ParallelAction(
+                getRobot().getCollector().collect(),
+                getRobot().getHinge().shakeHingeDown()
         );
     }
     public Action retractAction() {

@@ -127,6 +127,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  extension actual power", robot.getExtension().getExtensionMotor().getPower());
             telemetry.addData("  hitting extension hard stop", robot.getExtension().hitRetractHardStop());
             telemetry.addData("  magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
+            telemetry.addData(" raw magnet sensor state", robot.getExtension().getMagnetSwitch().getState());
 
             // robot's hanging system
             telemetry.addData("", "");
@@ -147,6 +148,12 @@ public class TeleMain extends LinearOpMode {
         // final double STRAFE_X_AMP = 0.3;
         final double STRAFE_Y_AMP = 0.5;
         final double TURN_AMP = 0.8;
+        final double hangAndExtendPower = 0.2;
+
+
+        if (robot.getLift().getTransitionState().getGoalStateType() == Lift.StateType.RAM_AFTER
+        && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
+            robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(new Vector2d(hangAndExtendPower, 0), 0));
 
         //int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
         int strafeDirY = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
@@ -208,6 +215,12 @@ public class TeleMain extends LinearOpMode {
         // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
         if (gamepadTracker.isDpadDownPressed())
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
+
+        // short extend while hanging
+        if (gamepadTracker.isAPressed()
+                && robot.getLift().getTransitionState().getGoalStateType() == Lift.StateType.RAM_AFTER)
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+
     }
     private void listenForLiftingInput() {
         // checking changes in basket/bar heights

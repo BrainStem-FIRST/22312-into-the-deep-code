@@ -7,14 +7,13 @@ import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class RetractingState extends RobotState<CollectingSystem.StateType> {
-
-    private boolean waitingForHinge;
     public RetractingState() {
         super(CollectingSystem.StateType.RETRACTING);
-        waitingForHinge = false;
     }
     @Override
     public void execute() {
+        if (isFirstTime())
+            robot.setCanTransfer(true);
         // force hinge to be in up position
         robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
 

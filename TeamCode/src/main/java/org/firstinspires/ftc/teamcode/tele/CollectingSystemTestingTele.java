@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
@@ -56,6 +57,7 @@ public class CollectingSystemTestingTele extends LinearOpMode {
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
+
         waitForStart();
 
         extensionMotor = hardwareMap.get(DcMotorEx.class, "ExtensionMotor");
@@ -78,6 +80,12 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             telemetry.addData("extension encoder", extensionMotor.getCurrentPosition());
             telemetry.addData("extension motor power", extensionMotor.getPower());
             telemetry.addData("manual pid value", Range.clip(0.01 * (Extension.MIN_POSITION - extensionMotor.getCurrentPosition()), -1, 1));
+
+            telemetry.addData("", "");
+            telemetry.addData("collector motor power", spindleMotor.getPower());
+            telemetry.addData("collector motor current (in milliamps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+
+
             telemetry.update();
         }
     }

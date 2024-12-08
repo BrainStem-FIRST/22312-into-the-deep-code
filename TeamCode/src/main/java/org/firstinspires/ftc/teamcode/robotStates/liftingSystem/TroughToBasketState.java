@@ -22,19 +22,16 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
             // only want to set lift state to be in transition if in trough; not if its already going up
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
-                robot.getLift().getTransitionState().getPid().setkI(0);
             }
 
             else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
                 // if and else if below checks for basket overriding
                 if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
                     robot.getLift().getTransitionState().overrideGoalPosition(Lift.HIGH_BASKET_POS);
-                    robot.getLift().getTransitionState().getPid().setkI(0);
                     // robot.telemetry.addData("basket overriding during transition", "");
                 }
                 else if(!robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS) {
                     robot.getLift().getTransitionState().overrideGoalPosition(Lift.LOW_BASKET_POS);
-                    robot.getLift().getTransitionState().getPid().setkI(0);
                     // robot.telemetry.addData("basket overriding during transition", "");
                 }
                 // optimization did not work as of 12/1; i don't know why

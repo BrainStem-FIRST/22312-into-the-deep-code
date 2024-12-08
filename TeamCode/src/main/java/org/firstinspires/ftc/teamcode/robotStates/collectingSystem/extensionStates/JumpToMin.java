@@ -18,11 +18,6 @@ public class JumpToMin extends RobotState<Extension.StateType> {
     @Override
     public void execute() {
 
-        // reset canTransfer so the actions of collecting and spitting temp of prev block do not affect
-        // this collection cycle
-        if (isFirstTime())
-            robot.setCanTransfer(true);
-
         // go to min position
         robot.getExtension().setExtensionMotorPosition(Extension.MIN_SEARCH_AND_COLLECT_POSITION + Extension.EXTRA_MIN_SAFETY_DIST);
     }

@@ -33,7 +33,6 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
                 || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
                     robot.getLift().getTransitionState().getPid().setkP(Lift.LOWERING_KP);
-                    robot.getLift().getTransitionState().getPid().setkI(Lift.LOWERING_KI);
                     robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.UP_TO_BASKET_SAFETY_TIME);
                 }
             }

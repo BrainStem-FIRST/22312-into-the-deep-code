@@ -3,14 +3,16 @@ package org.firstinspires.ftc.teamcode.robot;
 import java.util.HashMap;
 import java.util.Objects;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
+@Config
 public class BlockColorSensor {
 
     // how many frames the collector has had the block with the same color (to reduce noise)
-    public static double BLOCK_COLOR_VALIDATION_TIME = 0.5;
+    public static double BLOCK_COLOR_VALIDATION_TIME = 0.2;
 
     // stores r, g and b bounds as Double[] for each block color as a new entry in the hashmap
     public static final HashMap<BlockColor, Double[]> MAX_BLOCK_PERCENTS = new HashMap<>();
@@ -127,7 +129,6 @@ public class BlockColorSensor {
         double rPercent = red * 100. / sum;
         double gPercent = green * 100. / sum;
         double bPercent = blue * 100. / sum;
-
 
         return colorPercentInRange(rPercent, MAX_BLOCK_PERCENTS.get(blockColor)[0], MIN_BLOCK_PERCENTS.get(blockColor)[0]) &&
                 colorPercentInRange(gPercent, MAX_BLOCK_PERCENTS.get(blockColor)[1], MIN_BLOCK_PERCENTS.get(blockColor)[1]) &&

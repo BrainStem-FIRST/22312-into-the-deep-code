@@ -74,7 +74,7 @@ public class LiftingSystem {
 
     public Action transferBlock() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.TROUGH_POS - 5),
+            robot.getLift().moveTo(Lift.TROUGH_POS - Lift.AUTO_DESTINATION_THRESHOLD/2),
             robot.getGrabber().close(),
             robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
         );
@@ -87,7 +87,7 @@ public class LiftingSystem {
     }
     public Action depositHighInitial() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.AUTO_HIGH_BASKET_POS, Lift.HIGH_BASKET_SAFETY_POS),
+            robot.getLift().moveTo(Lift.HIGH_BASKET_POS, Lift.HIGH_BASKET_SAFETY_POS),
             new ParallelAction(
                     robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0),
                     new SequentialAction(
@@ -105,7 +105,7 @@ public class LiftingSystem {
     }
     public Action lowerFromDeposit() {
         return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_DROP_TO_UP_TIME),
+                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
                 new ParallelAction(
                         robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
                         robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)

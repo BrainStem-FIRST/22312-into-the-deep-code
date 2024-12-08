@@ -22,32 +22,29 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Config
 public class Extension extends Subsystem {
-    public static double AUTO_SLOW_EXTEND_POWER = 0.3;
-
     // TODO: find extension encoder ticks for these 3
-    public static int MIN_POSITION = 5;
-    // max position
-    public static int MAX_POSITION = 1880;
+    public static int MIN_POSITION = 5,
+            RETRACT_SLOW_POSITION = 100,
+            MIN_SEARCH_AND_COLLECT_POSITION = 350,
+            MAX_POSITION = 1880;
 
-    public static int MIN_SEARCH_AND_COLLECT_POSITION = 400,
-        EXTRA_MIN_SAFETY_DIST = 50;
+    public static int GO_TO_THRESHOLD = 10, // if extension going to target position and is within this threshold of distance, from it, we consider the transition complete
+            EXTRA_MIN_SAFETY_DIST = GO_TO_THRESHOLD + 10;  // extra distance that extension goes to in short extend to ensure you can hinge down straight after
 
-    public static int GO_TO_THRESHOLD = 10; // threshold whenever extension is going to a target position
-
-    public static double SEARCH_POWER = 0.6;
-    public static double RETRACT_POWER_FAST = -1, RETRACT_POWER_SLOW = -0.7, RETRACT_POWER_IN = -0.1;
-    public static int RETRACT_SLOW_POSITION = 100;
+    public static double SEARCH_POWER = 0.6,
+            RETRACT_POWER_FAST = -1,
+            RETRACT_POWER_SLOW = -0.7,
+            RETRACT_POWER_IN = -0.1;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
     }
-    private final PIDController pid;
+    private final StateManager<StateType> stateManager;
+
     private final DcMotorEx extensionMotor;
+    private final PIDController pid;
     private final DigitalChannel magnetResetSwitch;
     private double targetPower;
-
-
-    private final StateManager<StateType> stateManager;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot);
@@ -97,6 +94,9 @@ public class Extension extends Subsystem {
     public void setTargetPower(double targetPower) {
         this.targetPower = targetPower;
     }
+    public DigitalChannel getMagnetSwitch() {
+        return magnetResetSwitch;
+    }
 
     public boolean isMagnetSwitchActivated() {
         return !magnetResetSwitch.getState();
@@ -118,24 +118,6 @@ public class Extension extends Subsystem {
                 setExtensionMotorPosition(targetPosition);
                 return !Subsystem.inRange(getExtensionMotor(), targetPosition, GO_TO_THRESHOLD);
                 //return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
-            }
-        };
-    }
-    public Action slowExtendAction() {
-        return new SequentialAction(
-                slowExtensionAction(),
-                stopExtensionAction()
-        );
-    }
-    private Action slowExtensionAction() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (getExtensionMotor().getCurrentPosition() < Extension.MAX_POSITION)
-                    setExtensionMotorPower(Extension.AUTO_SLOW_EXTEND_POWER);
-                else
-                    return false;
-                return getRobot().getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE;
             }
         };
     }

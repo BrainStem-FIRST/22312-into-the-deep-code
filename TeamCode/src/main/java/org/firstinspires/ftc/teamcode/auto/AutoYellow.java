@@ -17,25 +17,25 @@ import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
+import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 
 @Autonomous(name="AutoYellow")
 @Config
 public class AutoYellow extends LinearOpMode {
     public static class Params {
-        public double beginX = -40.5, beginY = -64.5, beginA = 0;
-        public double depositX = -58, depositY = -58, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
-        public double rightBlockX = -48.5, rightBlockY = -40, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
-        public double midBlockX = -60.5, midBlockY = -40, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
-        public double leftBlockX2 = -40, leftBlockY2 = -32.5, leftBlockX1 = -54, leftBlockY1 = -37.5, leftBlockA = Math.toRadians(135), leftBlockT = Math.toRadians(135);
-        public double parkX = -12, parkY = 0, parkA = Math.toRadians(90);
+        public double beginX = -40.825, beginY = -64.5, beginA = 0;
+        public double depositX = -58.5, depositY = -59.5, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
+        public double rightBlockX = -49.5, rightBlockY = -44, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
+        public double midBlockX = -61.8, midBlockY = -42, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
+        public double leftBlockX1 = -58.7, leftBlockY1 = -40.5, leftBlockX2 = 60.5, leftBlockY2 = -26, leftBlockA = Math.toRadians(135);
+        public double parkX = -12, parkY = 0, parkA = Math.toRadians(0), parkT = Math.toRadians(0);
+        public int rightBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
+        public int midBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
+        public int leftBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
 
-        public int rightBlockExtensionAmount = 400;
-        public int midBlockExtensionAmount = 400;
-        public int leftBlockExtensionAmount = 400;
-
-        public double rightBlockDriveForwardDistance = 8;
-        public double midBlockDriveForwardDistance = 8;
+        public double rightBlockDriveForwardDistance = 7;
+        public double midBlockDriveForwardDistance = 7;
     }
     public static Params params = new Params();
     @Override
@@ -90,7 +90,7 @@ public class AutoYellow extends LinearOpMode {
                 //.lineToX(params.leftBlockX - params.leftBlockDriveForwardDistance);
 
         TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose)
-                .splineToLinearHeading(parkPose, Math.toRadians(0));
+                .splineToLinearHeading(parkPose, params.parkT);
 
         Action firstDeposit = firstDepositTrajectory.build();
 
@@ -111,12 +111,15 @@ public class AutoYellow extends LinearOpMode {
         // setting up robot
         Actions.runBlocking(
                 new SequentialAction(
-                        new ParallelAction(
-                                robot.getGrabber().close(),
-                                new SequentialAction(
-                                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                                        robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_TRANSFER_TIME)
-                                )
+                        robot.getGrabber().close(),
+                        new SequentialAction(
+                                // setting up lift and arm
+                                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
+                                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_TRANSFER_TIME),
+
+                                // setting up extension and hinge
+                                robot.getHinge().hingeUpAction(),
+                                robot.getExtension().retractAction()
                         )
                 )
         );
@@ -128,61 +131,64 @@ public class AutoYellow extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        // DEPOSIT FIRST BLOCK
+                        // DEPOSIT FIRST BLOCK & PREP FOR RIGHT BLOCK COLLECTION
                         // depositing block that you start with
+                        // extend and hinge down while doing this
                         new ParallelAction(
-                                robot.getExtension().retractAction(),
                                 firstDeposit,
                                 robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME),
-                                robot.getLiftingSystem().depositHighInitial()
+                                robot.getLiftingSystem().depositHighInitial(),
+                                robot.getCollectingSystem().startCollectSequence(params.rightBlockExtensionAmount)
                         ),
                         // GET AND DEPOSIT RIGHT BLOCK
                         // resetting lift, driving to position and extending and collecting right block
                         new ParallelAction(
+                                robot.getLiftingSystem().lowerFromDeposit(),
+
+                                robot.getCollectingSystem().startCollect(),
                                 new SequentialAction(
                                         rightBlock,
                                         rightBlockDriveThrough
-                                ),
-                                robot.getCollectingSystem().extendAndCollectAction(params.rightBlockExtensionAmount),
-                                robot.getLiftingSystem().lowerFromDeposit()
+                                )
                         ),
-                        // retracting extension, transferring block to lift, and going to deposit position and depositing
+                        // retracting extension, transferring block to lift, going to deposit position and depositing, and doing a short extend and hinge
                         new ParallelAction(
-                                robot.retractAndTransferAndDeposit(),
-                                rightBlockDeposit
+                                rightBlockDeposit,
+                                robot.retractAndDepositAndExtend(params.midBlockExtensionAmount)
                         ),
 
                         // GET AND DEPOSIT MIDDLE BLOCK
                         new ParallelAction(
-                                new SequentialAction(
-                                        midBlock, midBlockDriveThrough
-                                ),
                                 robot.getLiftingSystem().lowerFromDeposit(),
-                                robot.getCollectingSystem().extendAndCollectAction(params.midBlockExtensionAmount)
+                                robot.getCollectingSystem().startCollect(),
+                                new SequentialAction(
+                                        midBlock,
+                                        midBlockDriveThrough
+                                )
                         ),
                         new ParallelAction(
-                                robot.retractAndTransferAndDeposit(),
-                                midBlockDeposit
+                                midBlockDeposit,
+                                robot.retractAndDepositAndExtend(params.leftBlockExtensionAmount)
                         ),
 
                         // GET AND DEPOSIT LEFT BLOCK
                         new ParallelAction(
+                                robot.getLiftingSystem().lowerFromDeposit(),
+                                robot.getCollectingSystem().startCollect(),
                                 new SequentialAction(
                                         leftBlock,
                                         leftBlockDriveThrough
-                                ),
-                                robot.getLiftingSystem().lowerFromDeposit(),
-                                robot.getCollectingSystem().extendAndCollectAction(params.leftBlockExtensionAmount)
+                                )
                         ),
                         new ParallelAction(
-                                robot.retractAndTransferAndDeposit(),
-                                leftBlockDeposit
+                                leftBlockDeposit,
+                                robot.retractAndDeposit()
                         ),
 
                         // PARK ROBOT
                         new ParallelAction(
                                 robot.getLiftingSystem().lowerFromDeposit(),
-                            park
+                                park
                         )
                 )
         );
