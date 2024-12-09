@@ -319,8 +319,11 @@ public class TeleMain extends LinearOpMode {
 
         // checking for gamepad1 x; button for activating safety overrides
         else if(input.getGamepadTracker1().isFirstFrameX())
+            // checking for overriding transfer to safety position
+            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TRANSFER)
+                robot.setShouldTransfer(false);
             // handling block knocking check
-            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+            else if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
             && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
                 robot.setShouldTransfer(false);
