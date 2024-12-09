@@ -17,62 +17,21 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     public void execute() {
         // handling actual transfer
         if(robot.shouldTransfer()) {
-            if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-                // transfer stage 1: opening grabber, setting arm to transfer pos, and lowering lift if at trough safety
-                if(robot.getCollector().hasValidBlockColor()) {
-                    // resetting grabber to be ready to transfer
-                    if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                        robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                        robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
-                    }
-                    // moving arm into position to transfer
-                    if (robot.getArm().getStateManager().getActiveStateType() != Arm.StateType.TRANSFER)
-                        robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
-
-                    // lowering lift to transfer once both subsystems are ready
-                    if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN
-                            && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER) {
-                        robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
-                        robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
-                    }
-                }
-                // stage 3: checks if transfer is actually successful or not (only then it stops repeating transfer cycle)
-                else
-                    robot.setShouldTransfer(false);
-            }
-            // transfer stage 2: closing onto block once lift is down and raising lift
-            else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
-                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
-                    robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
-
-                    robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());
-                    robot.setIsDepositing(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW); // here I set isDepositing automatically (basically, it is reset every time transfer occurs)
-                    robot.getLiftingSystem().setStayInTrough(false); // I also reset stayInTrough every time there is a transfer
-                }
-                // waiting for grabber to close on block before raising lift
-                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                    robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-                }
-            }
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TRANSFER);
         }
-
-        // handling transitions after transfer and checking if suddenly cannot transfer
+        // checking if need to transfer again and handling transitions after transfer and checking if suddenly cannot transfer
         else {
+            // this would handle automatic transition to transfer; note that it depends on color sensor
+            if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN
+            && robot.getCollector().hasValidBlockColor()) {
+                robot.setShouldTransfer(true); // next frame transfer will occur
+            }
             // if have successful transfer and is depositing
-            if (robot.getGrabber().hasBlock() && robot.isDepositing())
+            else if (robot.getGrabber().hasBlock() && robot.isDepositing())
                 robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
-                // prepping for specimen pickup at human player station
+            // prepping for specimen pickup at human player station
             else if (!robot.getLiftingSystem().getStayInTrough())
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
-
-
-            // handling the resetting of lift to trough safety if already started transfer
-            if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_POS)
-                robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-
-            // handling resetting of grabber if already started transfer
-            if(robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.CLOSE_POS)
-                robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
         }
     }
 

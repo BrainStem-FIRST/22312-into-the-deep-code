@@ -13,8 +13,9 @@ public class InState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute() {
-        if(isFirstTime())
+        if(isFirstTime()) {
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+        }
         robot.getExtension().getStateManager().tryEnterState(Extension.StateType.IN);
     }
 
