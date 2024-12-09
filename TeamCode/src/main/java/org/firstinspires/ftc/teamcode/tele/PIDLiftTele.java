@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class PIDLiftTele extends LinearOpMode {
 
     public static class Params {
-        public double kP = 0.005, kI = 0, kD = 0;
+        public double kP = 0.002, kI = 0.0008, kD = 0;
     }
     public static Params PARAMS = new Params();
     Input input;

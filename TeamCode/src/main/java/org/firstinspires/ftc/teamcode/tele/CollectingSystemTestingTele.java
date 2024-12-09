@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,10 +14,10 @@ import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 import org.firstinspires.ftc.teamcode.util.Input;
-import org.firstinspires.ftc.teamcode.util.MotorPowerJamTracker;
+import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 
-
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "ExtensionTestingTele")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingSystemTestingTele")
+@Config
 public class CollectingSystemTestingTele extends LinearOpMode {
 
     /*
@@ -31,11 +32,8 @@ public class CollectingSystemTestingTele extends LinearOpMode {
         public int maxExtensionTick = 1880;
         public double extensionSearchPower = 0.55;
 
-        public int spindleJamFrames = 4; // number of frames it gets to try to unjam
-        public int spindleJamRequiredEncoderTicks = 10; // must travel at least 10 ticks per frame to unjam
-        public double spindleJamPower = -0.2; // power given to spindle motor when it is jammed
-        public double collectPower = 1;
-        public double spitPower = -1;
+        public double collectPower = 0.99;
+        public double spitPower = -0.99;
         public double spitTempPower = -0.5;
         public double collectTempPower = 0.4;
 
@@ -43,14 +41,17 @@ public class CollectingSystemTestingTele extends LinearOpMode {
         public int minHingeTick = 1480;
         public double hingeUpPosition = 0.99;
         public double hingeDownPosition = 0.01;
+
+
     }
     public static Params params = new Params();
 
     private Input input;
     private DcMotorEx extensionMotor, spindleMotor;
+    private MotorCurrentTracker spindleCurrentTracker;
     private ServoImplEx hingeServo;
+    private double spindleJamSpitFrames;
 
-    private MotorPowerJamTracker spindleJamTracker;
     @Override
     public void runOpMode() throws InterruptedException {
          input = new Input(gamepad1, gamepad2);
@@ -65,13 +66,15 @@ public class CollectingSystemTestingTele extends LinearOpMode {
 
         spindleMotor = hardwareMap.get(DcMotorEx.class, "CollectSpindleMotor");
         spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        spindleJamTracker = new MotorPowerJamTracker(spindleMotor, params.collectPower, params.spindleJamRequiredEncoderTicks, params.spindleJamFrames);
+        spindleCurrentTracker = new MotorCurrentTracker(spindleMotor, 6000, 3);
+        spindleJamSpitFrames = 0;
 
         hingeServo = hardwareMap.get(ServoImplEx.class, "CollectHingeServo");
         hingeServo.setPwmRange(new PwmControl.PwmRange(params.minHingeTick, params.maxHingeTick));
 
         while(opModeIsActive()) {
             input.update();
+            spindleCurrentTracker.updateCurrentTracking();
 
             listenForExtensionControls(input.getGamepadTracker1());
             listenForSpindleControls(input.getGamepadTracker1());
@@ -82,9 +85,11 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             telemetry.addData("manual pid value", Range.clip(0.01 * (Extension.MIN_POSITION - extensionMotor.getCurrentPosition()), -1, 1));
 
             telemetry.addData("", "");
+            telemetry.addData("collector motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
             telemetry.addData("collector motor power", spindleMotor.getPower());
-            telemetry.addData("collector motor current (in milliamps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
-
+            telemetry.addData("is abnormal validated", spindleCurrentTracker.hasValidatedAbnormalCurrent());
+            telemetry.addData("abnormal frames", spindleCurrentTracker.getConsecutiveAbnormalFrames());
+            telemetry.addData("is abnormal raw", spindleCurrentTracker.hasRawAbnormalCurrent());
 
             telemetry.update();
         }
@@ -99,11 +104,24 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             Subsystem.setMotorPower(extensionMotor, 0);
     }
     public void listenForSpindleControls(GamepadTracker gamepadTracker) {
-
-        spindleJamTracker.updateJamTracking();
-        if (spindleJamTracker.isJammed())
-            Subsystem.setMotorPower(spindleMotor, params.spindleJamPower);
-
+        if (spindleCurrentTracker.hasValidatedAbnormalCurrent()) {
+            spindleJamSpitFrames++;
+            Subsystem.setMotorPower(spindleMotor, params.spitTempPower);
+        }
+        else {
+            spindleJamSpitFrames = 0;
+            if (gamepadTracker.isAPressed())
+                Subsystem.setMotorPower(spindleMotor, params.collectPower);
+            else
+                Subsystem.setMotorPower(spindleMotor, 0);
+        }
+        /*
+        if(spindleMotor.getCurrent(CurrentUnit.MILLIAMPS) > 5000)
+            Subsystem.setMotorPower(spindleMotor, params.spitTempPower);
+        else
+            Subsystem.setMotorPower(spindleMotor, params.collectPower);
+        */
+        /*
         else if (gamepadTracker.isAPressed())
             Subsystem.setMotorPower(spindleMotor, params.collectPower);
         else if (gamepadTracker.isBPressed())
@@ -114,6 +132,7 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             Subsystem.setMotorPower(spindleMotor, params.spitTempPower);
         else
             Subsystem.setMotorPower(spindleMotor, 0);
+         */
     }
     public void listenForHingeControls(GamepadTracker gamepadTracker) {
         if (gamepadTracker.isRightTriggerPressed())

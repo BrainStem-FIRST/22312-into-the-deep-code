@@ -5,11 +5,9 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
@@ -22,9 +20,15 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 public class Lift extends Subsystem {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
-    public static double NORMAL_KP = 0.003, NORMAL_KI = 0.0008, NORMAL_KD = 0, LOWERING_KP = 0.002, LOWERING_KI = 0.0008;
-    public static int ABSOLUTE_MIN = -50, TROUGH_POS = -5;
-    public static int TROUGH_SAFETY_POS = 350, // position where arm can safely raise without colliding with collector
+    // TODO: big transition kp can be better
+    public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
+    public static double KP = 0.0042, ZERO_KD = 0;
+    public static int DESTINATION_THRESHOLD = 40, // threshold in which I consider a lift transition done during tele
+            AUTO_DESTINATION_THRESHOLD = 40; // threshold in which I consider a lift transition done during auto
+    public static int ABSOLUTE_MIN = -50,
+        TROUGH_POS = 0,
+        AUTO_TROUGH_POS = TROUGH_POS,
+        TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 50, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
@@ -35,12 +39,9 @@ public class Lift extends Subsystem {
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
         HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
-        HIGH_BASKET_SAFETY_POS = 2900, // position where arm can start rotating into position to deposit on high basket
+        HIGH_BASKET_SAFETY_POS = 2830, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
-    public static int DESTINATION_THRESHOLD = 30, // threshold in which I consider a lift transition done during tele
-        AUTO_DESTINATION_THRESHOLD = 15, // threshold in which I consider a lift transition done during auto
-        AUTO_TO_POSITION_THRESHOLD = 300; // when lift distance from goal encoder is smaller than this, I set lift to runToTargetPosition
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
@@ -53,7 +54,7 @@ public class Lift extends Subsystem {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        pid = new PIDController(NORMAL_KP, NORMAL_KI, NORMAL_KD);
+        pid = new PIDController(KP, ZERO_KI, ZERO_KD);
         pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         pid.setOutputBounds(-1, 1);
 
@@ -78,23 +79,42 @@ public class Lift extends Subsystem {
     public void update(double dt) {
         stateManager.update(dt);
     }
-    private void updateLiftAutoMovement(int target) {
-        if(Subsystem.inRange(liftMotor, target, Lift.AUTO_TO_POSITION_THRESHOLD))
-            Subsystem.setMotorPosition(liftMotor, target);
-        else
-            Subsystem.setMotorPower(liftMotor, Range.clip(target - liftMotor.getCurrentPosition(), -1, 1));
+    public void updateLiftAutoPidMovement(int target) {
+        pid.setTarget(target);
+        telemetry.addData("lift pid target", pid.getTarget());
+        telemetry.addData("lift power", liftMotor.getPower());
+        telemetry.addData("lift position", liftMotor.getCurrentPosition());
+        telemetry.addData("kP", pid.getkP());
+        telemetry.addData("kI", pid.getkI());
+        telemetry.addData("kD", pid.getkD());
+        telemetry.update();
+        Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
+
     }
     public Action moveTo(int target) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
-            Subsystem.setMotorPosition(liftMotor, target);
-            //updateLiftAutoMovement(target);
+            updateLiftAutoPidMovement(target);
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
         };
     }
     public Action moveTo(int target, int posToPass) {
+        int startPos = liftMotor.getCurrentPosition();
+        return (@NonNull TelemetryPacket telemetryPacket) -> {
+            updateLiftAutoPidMovement(target);
+            return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
+                    && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
+        };
+    }
+    public Action moveToWithoutPid(int target) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
             Subsystem.setMotorPosition(liftMotor, target);
-            //updateLiftAutoMovement(target);
+            return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
+        };
+    }
+    public Action moveToWithoutPid(int target, int posToPass) {
+        int startPos = liftMotor.getCurrentPosition();
+        return (@NonNull TelemetryPacket telemetryPacket) -> {
+            Subsystem.setMotorPosition(liftMotor, target);
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
                     && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
         };

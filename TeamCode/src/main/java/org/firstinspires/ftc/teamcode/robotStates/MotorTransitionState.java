@@ -65,6 +65,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     @Override
     public void overrideGoalState(double goalPosition, StateType goalStateType) {
         if(pid != null) {
+            usingPid = true;
             pid.reset();
             pid.setTarget(goalPosition);
         }
@@ -105,14 +106,10 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         int motorPos = motor.getCurrentPosition();
         int desiredDir = (int)goalPosition - startEncoder;
         int curDif = (int)goalPosition - motorPos;
-        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD)
-                || Math.signum(desiredDir) != Math.signum(curDif); // checking if moving up, if difference is positive, vice versa for moving down
+        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
+                //|| Math.signum(desiredDir) != Math.signum(curDif); // checking if moving up, if difference is positive, vice versa for moving down
     }
 
-    @Override
-    public StateType getNextStateType() {
-        return goalStateType;
-    }
     public PIDController getPid() {
         return pid;
     }

@@ -41,6 +41,12 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
             stateManager.tryEnterState(stateType);
         }
     }
+    public void overrideGoalState(double goalPosition, StateType goalStateType, double timeDone) {
+        this.timeDone = timeDone;
+        this.goalPosition = goalPosition;
+        this.goalStateType = goalStateType;
+        stateManager.tryEnterState(stateType);
+    }
     @Override
     public void execute() {
         servo.setPosition(goalPosition);

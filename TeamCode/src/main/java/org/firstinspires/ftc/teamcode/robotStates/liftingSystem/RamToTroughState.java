@@ -29,7 +29,6 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
                     robot.getArm().getTransitionState().setGoalState(Arm.UP_POS, Arm.StateType.UP, Arm.SPECIMEN_HANG_TO_UP_TIME);
                 else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.UP) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-                    robot.getLift().getTransitionState().getPid().setkP(Lift.LOWERING_KP);
                     robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.UP_TO_TRANSFER_TIME);
                 }
             }

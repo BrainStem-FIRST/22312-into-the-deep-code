@@ -19,9 +19,6 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
-import org.firstinspires.ftc.teamcode.robot.Subsystem;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
-import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 import org.firstinspires.ftc.teamcode.util.Input;
@@ -45,7 +42,6 @@ public class TeleMain extends LinearOpMode {
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
-        robot.setup();
 
         waitForStart();
 
@@ -56,7 +52,10 @@ public class TeleMain extends LinearOpMode {
         double minDt = 10;
         timeSinceStart = 0; // time since start of match; need for hanging
 
+        // initial robot setup
+        robot.setup();
         while (opModeIsActive()) {
+
             // update dt
             prevTime = currentTime;
             currentTime = System.currentTimeMillis();
@@ -102,6 +101,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("lift state", robot.getLift().getStateManager().getActiveStateType());
             telemetry.addData("  lift's active state's time", robot.getLift().getStateManager().getActiveState().getTime());
             telemetry.addData("  lift goal encoder", robot.getLift().getTransitionState().getGoalStatePosition());
+            telemetry.addData("  lift goal state", robot.getLift().getTransitionState().getNextStateType());
             telemetry.addData("  lift motor encoder", robot.getLift().getLiftMotor().getCurrentPosition());
             telemetry.addData("  lift motor power", robot.getLift().getLiftMotor().getPower());
             telemetry.addData("  lift transition pid", robot.getLift().getTransitionState().getPid().toString());
@@ -121,6 +121,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  validated block color sensor", robot.getCollector().getBlockColorSensor().getValidatedColor());
             telemetry.addData("  block color in trough", robot.getCollector().getBlockColorInTrough());
             telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
+            telemetry.addData("  hinge goal pwm", robot.getHinge().getTransitionState().getGoalStatePosition());
             telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
             telemetry.addData("  extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
             telemetry.addData("  extension target power", robot.getExtension().getTargetPower());
@@ -146,12 +147,12 @@ public class TeleMain extends LinearOpMode {
     }
     private void listenForDriveTrainInput() {
         // final double STRAFE_X_AMP = 0.3;
-        final double STRAFE_Y_AMP = 0.5;
+        final double STRAFE_Y_AMP = 0.3;
         final double TURN_AMP = 0.8;
         final double hangAndExtendPower = 0.2;
 
 
-        if (robot.getLift().getTransitionState().getGoalStateType() == Lift.StateType.RAM_AFTER
+        if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER
         && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(new Vector2d(hangAndExtendPower, 0), 0));
 
@@ -218,7 +219,7 @@ public class TeleMain extends LinearOpMode {
 
         // short extend while hanging
         if (gamepadTracker.isAPressed()
-                && robot.getLift().getTransitionState().getGoalStateType() == Lift.StateType.RAM_AFTER)
+                && robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER)
             robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
 
     }
@@ -320,10 +321,10 @@ public class TeleMain extends LinearOpMode {
         }
         else if (input.getGamepadTracker2().isRightTriggerPressed()) {
             if (robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
-                robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_TICK, Hanger.StateType.HANG_DOWN);
+                robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_ENCODER, Hanger.StateType.HANG_DOWN);
             else if (robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.TRANSITION
             && robot.getHanger().getTransitionState().getGoalStatePosition() == Hanger.UP_TICK)
-                robot.getHanger().getTransitionState().overrideGoalState(Hanger.HANG_DOWN_TICK, Hanger.StateType.HANG_DOWN);
+                robot.getHanger().getTransitionState().overrideGoalState(Hanger.HANG_DOWN_ENCODER, Hanger.StateType.HANG_DOWN);
         }
     }
 

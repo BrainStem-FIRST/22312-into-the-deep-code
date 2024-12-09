@@ -12,10 +12,6 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-
-        // reset canTransfer so the actions of collecting and spitting temp of prev block do not affect next transfer
-        if (isFirstTime())
-            robot.setCanTransfer(true);
         //if(isFirstTime())
         //    robot.getExtension().getPid().reset();
         //if(!robot.getInPidMode())

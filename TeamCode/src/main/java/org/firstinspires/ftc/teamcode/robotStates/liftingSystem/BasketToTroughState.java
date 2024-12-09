@@ -19,6 +19,7 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
         //OLD CODE (but it works): if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // releasing block
             if(robot.getGrabber().hasBlock()) {
+                robot.getLiftingSystem().setStayInTrough(false); // resets need to stay in trough once block is deposited
                 robot.getLiftingSystem().setButtonACued(false); // resets button cuing to be set for next time
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                 robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
@@ -32,7 +33,6 @@ public class BasketToTroughState extends RobotState<LiftingSystem.StateType> {
                 else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
                 || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-                    robot.getLift().getTransitionState().getPid().setkP(Lift.LOWERING_KP);
                     robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.UP_TO_BASKET_SAFETY_TIME);
                 }
             }

@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
@@ -30,7 +31,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Collector extends Subsystem {
 
     public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
-    public static double COLLECT_POWER = 1, SPIT_POWER = -1;
+    public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
     public static double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
@@ -45,9 +46,9 @@ public class Collector extends Subsystem {
         SPITTING_TEMP, // stops next frame unless called continuously
         VALID_BLOCK
     }
-    public static int JAM_CURRENT_THRESHOLD = 6000;
-    public static int JAM_VALIDATION_FRAMES = 1;
-    private final MotorCurrentTracker motorCurrentTracker;
+    public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 5000;
+    public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 10;
+    private final MotorCurrentTracker teleCurrentTracker, autoCurrentTracker;
     private final DcMotorEx spindleMotor;
 
     private final BlockColorSensor blockColorSensor;
@@ -60,7 +61,8 @@ public class Collector extends Subsystem {
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
         spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        motorCurrentTracker = new MotorCurrentTracker(spindleMotor, JAM_CURRENT_THRESHOLD, JAM_VALIDATION_FRAMES);
+        teleCurrentTracker = new MotorCurrentTracker(spindleMotor, TELE_JAM_CURRENT_THRESHOLD, TELE_JAM_VALIDATION_FRAMES);
+        autoCurrentTracker = new MotorCurrentTracker(spindleMotor, AUTO_JAM_CURRENT_THRESHOLD, AUTO_JAM_VALIDATION_FRAMES);
 
         blockColorSensor = new BlockColorSensor(hwMap, robot);
         blockColorInTrough = BlockColor.NONE;
@@ -89,6 +91,7 @@ public class Collector extends Subsystem {
 
     @Override
     public void update(double dt) {
+        teleCurrentTracker.updateCurrentTracking();
         blockColorSensor.update(dt);
         stateManager.update(dt);
     }
@@ -110,11 +113,11 @@ public class Collector extends Subsystem {
     public Action collect() {
         return telemetryPacket -> {
             // updating motor current check
-            motorCurrentTracker.updateCurrentTracking();
-            if(motorCurrentTracker.hasValidatedAbnormalCurrent())
-                setSpindleMotorPower(Collector.SPIT_POWER);
+            autoCurrentTracker.updateCurrentTracking();
+            if(autoCurrentTracker.hasValidatedAbnormalCurrent())
+                setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
             else
-                setSpindleMotorPower(Collector.COLLECT_POWER);
+                setSpindleMotorPower(Collector.AUTO_COLLECT_POWER);
 
             // checking for color sensor validation
             if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
@@ -122,9 +125,17 @@ public class Collector extends Subsystem {
             else
                 autoColorValidationFrames = 0;
 
+            telemetry.addData("motor current (milliAmps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+            telemetry.addData("validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
+            telemetry.addData("motor power", spindleMotor.getPower());
+            telemetry.update();
             return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
                     && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
         };
+    }
+    public Action hasNoBlock() {
+        return telemetryPacket -> blockColorSensor.getRawBlockColor() == BlockColor.NONE;
+
     }
     public Action collectUntilHardStop() {
         return telemetryPacket -> {

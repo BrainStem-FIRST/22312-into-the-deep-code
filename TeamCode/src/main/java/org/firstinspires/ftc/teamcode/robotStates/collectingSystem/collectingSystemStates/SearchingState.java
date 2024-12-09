@@ -22,17 +22,16 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
             extensionManager.tryEnterState(Extension.StateType.JUMP_TO_MIN);
 
             // if previous state was search and collect, this will hinge up and stop collector
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
+            robot.getHinge().goToHingeUpState();
 
             collectorManager.tryEnterState(Collector.StateType.NOTHING);
         }
 
         // transitioning between collector doing nothing and spitting
-        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING
-                && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
-        else if (robot.getCollector().isSpitting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.MIDDLE)
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
+        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING)
+            robot.getHinge().goToHingeUpState();
+        else if (robot.getCollector().isSpitting())
+            robot.getHinge().goToHingeMiddleState();
     }
 
     @Override

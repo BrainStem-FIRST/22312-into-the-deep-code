@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,7 +17,11 @@ public class Hanger extends Subsystem {
 
     // TODO: find down and up tick values and threshold
     // down refers to the position the hanging goes to after it is on the bar
-    public final static int FULL_DOWN_TICK = 0, HANG_DOWN_TICK = 8100, UP_TICK = 33600, DESTINATION_THRESHOLD = 30;
+    public final static int FULL_DOWN_ENCODER = 0,
+            HANG_DOWN_ENCODER = 8100,
+            HANG_PARK_ENCODER = 11700,
+            UP_TICK = 33600,
+            DESTINATION_THRESHOLD = 70;
     public final static double HANG_HOLD_POWER = -0.3;
 
     public enum StateType {
@@ -35,9 +40,8 @@ public class Hanger extends Subsystem {
         hangMotor = hwMap.get(DcMotorEx.class, "HangMotor");
         hangMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        hangMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        pid = new PIDController(0.04, 0, 0);
+        pid = new PIDController(0.004, 0.0005, 0);
 
         stateManager = new StateManager<>(StateType.FULL_DOWN);
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
@@ -45,7 +49,7 @@ public class Hanger extends Subsystem {
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
         transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD, pid);
-        transitionState.setEncoderBounds(FULL_DOWN_TICK, UP_TICK);
+        transitionState.setEncoderBounds(FULL_DOWN_ENCODER, UP_TICK);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
@@ -65,5 +69,12 @@ public class Hanger extends Subsystem {
     @Override
     public void update(double dt) {
         stateManager.update(dt);
+    }
+    public Action moveTo(int target) {
+        return telemetryPacket -> {
+            pid.setTarget(target);
+            Subsystem.setMotorPower(hangMotor, Hanger.HANG_PARK_ENCODER);
+            return Subsystem.inRange(hangMotor, target, DESTINATION_THRESHOLD);
+        };
     }
 }

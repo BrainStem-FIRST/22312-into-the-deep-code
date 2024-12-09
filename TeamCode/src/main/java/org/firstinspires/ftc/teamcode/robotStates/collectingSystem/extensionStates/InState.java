@@ -12,12 +12,18 @@ public class InState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute() {
-        if(robot.getExtension().hitRetractHardStop() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.TROUGH_POS) {
+        if(!robot.getExtension().hitRetractHardStop()) {
+            robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER_IN);
+            robot.getExtension().setTargetPower(Extension.RETRACT_POWER_IN);
+        }
+        else if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.TROUGH) {
+            robot.getExtension().setExtensionMotorPower(Extension.TRANSFER_POWER_IN);
+            robot.getExtension().setTargetPower(Extension.TRANSFER_POWER_IN);
+        }
+        else {
             robot.getExtension().setExtensionMotorPower(0);
             robot.getExtension().getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        else
-            robot.getExtension().setExtensionMotorPower(Extension.RETRACT_POWER_IN);
     }
 
     @Override

@@ -27,10 +27,10 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
         // transitioning between collecting and spitting
-        if (robot.getCollector().isCollecting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.DOWN)
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
-        else if (robot.getCollector().isSpitting() && robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.MIDDLE)
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE);
+        if (robot.getCollector().isCollecting())
+            robot.getHinge().goToHingeDownState();
+        else if (robot.getCollector().isSpitting())
+            robot.getHinge().goToHingeMiddleState();
     }
 
     @Override

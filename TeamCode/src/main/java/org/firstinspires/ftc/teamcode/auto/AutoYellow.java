@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.ProfileParams;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 
 @Autonomous(name="AutoYellow")
@@ -25,17 +27,17 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 public class AutoYellow extends LinearOpMode {
     public static class Params {
         public double beginX = -40.825, beginY = -64.5, beginA = 0;
-        public double depositX = -58.5, depositY = -59.5, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
-        public double rightBlockX = -49.5, rightBlockY = -44, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
-        public double midBlockX = -61.8, midBlockY = -42, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
-        public double leftBlockX1 = -58.7, leftBlockY1 = -40.5, leftBlockX2 = 60.5, leftBlockY2 = -26, leftBlockA = Math.toRadians(135);
-        public double parkX = -12, parkY = 0, parkA = Math.toRadians(0), parkT = Math.toRadians(0);
+        public double depositX = -57.1, depositY = -58.1, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
+        public double rightBlockX = -49.35, rightBlockY = -45, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
+        public double midBlockX = -62, midBlockY = -43, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
+        public double leftBlockX1 = -60.5, leftBlockY1 = -38, leftBlockX2 = -60.5, leftBlockY2 = -21, leftBlockA = Math.toRadians(135);
+        public double parkX1 = -36, parkY1 = -8, parkX2 = -15, parkY2 = -8, parkA = Math.toRadians(270);
         public int rightBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int midBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int leftBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
 
-        public double rightBlockDriveForwardDistance = 7;
-        public double midBlockDriveForwardDistance = 7;
+        public double rightBlockDriveForwardDistance = 9;
+        public double midBlockDriveForwardDistance = 9;
     }
     public static Params params = new Params();
     @Override
@@ -49,7 +51,8 @@ public class AutoYellow extends LinearOpMode {
         Pose2d midBlockCollectedPose = new Pose2d(params.rightBlockX, params.rightBlockY + params.midBlockDriveForwardDistance, params.midBlockA);
         Pose2d leftBlockPose = new Pose2d(params.leftBlockX1, params.leftBlockY1, params.leftBlockA);
         Pose2d leftBlockCollectedPose = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.leftBlockA);
-        Pose2d parkPose = new Pose2d(params.parkX, params.parkY, params.parkA);
+
+        ProfileParams wayPointProfileParams = new ProfileParams(2, Math.toRadians(20), 1e-2);
 
         BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
         PinpointDrive drive = robot.getDriveTrain();
@@ -89,8 +92,9 @@ public class AutoYellow extends LinearOpMode {
                 .strafeToConstantHeading(new Vector2d(params.leftBlockX2, params.leftBlockY2));
                 //.lineToX(params.leftBlockX - params.leftBlockDriveForwardDistance);
 
-        TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose)
-                .splineToLinearHeading(parkPose, params.parkT);
+        TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose, wayPointProfileParams)
+                .strafeToLinearHeading(new Vector2d(params.parkX1, params.parkY1), params.parkA)
+                .strafeToConstantHeading(new Vector2d(params.parkX2, params.parkY2));
 
         Action firstDeposit = firstDepositTrajectory.build();
 
@@ -108,22 +112,6 @@ public class AutoYellow extends LinearOpMode {
 
         Action park = parkTrajectory.build();
 
-        // setting up robot
-        Actions.runBlocking(
-                new SequentialAction(
-                        robot.getGrabber().close(),
-                        new SequentialAction(
-                                // setting up lift and arm
-                                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_TRANSFER_TIME),
-
-                                // setting up extension and hinge
-                                robot.getHinge().hingeUpAction(),
-                                robot.getExtension().retractAction()
-                        )
-                )
-        );
-
         telemetry.addLine("Robot Ready");
         telemetry.update();
 
@@ -135,6 +123,7 @@ public class AutoYellow extends LinearOpMode {
                         // depositing block that you start with
                         // extend and hinge down while doing this
                         new ParallelAction(
+                                robot.getGrabber().close(), // ensuring has good grip on block
                                 firstDeposit,
                                 robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME),
                                 robot.getLiftingSystem().depositHighInitial(),
@@ -180,15 +169,24 @@ public class AutoYellow extends LinearOpMode {
                                         leftBlockDriveThrough
                                 )
                         ),
+                        // DEPOSIT LEFT BLOCK, RESET, AND PARK
                         new ParallelAction(
-                                leftBlockDeposit,
-                                robot.retractAndDeposit()
-                        ),
+                                // SET UP HANG
+                                robot.getHanger().moveTo(Hanger.HANG_PARK_ENCODER),
 
-                        // PARK ROBOT
-                        new ParallelAction(
-                                robot.getLiftingSystem().lowerFromDeposit(),
-                                park
+                                // DEPOSIT LEFT BLOCK
+                                new SequentialAction(
+                                        new ParallelAction(
+                                                leftBlockDeposit,
+                                                robot.retractAndDeposit()
+                                        ),
+
+                                        // PARK ROBOT
+                                        new ParallelAction(
+                                                robot.getLiftingSystem().lowerFromDeposit(),
+                                                park
+                                        )
+                                )
                         )
                 )
         );

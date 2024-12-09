@@ -19,7 +19,8 @@ public class CollectTempState extends RobotState<Collector.StateType> {
         robot.getCollector().setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
 
         // tell robot that block is not ready for transfer
-        if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
+        if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN
+        && robot.getCollectingSystem().getStateManager().getActiveState().getTime() > 0.1)
             robot.setCanTransfer(false);
     }
 

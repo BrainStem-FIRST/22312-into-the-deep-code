@@ -24,7 +24,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Extension extends Subsystem {
     // TODO: find extension encoder ticks for these 3
     public static int MIN_POSITION = 5,
-            RETRACT_SLOW_POSITION = 100,
+            RETRACT_SLOW_POSITION = 120,
             MIN_SEARCH_AND_COLLECT_POSITION = 350,
             MAX_POSITION = 1880;
 
@@ -34,7 +34,8 @@ public class Extension extends Subsystem {
     public static double SEARCH_POWER = 0.6,
             RETRACT_POWER_FAST = -1,
             RETRACT_POWER_SLOW = -0.7,
-            RETRACT_POWER_IN = -0.1;
+            RETRACT_POWER_IN = -0.5,
+            TRANSFER_POWER_IN = -0.2;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
@@ -85,7 +86,8 @@ public class Extension extends Subsystem {
         Subsystem.setMotorPower(extensionMotor, power);
     }
     public void retractExtensionMotor() {
-        Subsystem.setMotorPower(extensionMotor, extensionMotor.getCurrentPosition() > RETRACT_SLOW_POSITION ? RETRACT_POWER_FAST : RETRACT_POWER_SLOW);
+        targetPower = extensionMotor.getCurrentPosition() > RETRACT_SLOW_POSITION ? RETRACT_POWER_FAST : RETRACT_POWER_SLOW;
+        Subsystem.setMotorPower(extensionMotor, targetPower);
     }
 
     public double getTargetPower() {

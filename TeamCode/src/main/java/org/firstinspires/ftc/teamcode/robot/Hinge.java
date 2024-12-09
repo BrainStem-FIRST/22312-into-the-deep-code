@@ -25,7 +25,7 @@ public class Hinge extends Subsystem {
     public static double HINGE_SHAKE_DOWN_POSITION = 0.6;
     public static int HINGE_UP_TICK = 2250, HINGE_DOWN_TICK = 1480;
     public static double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.65;
-    public static double FULL_ROTATION_TIME = 0.2;
+    public static double HINGE_DOWN_TIME = 0.2, HINGE_UP_TIME = 0.3;
 
     public enum StateType {
         UP,
@@ -50,7 +50,7 @@ public class Hinge extends Subsystem {
         stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
         stateManager.addState(StateType.MIDDLE, new NothingState<>(StateType.MIDDLE));
 
-        transitionState = new ServoTransitionState<>(StateType.TRANSITION, hingeServo, FULL_ROTATION_TIME);
+        transitionState = new ServoTransitionState<>(StateType.TRANSITION, hingeServo);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(getRobot(), stateManager);
@@ -67,10 +67,39 @@ public class Hinge extends Subsystem {
         hingeServo.setPosition(position);
     }
 
-
     @Override
     public void update(double dt) {
         stateManager.update(dt);
+    }
+
+    // these functions do not override hinge transition if it is already in transition
+    public void goToHingeUpState() {
+        if (stateManager.getActiveStateType() == StateType.UP)
+            return;
+        double time =  HINGE_UP_TIME;
+        if (stateManager.getActiveStateType() == StateType.MIDDLE)
+            time *= 0.5;
+        transitionState.setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP, time);
+
+    }
+    public void goToHingeMiddleState() {
+        if (stateManager.getActiveStateType() == StateType.MIDDLE)
+            return;
+
+        double time = HINGE_UP_TIME * 0.5;
+        if (stateManager.getActiveStateType() == StateType.UP)
+            time = HINGE_DOWN_TIME * 0.5;
+        transitionState.setGoalState(Hinge.HINGE_MIDDLE_POSITION, Hinge.StateType.MIDDLE, time);
+    }
+    public void goToHingeDownState() {
+        if (stateManager.getActiveStateType() == StateType.DOWN)
+            return;
+
+        double time = HINGE_DOWN_TIME;
+        if (stateManager.getActiveStateType() == StateType.MIDDLE)
+            time *= 0.5;
+
+        transitionState.setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN, time);
     }
 
     private Action hingeServoUp() {
@@ -88,13 +117,13 @@ public class Hinge extends Subsystem {
     public Action hingeUpAction() {
         return new SequentialAction(
                 hingeServoUp(),
-                new SleepAction(FULL_ROTATION_TIME)
+                new SleepAction(HINGE_UP_TIME)
         );
     }
     public Action hingeDownAction() {
         return new SequentialAction(
                 hingeServoDown(),
-                new SleepAction(FULL_ROTATION_TIME)
+                new SleepAction(HINGE_DOWN_TIME)
         );
     }
 

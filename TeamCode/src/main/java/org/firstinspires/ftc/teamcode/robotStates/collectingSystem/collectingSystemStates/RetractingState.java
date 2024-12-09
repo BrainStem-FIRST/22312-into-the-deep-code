@@ -15,16 +15,15 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
         if (isFirstTime())
             robot.setCanTransfer(true);
         // force hinge to be in up position
-        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP);
+        if (robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)
+            robot.getHinge().getTransitionState().overrideGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP, Hinge.HINGE_UP_TIME);
 
         // retract when hinging is done
         if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.UP)
                 robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
-        else
-            robot.getExtension().setTargetPower(0); // do not let extension move
 
         // collect while retracting to make sure block stays in
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
     }
 
     @Override

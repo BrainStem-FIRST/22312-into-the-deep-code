@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.AutoYellow;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 
 public class BrainSTEMRobot {
@@ -100,6 +99,7 @@ public class BrainSTEMRobot {
             telemetry.update();
             time = System.currentTimeMillis() / 1000.0 - start;
         }
+
     }
     private boolean setupLiftingSystem(double time) {
         grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
@@ -111,10 +111,9 @@ public class BrainSTEMRobot {
     private boolean setupCollectingSystem(double time) {
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
 
-        if (time >= Hinge.FULL_ROTATION_TIME)
-            extension.setExtensionMotorPower(-0.5);
+        if (time >= Hinge.HINGE_UP_TIME)
+            extension.retractExtensionMotor();
         if (extension.hitRetractHardStop()) {
-            extension.setExtensionMotorPosition(0);
             extension.getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         return extension.hitRetractHardStop();
@@ -209,8 +208,8 @@ public class BrainSTEMRobot {
     public Action retractAndDepositAndExtend(int extensionTick) {
         return new SequentialAction(
                 getCollectingSystem().retractAction(),
-                getLiftingSystem().transferBlock(),
                 getCollector().stopCollect(),
+                getLiftingSystem().transferBlockOnce(),
                 new ParallelAction(
                         getCollectingSystem().startCollectSequence(extensionTick),
                         getLiftingSystem().depositHigh()
@@ -221,7 +220,7 @@ public class BrainSTEMRobot {
         return new SequentialAction(
                 getCollectingSystem().retractAction(),
                 getCollector().stopCollect(),
-                getLiftingSystem().transferBlock(),
+                getLiftingSystem().transferBlockOnce(),
                 getLiftingSystem().depositHigh()
         );
     }

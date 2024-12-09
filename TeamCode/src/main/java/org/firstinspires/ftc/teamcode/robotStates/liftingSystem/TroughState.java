@@ -50,6 +50,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN
                 && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                    robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
                 }
             }
             // transfer stage 2: closing onto block once lift is down and raising lift

@@ -68,6 +68,9 @@ public class Arm extends Subsystem {
     }
 
     public Action rotateTo(double pos, double timeDone) {
+        telemetry.addData("", "rotateTo is being called for arm");
+        telemetry.addData("", "pos: " + pos + " | timeDone: " + timeDone);
+        telemetry.update();
         return new SequentialAction(
                 rotateServo(pos),
                 new SleepAction(timeDone)

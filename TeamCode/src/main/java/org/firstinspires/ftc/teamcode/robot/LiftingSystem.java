@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
@@ -72,13 +73,47 @@ public class LiftingSystem {
         this.stayInTrough = stayInTrough;
     }
 
+    // continuous block transfer until block is grabbed onto (also uses pid)
     public Action transferBlock() {
+        ElapsedTime grabTimer = new ElapsedTime();
+        return telemetryPacket -> {
+            if(robot.getCollector().getBlockColorSensor().getRawBlockColor() != BlockColor.NONE) {
+                // setting target to try and transfer
+                if(Subsystem.inRange(robot.getLift().getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.AUTO_DESTINATION_THRESHOLD)) {
+                    robot.getLift().getPid().setTarget(Lift.AUTO_TROUGH_POS);
+                    robot.getGrabber().getGrabServo().setPosition(Grabber.OPEN_POS);
+                }
+                // checking what to do once lift gets low enough to grab onto block
+                else if(Subsystem.inRange(robot.getLift().getLiftMotor(), Lift.AUTO_TROUGH_POS, Lift.AUTO_DESTINATION_THRESHOLD))
+                    // closes onto block if haven't already
+                    if(robot.getGrabber().getGrabServo().getPosition() == Grabber.OPEN_POS) {
+                        robot.getGrabber().getGrabServo().setPosition(Grabber.CLOSE_POS);
+                        grabTimer.reset();
+                    }
+                    // raises lift after set time passed (to ensure grabber has block)
+                    else if(grabTimer.seconds() >= Grabber.FULL_ROTATION_TIME)
+                        robot.getLift().getPid().setTarget(Lift.TROUGH_SAFETY_POS);
+
+                // moving lift down once pid is set to transfer down
+                if(robot.getLift().getPid().getTarget() == Lift.AUTO_TROUGH_POS)
+                    Subsystem.setMotorPower(robot.getLift().getLiftMotor(), robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
+                // moving lift up once pid set to move back up
+                else if(robot.getLift().getPid().getTarget() == Lift.TROUGH_SAFETY_POS)
+                    Subsystem.setMotorPower(robot.getLift().getLiftMotor(), robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
+            }
+
+            return !(robot.getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE
+            && Subsystem.inRange(robot.getLift().getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.AUTO_DESTINATION_THRESHOLD));
+        };
+    }
+    public Action transferBlockOnce() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.TROUGH_POS - Lift.AUTO_DESTINATION_THRESHOLD/2),
-            robot.getGrabber().close(),
-            robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
+                robot.getLift().moveTo(Lift.AUTO_TROUGH_POS),
+                robot.getGrabber().close(),
+                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
         );
     }
+
     public Action transferToDropOff() {
         return new SequentialAction(
                 robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.TRANSFER_TO_DROP_AREA_TIME),
@@ -107,7 +142,7 @@ public class LiftingSystem {
         return new SequentialAction(
                 robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
                 new ParallelAction(
-                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
+                        robot.getLift().moveToWithoutPid(Lift.TROUGH_SAFETY_POS),
                         robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
                 )
         );
