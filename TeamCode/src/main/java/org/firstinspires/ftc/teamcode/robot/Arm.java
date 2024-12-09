@@ -25,17 +25,31 @@ public class Arm extends Subsystem<Arm.StateType> {
 
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
-    public static double TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
-            BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
-            BASKET_DROP_TO_UP_TIME = 0.18,
-            UP_TO_BASKET_SAFETY_TIME = 0.42,
-            SPECIMEN_HANG_TO_UP_TIME = 0.18,
-            TRANSFER_TO_DROP_AREA_TIME = 0.28,
-            DROP_AREA_TO_RAM_TIME = 0.66,
-            UP_TO_TRANSFER_TIME = 0.55;
-    public static final double TRANSFER_POS = 0.01, DROP_OFF_POS = 0.33, BASKET_DROP_POS = 0.30, UP_POS = 0.67, SPECIMEN_HANG_POS = 0.99, BASKET_SAFETY_POS = 0.85;
+    public static double TRANSFER_TO_KNOCK_BLOCK_TIME = 0.14,
+        TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
+        BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
+        BASKET_DROP_TO_UP_TIME = 0.18,
+        UP_TO_BASKET_SAFETY_TIME = 0.42,
+        SPECIMEN_HANG_TO_UP_TIME = 0.18,
+        TRANSFER_TO_DROP_AREA_TIME = 0.28,
+        DROP_AREA_TO_RAM_TIME = 0.66,
+        UP_TO_TRANSFER_TIME = 0.55;
+    public static final double TRANSFER_POS = 0.01,
+        KNOCK_BLOCK_POS = 0.15,
+        DROP_OFF_POS = 0.33,
+        BASKET_DROP_POS = 0.30,
+        UP_POS = 0.67,
+        SPECIMEN_HANG_POS = 0.99,
+        BASKET_SAFETY_POS = 0.85;
     public enum StateType {
-        TRANSFER, DROP_OFF, BASKET_DROP, UP, BASKET_SAFETY, SPECIMEN_HANG, TRANSITION
+        TRANSFER,
+        KNOCK_BLOCK,
+        DROP_OFF,
+        BASKET_DROP,
+        UP,
+        BASKET_SAFETY,
+        SPECIMEN_HANG,
+        TRANSITION
     }
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
@@ -47,6 +61,7 @@ public class Arm extends Subsystem<Arm.StateType> {
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
 
         stateManager.addState(StateType.TRANSFER, new NothingState<>(StateType.TRANSFER));
+        stateManager.addState(StateType.KNOCK_BLOCK, new NothingState<>(StateType.KNOCK_BLOCK));
         stateManager.addState(StateType.DROP_OFF, new NothingState<>(StateType.DROP_OFF));
         stateManager.addState(StateType.BASKET_DROP, new NothingState<>(StateType.BASKET_DROP));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));

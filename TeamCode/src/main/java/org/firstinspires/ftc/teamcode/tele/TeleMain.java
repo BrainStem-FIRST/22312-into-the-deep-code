@@ -283,7 +283,7 @@ public class TeleMain extends LinearOpMode {
                     break;
             }
 
-        // button for "going back" a state
+        // b = button for "going back" a state
         else if(input.getGamepadTracker1().isFirstFrameB())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
@@ -307,6 +307,15 @@ public class TeleMain extends LinearOpMode {
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
                     }
                     break;
+            }
+
+        // x = perform safety override
+        else if(input.getGamepadTracker1().isFirstFrameX())
+            // handling block knocking check
+            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+            && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
+                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
+                robot.setCanTransfer(false);
             }
     }
     private void listenForHangingInput() {

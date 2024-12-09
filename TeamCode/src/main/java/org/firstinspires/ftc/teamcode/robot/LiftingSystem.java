@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.Helper;
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
-        TROUGH,
+        TROUGH, KNOCK_BLOCK, // trough states
         TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_TROUGH, // depositing block in basket
         TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
@@ -32,6 +32,7 @@ public class LiftingSystem {
         stateManager = new StateManager<>(StateType.TROUGH);
 
         stateManager.addState(StateType.TROUGH, new TroughState());
+        stateManager.addState(StateType.KNOCK_BLOCK, new KnockBlockState());
         stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState());
         stateManager.addState(StateType.BASKET_TO_BASKET, new BasketToBasketState());
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));

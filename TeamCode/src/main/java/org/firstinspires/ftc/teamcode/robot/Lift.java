@@ -27,6 +27,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     public static int ABSOLUTE_MIN = -50,
         TROUGH_POS = 0,
         AUTO_TROUGH_POS = TROUGH_POS,
+        KNOCK_BLOCK_POS = 100, // position where arm can rotate down to knock over vertical block in trough
         TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 50, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
@@ -42,7 +43,15 @@ public class Lift extends Subsystem<Lift.StateType> {
         ABSOLUTE_MAX = 3420;
 
     public enum StateType {
-        TROUGH, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
+        TROUGH,
+        KNOCK_BLOCK,
+        TROUGH_SAFETY,
+        DROP_AREA,
+        DROP_AREA_AFTER,
+        RAM_BEFORE,
+        RAM_AFTER,
+        BASKET_DEPOSIT,
+        TRANSITION
     }
     private final MotorTransitionState<StateType> transitionState;
 
@@ -57,6 +66,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         pid.setOutputBounds(-1, 1);
 
         stateManager.addState(StateType.TROUGH, new NothingState<>(StateType.TROUGH, liftMotor));
+        stateManager.addState(StateType.KNOCK_BLOCK, new NothingState<>(StateType.KNOCK_BLOCK));
         stateManager.addState(StateType.TROUGH_SAFETY, new NothingState<>(StateType.TROUGH_SAFETY, liftMotor));
         stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA, liftMotor));
         stateManager.addState(StateType.DROP_AREA_AFTER, new NothingState<>(StateType.DROP_AREA_AFTER, liftMotor));
