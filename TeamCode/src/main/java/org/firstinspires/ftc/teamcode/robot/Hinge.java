@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 @Config
-public class Hinge extends Subsystem {
+public class Hinge extends Subsystem<Hinge.StateType> {
     public static int AUTO_SHAKE_FRAMES = 10;
     private boolean isFullyDown;
     public static double HINGE_SHAKE_DOWN_POSITION = 0.6;
@@ -34,17 +34,14 @@ public class Hinge extends Subsystem {
         TRANSITION
     }
 
-    private final StateManager<StateType> stateManager;
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx hingeServo;
 
     public Hinge(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.UP);
 
         hingeServo = hwMap.get(ServoImplEx.class, "CollectHingeServo");
         hingeServo.setPwmRange(new PwmControl.PwmRange(HINGE_UP_TICK, HINGE_DOWN_TICK));
-
-        stateManager = new StateManager<>(StateType.UP);
 
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.DOWN, new NothingState<>(StateType.DOWN));
@@ -55,10 +52,6 @@ public class Hinge extends Subsystem {
 
         stateManager.setupStates(getRobot(), stateManager);
     }
-    public StateManager<StateType> getStateManager() {
-        return stateManager;
-    }
-
     public ServoTransitionState<StateType> getTransitionState() {
         return transitionState;
     }

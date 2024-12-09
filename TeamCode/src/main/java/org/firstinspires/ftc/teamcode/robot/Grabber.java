@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
-public class Grabber extends Subsystem {
+public class Grabber extends Subsystem<Grabber.StateType> {
     public static final int MIN_TICK = 1210, MAX_TICK = 2400;
     public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
     public static final double FULL_ROTATION_TIME = 0.3;
@@ -27,12 +27,11 @@ public class Grabber extends Subsystem {
         OPEN, CLOSED, TRANSITION
     }
     private final ServoTransitionState<StateType> transitionState;
-    private final StateManager<StateType> stateManager;
     private final ServoImplEx grabServo;
 
 
     public Grabber(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.OPEN);
 
         grabServo = hwMap.get(ServoImplEx.class, "LiftGrabServo");
         grabServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
@@ -40,18 +39,12 @@ public class Grabber extends Subsystem {
         blockColorHeld = BlockColor.NONE;
         hasSpecimen = false;
 
-        stateManager = new StateManager<>(StateType.OPEN);
-
         stateManager.addState(StateType.OPEN, new NothingState<>(StateType.OPEN));
         stateManager.addState(StateType.CLOSED, new NothingState<>(StateType.CLOSED));
         transitionState = new ServoTransitionState<>(StateType.TRANSITION, grabServo, FULL_ROTATION_TIME);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
-    }
-
-    public StateManager<StateType> getStateManager() {
-        return stateManager;
     }
     @Override
     public void update(double dt) {

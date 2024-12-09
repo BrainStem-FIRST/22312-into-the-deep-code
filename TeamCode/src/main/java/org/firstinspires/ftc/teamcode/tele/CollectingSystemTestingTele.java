@@ -66,7 +66,7 @@ public class CollectingSystemTestingTele extends LinearOpMode {
 
         spindleMotor = hardwareMap.get(DcMotorEx.class, "CollectSpindleMotor");
         spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        spindleCurrentTracker = new MotorCurrentTracker(spindleMotor, 6000, 3);
+        spindleCurrentTracker = new MotorCurrentTracker(spindleMotor, 6000, 3, 5);
         spindleJamSpitFrames = 0;
 
         hingeServo = hardwareMap.get(ServoImplEx.class, "CollectHingeServo");

@@ -12,12 +12,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 
 @Config
-public class Lift extends Subsystem {
+public class Lift extends Subsystem<Lift.StateType> {
     private final DcMotorEx liftMotor;
     private final PIDController pid;
     // TODO: big transition kp can be better
@@ -45,11 +44,10 @@ public class Lift extends Subsystem {
     public enum StateType {
         TROUGH, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
-    private final StateManager<StateType> stateManager;
     private final MotorTransitionState<StateType> transitionState;
 
     public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.TROUGH_SAFETY);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -57,8 +55,6 @@ public class Lift extends Subsystem {
         pid = new PIDController(KP, ZERO_KI, ZERO_KD);
         pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         pid.setOutputBounds(-1, 1);
-
-        stateManager = new StateManager<>(StateType.TROUGH_SAFETY);
 
         stateManager.addState(StateType.TROUGH, new NothingState<>(StateType.TROUGH, liftMotor));
         stateManager.addState(StateType.TROUGH_SAFETY, new NothingState<>(StateType.TROUGH_SAFETY, liftMotor));
@@ -122,9 +118,6 @@ public class Lift extends Subsystem {
 
     public DcMotorEx getLiftMotor() {
         return liftMotor;
-    }
-    public StateManager<StateType> getStateManager() {
-        return stateManager;
     }
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;

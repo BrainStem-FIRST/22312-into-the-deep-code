@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Config
-public class Extension extends Subsystem {
+public class Extension extends Subsystem<Extension.StateType> {
     // TODO: find extension encoder ticks for these 3
     public static int MIN_POSITION = 5,
             RETRACT_SLOW_POSITION = 120,
@@ -40,15 +40,13 @@ public class Extension extends Subsystem {
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
     }
-    private final StateManager<StateType> stateManager;
-
     private final DcMotorEx extensionMotor;
     private final PIDController pid;
     private final DigitalChannel magnetResetSwitch;
     private double targetPower;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.IN);
 
         extensionMotor = hwMap.get(DcMotorEx.class, "ExtensionMotor");
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,18 +60,12 @@ public class Extension extends Subsystem {
         pid.setTarget(MIN_POSITION);
         pid.setOutputBounds(-1,1);
 
-        stateManager = new StateManager<>(StateType.IN);
-
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.JUMP_TO_MIN, new JumpToMin());
         stateManager.addState(StateType.FINDING_BLOCK, new FindingBlockState());
         stateManager.addState(StateType.RETRACTING, new RetractingState());
 
         stateManager.setupStates(getRobot(), stateManager);
-    }
-
-    public StateManager<StateType> getStateManager() {
-        return stateManager;
     }
 
     public DcMotorEx getExtensionMotor() {

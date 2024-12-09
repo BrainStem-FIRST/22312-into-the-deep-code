@@ -28,7 +28,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 // if block not good, spin wheels in opposite direction and run collect motor in opposite direction
 // then would need to adjust robot (and potentially extension) position to search new area for block
 @Config
-public class Collector extends Subsystem {
+public class Collector extends Subsystem<Collector.StateType> {
 
     public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
     public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
@@ -37,7 +37,6 @@ public class Collector extends Subsystem {
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.4;
 
-    private final StateManager<StateType> stateManager;
     public enum StateType {
         NOTHING,
         COLLECTING,
@@ -48,6 +47,7 @@ public class Collector extends Subsystem {
     }
     public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 5000;
     public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 10;
+    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 5;
     private final MotorCurrentTracker teleCurrentTracker, autoCurrentTracker;
     private final DcMotorEx spindleMotor;
 
@@ -56,18 +56,17 @@ public class Collector extends Subsystem {
     private int autoColorValidationFrames;
 
     public Collector(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.NOTHING);
 
         spindleMotor = hwMap.get(DcMotorEx.class, "CollectSpindleMotor");
         spindleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        teleCurrentTracker = new MotorCurrentTracker(spindleMotor, TELE_JAM_CURRENT_THRESHOLD, TELE_JAM_VALIDATION_FRAMES);
-        autoCurrentTracker = new MotorCurrentTracker(spindleMotor, AUTO_JAM_CURRENT_THRESHOLD, AUTO_JAM_VALIDATION_FRAMES);
+        teleCurrentTracker = new MotorCurrentTracker(spindleMotor, TELE_JAM_CURRENT_THRESHOLD, TELE_JAM_VALIDATION_FRAMES, TELE_JAM_SAFETY_FRAMES);
+        autoCurrentTracker = new MotorCurrentTracker(spindleMotor, AUTO_JAM_CURRENT_THRESHOLD, AUTO_JAM_VALIDATION_FRAMES, AUTO_JAM_SAFETY_FRAMES);
 
         blockColorSensor = new BlockColorSensor(hwMap, robot);
         blockColorInTrough = BlockColor.NONE;
 
-        stateManager = new StateManager<>(StateType.NOTHING);
         stateManager.addState(StateType.NOTHING, new NothingState<>(StateType.NOTHING, spindleMotor));
         stateManager.addState(StateType.COLLECTING, new CollectState());
         stateManager.addState(StateType.COLLECTING_TEMP, new CollectTempState());
@@ -77,8 +76,11 @@ public class Collector extends Subsystem {
         stateManager.setupStates(getRobot(), stateManager);
     }
 
-    public StateManager<Collector.StateType> getStateManager() {
-        return stateManager;
+    public MotorCurrentTracker getTeleCurrentTracker() {
+        return teleCurrentTracker;
+    }
+    public MotorCurrentTracker getAutoCurrentTracker() {
+        return autoCurrentTracker;
     }
 
     public BlockColorSensor getBlockColorSensor() {

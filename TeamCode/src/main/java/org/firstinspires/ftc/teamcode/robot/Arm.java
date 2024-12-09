@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 
 @Config
-public class Arm extends Subsystem {
+public class Arm extends Subsystem<Arm.StateType> {
     public static final int MIN_TICK = 935, MAX_TICK = 2450;
 
 
@@ -37,17 +37,14 @@ public class Arm extends Subsystem {
     public enum StateType {
         TRANSFER, DROP_OFF, BASKET_DROP, UP, BASKET_SAFETY, SPECIMEN_HANG, TRANSITION
     }
-    private final StateManager<StateType> stateManager;
     private final ServoTransitionState<StateType> transitionState;
     private final ServoImplEx armServo;
 
     public Arm(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.TRANSFER);
 
         armServo = hwMap.get(ServoImplEx.class, "LiftArmServo");
         armServo.setPwmRange(new PwmControl.PwmRange(MIN_TICK, MAX_TICK));
-
-        stateManager = new StateManager<>(Arm.StateType.TRANSFER);
 
         stateManager.addState(StateType.TRANSFER, new NothingState<>(StateType.TRANSFER));
         stateManager.addState(StateType.DROP_OFF, new NothingState<>(StateType.DROP_OFF));
@@ -84,10 +81,6 @@ public class Arm extends Subsystem {
                 return false;
             }
         };
-    }
-
-    public StateManager<StateType> getStateManager() {
-        return stateManager;
     }
     public ServoImplEx getArmServo() {
         return armServo;

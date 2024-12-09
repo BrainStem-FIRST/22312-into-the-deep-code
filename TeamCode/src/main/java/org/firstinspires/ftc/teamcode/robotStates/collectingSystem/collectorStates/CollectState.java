@@ -11,8 +11,10 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public void execute() {
-        if (robot.getCollector().get)
-        robot.getCollector().setSpindleMotorPower(Collector.TELE_COLLECT_POWER);
+        if (robot.getCollector().getTeleCurrentTracker().hasValidatedAbnormalCurrent())
+            robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+        else
+            robot.getCollector().setSpindleMotorPower(Collector.TELE_COLLECT_POWER);
     }
 
     @Override

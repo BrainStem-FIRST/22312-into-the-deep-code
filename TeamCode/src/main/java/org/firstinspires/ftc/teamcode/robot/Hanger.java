@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.robotStates.hangingStates.HoldHang;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
-public class Hanger extends Subsystem {
+public class Hanger extends Subsystem<Hanger.StateType> {
 
     // TODO: find down and up tick values and threshold
     // down refers to the position the hanging goes to after it is on the bar
@@ -33,9 +33,8 @@ public class Hanger extends Subsystem {
     private final MotorTransitionState<StateType> transitionState;
     private final DcMotorEx hangMotor;
     private final PIDController pid;
-    private final StateManager<StateType> stateManager;
     public Hanger(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
-        super(hwMap, telemetry, allianceColor, robot);
+        super(hwMap, telemetry, allianceColor, robot, StateType.FULL_DOWN);
 
         hangMotor = hwMap.get(DcMotorEx.class, "HangMotor");
         hangMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -43,7 +42,6 @@ public class Hanger extends Subsystem {
 
         pid = new PIDController(0.004, 0.0005, 0);
 
-        stateManager = new StateManager<>(StateType.FULL_DOWN);
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
@@ -55,7 +53,6 @@ public class Hanger extends Subsystem {
         stateManager.setupStates(robot, stateManager);
     }
 
-    public StateManager<StateType> getStateManager() { return stateManager; }
     public DcMotorEx getHangMotor() {
         return hangMotor;
     }

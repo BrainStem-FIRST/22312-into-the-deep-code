@@ -5,8 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
-public abstract class Subsystem {
+public abstract class Subsystem<StateType extends Enum<StateType>> {
     /**
      * standardized function to set motor to go to target position
      * @param motor motor to run
@@ -53,21 +54,24 @@ public abstract class Subsystem {
 
     protected HardwareMap hwMap;
     protected Telemetry telemetry;
-    private final AllianceColor allianceColor;
+    protected final AllianceColor allianceColor;
     protected final BrainSTEMRobot robot;
 
-    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
+    protected final StateManager<StateType> stateManager;
+
+    public Subsystem(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot, StateType defaultState) {
         this.hwMap = hwMap;
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.robot = robot;
-    }
-
-    public AllianceColor getAllianceColor() {
-        return allianceColor;
+        stateManager = new StateManager<>(defaultState);
     }
     public BrainSTEMRobot getRobot() {
         return robot;
+    }
+
+    public StateManager<StateType> getStateManager() {
+        return stateManager;
     }
     public abstract void update(double dt);
 }
