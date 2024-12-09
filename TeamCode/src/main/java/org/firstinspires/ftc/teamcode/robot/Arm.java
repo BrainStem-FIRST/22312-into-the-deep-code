@@ -28,6 +28,7 @@ public class Arm extends Subsystem<Arm.StateType> {
     public static double TRANSFER_TO_KNOCK_BLOCK_TIME = 0.14,
         TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
         BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
+        BASKET_DROP_TO_DROP_OFF_TIME = 0.5,
         BASKET_DROP_TO_UP_TIME = 0.18,
         UP_TO_BASKET_SAFETY_TIME = 0.42,
         SPECIMEN_HANG_TO_UP_TIME = 0.18,

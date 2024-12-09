@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.robotStates;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class MotorTransitionState<StateType extends Enum<StateType>> extends TransitionState<StateType> {
     private final DcMotorEx motor;
+    private double powerOffset;
     private PIDController pid;
     private boolean usingPid;
     public final int DESTINATION_THRESHOLD;
@@ -21,6 +23,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         super(stateType);
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
+        powerOffset = 0;
         startEncoder = motor.getCurrentPosition();
         usingPid = false;
     }
@@ -87,8 +90,11 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         else
             if(pid == null || !usingPid)
                 Subsystem.setMotorPosition(motor, (int) goalPosition);
-            else
-                Subsystem.setMotorPower(motor, pid.update(motor.getCurrentPosition()));
+            else {
+                // finding pid power + offset, and ensuring it stays between -1 and 1
+                double totalPower = Range.clip(pid.update(motor.getCurrentPosition()) + powerOffset, -1, 1);
+                Subsystem.setMotorPower(motor, totalPower);
+            }
     }
 
     @Override
@@ -103,14 +109,16 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean isDone() {
-        int motorPos = motor.getCurrentPosition();
-        int desiredDir = (int)goalPosition - startEncoder;
-        int curDif = (int)goalPosition - motorPos;
         return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
-                //|| Math.signum(desiredDir) != Math.signum(curDif); // checking if moving up, if difference is positive, vice versa for moving down
     }
 
     public PIDController getPid() {
         return pid;
+    }
+    public void setPowerOffset(double powerOffset) {
+        this.powerOffset = powerOffset;
+    }
+    public int getDirection() {
+        return (int) Math.signum(getGoalStatePosition() - motor.getCurrentPosition());
     }
 }

@@ -16,7 +16,7 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
             robot.getLiftingSystem().setStayInTrough(true);
         }
         if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
-            robot.getLift().getTransitionState().setGoalStateWithoutPid(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
             if(robot.getGrabber().hasBlock())
                 robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
         }

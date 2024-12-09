@@ -13,7 +13,7 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     @Override
     public void execute() {
         if (isFirstTime())
-            robot.setCanTransfer(true);
+            robot.setShouldTransfer(true);
         // force hinge to be in up position
         if (robot.getHinge().getStateManager().getActiveStateType() != Hinge.StateType.UP)
             robot.getHinge().getTransitionState().overrideGoalState(Hinge.HINGE_UP_POSITION, Hinge.StateType.UP, Hinge.HINGE_UP_TIME);

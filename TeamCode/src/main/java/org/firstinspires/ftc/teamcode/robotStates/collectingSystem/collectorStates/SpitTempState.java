@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorSta
 
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class SpitTempState extends RobotState<Collector.StateType> {
@@ -20,7 +19,7 @@ public class SpitTempState extends RobotState<Collector.StateType> {
         // tell robot that block is not ready for transfer
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN
             || robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.RETRACTING)
-            robot.setCanTransfer(false);
+            robot.setShouldTransfer(false);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
@@ -25,7 +26,7 @@ public class BrainSTEMRobot {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean canTransfer; // resets during retraction of collecting system
+    private boolean shouldTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
     private boolean isDepositing;
@@ -49,7 +50,7 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        canTransfer = true;
+        shouldTransfer = false;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
@@ -72,7 +73,7 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        canTransfer = true;
+        shouldTransfer = false;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
@@ -80,45 +81,42 @@ public class BrainSTEMRobot {
 
     public void setup() {
         double start = System.currentTimeMillis() / 1000.0;
-        double time = 0, liftDoneTime = 0;
+        double time = 0;
 
-        while(true) {
-            // setup lift first, then collection and extension
-            // once both are set, stop
-            if (setupLiftingSystem(time)) {
-                if (liftDoneTime == 0)
-                    liftDoneTime = time;
+        setupHangingSystem();
 
-                if(setupCollectingSystem(time - liftDoneTime))
-                    break;
-            }
+        while(!setupLiftingSystem() || !setupCollectingSystem()) {
 
+            telemetry.addData("", "");
             telemetry.addData("robot status", "setting up");
             telemetry.addData("time", time);
-            telemetry.addData("lift encoder", lift.getLiftMotor().getCurrentPosition());
             telemetry.update();
             time = System.currentTimeMillis() / 1000.0 - start;
         }
-
     }
-    private boolean setupLiftingSystem(double time) {
+    private boolean setupLiftingSystem() {
+        telemetry.addData("setting up lifting system", "");
         grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
         Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
         if(lift.getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
             arm.getArmServo().setPosition(Arm.TRANSFER_POS);
-        return arm.getArmServo().getPosition() == Arm.TRANSFER_POS && time > 1;
+        return arm.getArmServo().getPosition() == Arm.TRANSFER_POS;
     }
-    private boolean setupCollectingSystem(double time) {
+    private boolean setupCollectingSystem() {
+        telemetry.addData("setting up collecting system", "");
+        ElapsedTime timer = new ElapsedTime();
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
 
-        if (time >= Hinge.HINGE_UP_TIME)
+        if (timer.seconds() >= Hinge.HINGE_UP_TIME)
             extension.retractExtensionMotor();
         if (extension.hitRetractHardStop()) {
             extension.getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         return extension.hitRetractHardStop();
     }
-
+    private void setupHangingSystem() {
+        hanger.getHangMotor().setTargetPosition(Hanger.FULL_DOWN_ENCODER);
+    }
 
     //  NOTE: COLLECTING SYSTEM NEEDS TO BE UPDATED BEFORE LIFTING SYSTEM TO ENSURE COLOR SENSOR VALUES ARE UP TO DATE WHEN LIFTING SYSTEM USES THEM
     public void update(double dt) {
@@ -180,11 +178,11 @@ public class BrainSTEMRobot {
     public boolean canCollect() {
         return !grabber.hasBlock();
     }
-    public boolean canTransfer() {
-        return canTransfer;
+    public boolean shouldTransfer() {
+        return shouldTransfer;
     }
-    public void setCanTransfer(boolean canTransfer) {
-        this.canTransfer = canTransfer;
+    public void setShouldTransfer(boolean shouldTransfer) {
+        this.shouldTransfer = shouldTransfer;
     }
     public boolean isHighDeposit() {
         return isHighDeposit;

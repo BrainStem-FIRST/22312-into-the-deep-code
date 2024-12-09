@@ -94,7 +94,7 @@ public class TeleMain extends LinearOpMode {
             // robot's lifting system
             telemetry.addData("", "");
             telemetry.addData("is depositing", robot.isDepositing());
-            telemetry.addData("can transfer", robot.canTransfer());
+            telemetry.addData("can transfer", robot.shouldTransfer());
             telemetry.addData("stay in trough", robot.getLiftingSystem().getStayInTrough());
             telemetry.addData("lifting system state", robot.getLiftingSystem().getStateManager().getActiveStateType());
             telemetry.addData("  lifting system's active state's time", robot.getLiftingSystem().getStateManager().getActiveState().getTime());
@@ -224,7 +224,8 @@ public class TeleMain extends LinearOpMode {
 
     }
     private void listenForLiftingInput() {
-        // checking changes in basket/bar heights
+        double liftDpadPowerOffset = 0.1;
+        // checking setting change of whether to deposit at high or low basket
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(true);
@@ -233,18 +234,25 @@ public class TeleMain extends LinearOpMode {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(false);
         }
-        // a = button for state progression
+
+        // checking for gamepad2 dpads; buttons for manually increasing lift power during transition (essentially acts as a variable kI)
+        if(input.getGamepadTracker2().isDpadDownPressed() || input.getGamepadTracker2().isDpadUpPressed())
+            robot.getLift().getTransitionState().setPowerOffset(robot.getLift().getTransitionState().getDirection() * liftDpadPowerOffset);
+        else
+            robot.getLift().getTransitionState().setPowerOffset(0);
+
+        // checking for either gamepad a; button for state progression
         if(input.getGamepadTracker1().isFirstFrameA() || input.getGamepadTracker2().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     // checking for bad transfer going down (resets lift back to trough pos)
                     if(robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_POS
                     && robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
-                        robot.setCanTransfer(false);
+                        robot.setShouldTransfer(false);
 
                     // activating manual transfer
-                    else if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
-                        robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
+                    else if(!robot.shouldTransfer() && robot.getCollector().hasValidBlockColor())
+                        robot.setShouldTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
                     // activating transition to deposit in basket once transfer is complete
                     else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
                     && robot.isDepositing() && robot.getGrabber().hasBlock())
@@ -256,7 +264,7 @@ public class TeleMain extends LinearOpMode {
                     break;
 
                 case BASKET_DEPOSIT:
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_TROUGH);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_DROP_AREA);
                     break;
 
                 case DROP_AREA:
@@ -283,8 +291,8 @@ public class TeleMain extends LinearOpMode {
                     break;
             }
 
-        // b = button for "going back" a state
-        else if(input.getGamepadTracker1().isFirstFrameB())
+        // checking for gamepad1 or gamepad2 b; button for "going back" a state
+        else if(input.getGamepadTracker1().isFirstFrameB() || input.getGamepadTracker2().isFirstFrameB())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
@@ -309,13 +317,13 @@ public class TeleMain extends LinearOpMode {
                     break;
             }
 
-        // x = perform safety override
+        // checking for gamepad1 x; button for activating safety overrides
         else if(input.getGamepadTracker1().isFirstFrameX())
             // handling block knocking check
             if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
             && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
-                robot.setCanTransfer(false);
+                robot.setShouldTransfer(false);
             }
     }
     private void listenForHangingInput() {
