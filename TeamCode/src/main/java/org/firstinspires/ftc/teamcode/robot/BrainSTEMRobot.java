@@ -26,7 +26,7 @@ public class BrainSTEMRobot {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean shouldTransfer; // resets during retraction of collecting system
+    private boolean canTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
     private boolean isDepositing;
@@ -50,7 +50,7 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        shouldTransfer = false;
+        canTransfer = false;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
@@ -73,7 +73,7 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        shouldTransfer = false;
+        canTransfer = true;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
@@ -178,11 +178,11 @@ public class BrainSTEMRobot {
     public boolean canCollect() {
         return !grabber.hasBlock();
     }
-    public boolean shouldTransfer() {
-        return shouldTransfer;
+    public boolean canTransfer() {
+        return canTransfer;
     }
-    public void setShouldTransfer(boolean shouldTransfer) {
-        this.shouldTransfer = shouldTransfer;
+    public void setCanTransfer(boolean canTransfer) {
+        this.canTransfer = canTransfer;
     }
     public boolean isHighDeposit() {
         return isHighDeposit;

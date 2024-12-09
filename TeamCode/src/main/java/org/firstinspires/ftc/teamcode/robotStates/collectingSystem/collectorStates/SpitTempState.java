@@ -18,7 +18,7 @@ public class SpitTempState extends RobotState<Collector.StateType> {
 
         // tell robot that block is not ready for transfer
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN)
-            robot.setShouldTransfer(false);
+            robot.setCanTransfer(false);
     }
 
     @Override

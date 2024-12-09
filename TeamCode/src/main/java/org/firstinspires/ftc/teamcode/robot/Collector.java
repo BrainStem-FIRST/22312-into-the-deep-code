@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
@@ -30,7 +34,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @Config
 public class Collector extends Subsystem<Collector.StateType> {
 
-    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
+    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2, AUTO_MAX_COLLECT_FRAMES = 200;
     public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
     public static double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
 
@@ -113,26 +117,32 @@ public class Collector extends Subsystem<Collector.StateType> {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
     public Action collect() {
-        return telemetryPacket -> {
-            // updating motor current check
-            autoCurrentTracker.updateCurrentTracking();
-            if(autoCurrentTracker.hasValidatedAbnormalCurrent())
-                setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
-            else
-                setSpindleMotorPower(Collector.AUTO_COLLECT_POWER);
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                telemetry.addData("time collecting", getTime());
+                updateFramesRunning();
+                // updating motor current check
+                autoCurrentTracker.updateCurrentTracking();
+                if (autoCurrentTracker.hasValidatedAbnormalCurrent())
+                    setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+                else
+                    setSpindleMotorPower(Collector.AUTO_COLLECT_POWER);
 
-            // checking for color sensor validation
-            if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
-                autoColorValidationFrames++;
-            else
-                autoColorValidationFrames = 0;
+                // checking for color sensor validation
+                if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
+                    autoColorValidationFrames++;
+                else
+                    autoColorValidationFrames = 0;
 
-            telemetry.addData("motor current (milliAmps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
-            telemetry.addData("validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
-            telemetry.addData("motor power", spindleMotor.getPower());
-            telemetry.update();
-            return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
-                    && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+                telemetry.addData("motor current (milliAmps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+                telemetry.addData("validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
+                telemetry.addData("motor power", spindleMotor.getPower());
+                telemetry.update();
+                return getFramesRunning() > AUTO_MAX_COLLECT_FRAMES ||
+                        autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+            }
         };
     }
     public Action hasNoBlock() {

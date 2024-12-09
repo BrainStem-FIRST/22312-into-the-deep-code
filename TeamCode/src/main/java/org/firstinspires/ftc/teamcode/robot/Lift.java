@@ -22,7 +22,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     public static int ABSOLUTE_MIN = -50,
         TROUGH_POS = 0,
         AUTO_TROUGH_POS = TROUGH_POS,
-        KNOCK_BLOCK_POS = 100, // position where arm can rotate down to knock over vertical block in trough
+        KNOCK_BLOCK_POS = 200,
         TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 50, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
@@ -38,20 +38,12 @@ public class Lift extends Subsystem<Lift.StateType> {
         ABSOLUTE_MAX = 3420;
 
     public enum StateType {
-        TROUGH,
-        KNOCK_BLOCK,
-        TROUGH_SAFETY,
-        DROP_AREA,
-        DROP_AREA_AFTER,
-        RAM_BEFORE,
-        RAM_AFTER,
-        BASKET_DEPOSIT,
-        TRANSITION
+        TROUGH, KNOCK_BLOCK, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
     private final MotorTransitionState<StateType> transitionState;
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
-    public static double KP = 0.0042, ZERO_KD = 0;
+    public static double KP = 0.0038, SMALL_TRANSITION_KP = 0.003, ZERO_KD = 0;
     private final DcMotorEx liftMotor;
     private final PIDController pid;
 

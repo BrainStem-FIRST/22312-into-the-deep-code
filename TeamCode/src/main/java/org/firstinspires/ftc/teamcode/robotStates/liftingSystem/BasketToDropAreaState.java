@@ -27,17 +27,17 @@ public class BasketToDropAreaState extends RobotState<LiftingSystem.StateType> {
             else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                 // moving arm up if arm still at left position
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP)
-                    robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.BASKET_DROP_TO_DROP_OFF_TIME);
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
                 // moving lift down when arm either passes up position or finishes rotating
-                else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_DROP
+                else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
                 || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
                 }
             }
         }
         // once lift reach safety threshold, move arm down
-        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-            robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
+        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA) {
+            robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.UP_TO_BASKET_SAFETY_TIME + Arm.BASKET_DROP_TO_UP_TIME);
         }
     }
 

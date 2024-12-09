@@ -21,7 +21,7 @@ public class CollectTempState extends RobotState<Collector.StateType> {
         // tell robot that block is not ready for transfer
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN
         && robot.getCollectingSystem().getStateManager().getActiveState().getTime() > 0.1)
-            robot.setShouldTransfer(false);
+            robot.setCanTransfer(false);
     }
 
     @Override
