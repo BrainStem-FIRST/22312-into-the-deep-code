@@ -35,9 +35,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class Collector extends Subsystem<Collector.StateType> {
 
-    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2, AUTO_MAX_COLLECT_TIME = 7;
+    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
+    public static double AUTO_MAX_COLLECT_TIME = 5.5;
     public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
-    public static double COLLECT_TEMP_POWER = 0.8, SPIT_TEMP_POWER = -0.7, AUTO_SPIT_SLOW_POWER = -0.3;
+    public static double COLLECT_TEMP_POWER = 0.8, SPIT_TEMP_POWER = -0.7, AUTO_JAM_SPIT_POWER = -0.35;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.4;
@@ -50,9 +51,9 @@ public class Collector extends Subsystem<Collector.StateType> {
         SPITTING_TEMP, // stops next frame unless called continuously
         VALID_BLOCK
     }
-    public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 5000;
+    public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 4500;
     public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 10;
-    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 5;
+    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 11;
     private final MotorCurrentTracker teleCurrentTracker, autoCurrentTracker;
     private final DcMotorEx spindleMotor;
 
@@ -123,21 +124,16 @@ public class Collector extends Subsystem<Collector.StateType> {
             boolean isFirst = true;
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
                 if (isFirst) {
                     autoCollectTimer.reset();
                     isFirst = false;
                 }
 
-                telemetry.addData("time collecting", autoCollectTimer.seconds());
-                telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
-                telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
-                telemetry.addData("motor power", spindleMotor.getPower());
-                telemetry.update();
-
                 // updating motor current check
                 autoCurrentTracker.updateCurrentTracking();
                 if (autoCurrentTracker.hasValidatedAbnormalCurrent())
-                    setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+                    setSpindleMotorPower(Collector.AUTO_JAM_SPIT_POWER);
                 else
                     setSpindleMotorPower(Collector.AUTO_COLLECT_POWER);
 
@@ -147,12 +143,18 @@ public class Collector extends Subsystem<Collector.StateType> {
                 else
                     autoColorValidationFrames = 0;
 
-                if (autoCollectTimer.seconds() >= AUTO_MAX_COLLECT_TIME) {
-                    return false;
-                }
+                boolean end = autoCollectTimer.seconds() >= AUTO_MAX_COLLECT_TIME ||
+                        (autoColorValidationFrames >= AUTO_COLOR_VALIDATION_REQUIRED
+                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE);
 
-                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
-                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+                telemetry.addData("time collecting", autoCollectTimer.seconds());
+                telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+                telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
+                telemetry.addData("motor power", spindleMotor.getPower());
+                telemetry.addData("should end", end);
+                telemetry.update();
+
+                return !end;
             }
         };
     }

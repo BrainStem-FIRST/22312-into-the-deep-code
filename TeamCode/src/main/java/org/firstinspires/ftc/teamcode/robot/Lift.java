@@ -80,6 +80,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     public void updateLiftAutoPidMovement(int target) {
         pid.setkI(SMALL_TRANSITION_KI);
         pid.setTarget(target);
+        /*
         telemetry.addData("lift pid target", pid.getTarget());
         telemetry.addData("lift power", liftMotor.getPower());
         telemetry.addData("lift position", liftMotor.getCurrentPosition());
@@ -87,6 +88,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         telemetry.addData("kI", pid.getkI());
         telemetry.addData("kD", pid.getkD());
         telemetry.update();
+         */
         Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
     }
     public Action moveTo(int target) {
@@ -106,9 +108,11 @@ public class Lift extends Subsystem<Lift.StateType> {
     public Action moveToWithoutPid(int target) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
             Subsystem.setMotorPosition(liftMotor, target);
+            /*
             telemetry.addData("lift target", liftMotor.getTargetPosition());
             telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
             telemetry.update();
+            */
 
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
         };
@@ -118,9 +122,11 @@ public class Lift extends Subsystem<Lift.StateType> {
 
             Subsystem.setMotorPosition(liftMotor, target);
 
+            /*
             telemetry.addData("lift target", liftMotor.getTargetPosition());
             telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
             telemetry.update();
+             */
 
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
                     && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);

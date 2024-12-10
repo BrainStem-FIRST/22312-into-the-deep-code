@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.TimedAction;
@@ -121,11 +122,18 @@ public class Hinge extends Subsystem<Hinge.StateType> {
     }
 
     public Action shakeHingeDown() {
-        return new TimedAction() {
+        return new Action() {
+            ElapsedTime timer = new ElapsedTime();
+            int framesRunning = 0;
+            boolean isFirst = true;
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
-                if (getFramesRunning() % AUTO_SHAKE_FRAMES == 0) {
+                if (isFirst) {
+                    timer.reset();
+                    isFirst = false;
+                }
+                framesRunning++;
+                if (framesRunning % AUTO_SHAKE_FRAMES == 0) {
                     isFullyDown = !isFullyDown;
 
                     if (isFullyDown)
@@ -133,7 +141,9 @@ public class Hinge extends Subsystem<Hinge.StateType> {
                     else
                         setHingeServoPosition(HINGE_SHAKE_DOWN_POSITION);
                 }
-                return getRobot().getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE;
+                boolean end = timer.seconds() >= Collector.AUTO_MAX_COLLECT_TIME
+                        || getRobot().getCollector().getBlockColorSensor().getRawBlockColor() != BlockColor.NONE;
+                return !end;
             }
         };
     }

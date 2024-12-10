@@ -26,11 +26,14 @@ public class BrainSTEMRobot {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean setupDone;
     private boolean canTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
     private boolean isDepositing;
+
+    public enum StateType {
+        SETTING_UP
+    }
 
 
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
@@ -51,7 +54,6 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        setupDone = false;
 
         canTransfer = false;
         isHighDeposit = true;
@@ -76,7 +78,6 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
-        setupDone = false;
 
         canTransfer = true;
         isHighDeposit = true;
