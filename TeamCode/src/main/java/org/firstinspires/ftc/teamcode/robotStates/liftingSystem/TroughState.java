@@ -21,14 +21,8 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
                 robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
 
-            // would want to continue transfer if and only if block has been latched onto (would not want to release grabber then)
-            else if(!robot.getCollector().hasValidBlockColor() && robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_SAFETY_POS)
-                return;
-
             // handling resetting of grabber
-            if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
-                robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-            else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.TRANSITION)
+            if(robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.OPEN)
                 robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
         }
 
