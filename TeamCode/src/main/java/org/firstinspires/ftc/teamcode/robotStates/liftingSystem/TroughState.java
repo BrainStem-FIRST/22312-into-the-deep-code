@@ -18,14 +18,13 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // handling override of transfer if suddenly cannot transfer
         if(!robot.canTransfer()) {
             // handling the resetting of lift to trough safety
-            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION)
+            if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
                 robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)
-                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
 
             // would want to continue transfer if and only if block has been latched onto (would not want to release grabber then)
             else if(!robot.getCollector().hasValidBlockColor() && robot.getLift().getTransitionState().getGoalStatePosition() == Lift.TROUGH_SAFETY_POS)
                 return;
+
             // handling resetting of grabber
             if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
@@ -85,7 +84,8 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     public boolean canEnter() {
         // lift must properly be lowered and set before entering
         return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH
-                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH;
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_TROUGH
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.KNOCK_BLOCK;
     }
 
     // only can be overridden if lift is at trough safety and if grabber has block

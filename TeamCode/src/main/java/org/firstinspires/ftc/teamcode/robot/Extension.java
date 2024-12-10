@@ -25,7 +25,7 @@ public class Extension extends Subsystem<Extension.StateType> {
     // TODO: find extension encoder ticks for these 3
     public static int MIN_POSITION = 5,
             RETRACT_SLOW_POSITION = 120,
-            MIN_SEARCH_AND_COLLECT_POSITION = 350,
+            MIN_SEARCH_AND_COLLECT_POSITION = 450,
             MAX_POSITION = 1880;
 
     public static int GO_TO_THRESHOLD = 10, // if extension going to target position and is within this threshold of distance, from it, we consider the transition complete

@@ -21,6 +21,7 @@ public class LiftingSystem {
     }
     public static final Vector2d DEPOSIT_SAFETY_POS = new Vector2d(-48, -48);
     public static final Vector2d DEPOSIT_CORNER = new Vector2d(-72, -72);
+    public static final double DEPOSIT_OVERRIDE_DIST = 48;
     public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private boolean stayInTrough;
@@ -108,9 +109,9 @@ public class LiftingSystem {
     }
     public Action transferBlockOnce() {
         return new SequentialAction(
-                robot.getLift().moveTo(Lift.AUTO_TROUGH_POS),
+                robot.getLift().moveToWithoutPid(Lift.AUTO_TROUGH_POS),
                 robot.getGrabber().close(),
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS)
+                robot.getLift().moveToWithoutPid(Lift.TROUGH_SAFETY_POS)
         );
     }
 

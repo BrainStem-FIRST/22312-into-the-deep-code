@@ -27,11 +27,11 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 public class AutoYellow extends LinearOpMode {
     public static class Params {
         public double beginX = -40.825, beginY = -64.5, beginA = 0;
-        public double depositX = -57.1, depositY = -58.1, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
+        public double depositX = -57, depositY = -57, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
         public double rightBlockX = -49.35, rightBlockY = -45, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
         public double midBlockX = -62, midBlockY = -43, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(90);
         public double leftBlockX1 = -60.5, leftBlockY1 = -38, leftBlockX2 = -60.5, leftBlockY2 = -21, leftBlockA = Math.toRadians(135);
-        public double parkX1 = -36, parkY1 = -8, parkX2 = -15, parkY2 = -8, parkA = Math.toRadians(270);
+        public double parkX1 = -36, parkY1 = -8, parkX2 = -15, parkY2 = -6, parkA = Math.toRadians(270);
         public int rightBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int midBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int leftBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
@@ -118,73 +118,73 @@ public class AutoYellow extends LinearOpMode {
         waitForStart();
 
         Actions.runBlocking(
-                new SequentialAction(
-                        // DEPOSIT FIRST BLOCK & PREP FOR RIGHT BLOCK COLLECTION
-                        // depositing block that you start with
-                        // extend and hinge down while doing this
-                        new ParallelAction(
-                                robot.getGrabber().close(), // ensuring has good grip on block
-                                firstDeposit,
-                                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME),
-                                robot.getLiftingSystem().depositHighInitial(),
-                                robot.getCollectingSystem().startCollectSequence(params.rightBlockExtensionAmount)
-                        ),
-                        // GET AND DEPOSIT RIGHT BLOCK
-                        // resetting lift, driving to position and extending and collecting right block
-                        new ParallelAction(
-                                robot.getLiftingSystem().lowerFromDeposit(),
+                new ParallelAction(
+                        robot.getHanger().moveTo(Hanger.HANG_PARK_ENCODER),
+                        new SequentialAction(
+                                // DEPOSIT FIRST BLOCK & PREP FOR RIGHT BLOCK COLLECTION
+                                // depositing block that you start with
+                                // extend and hinge down while doing this
+                                new ParallelAction(
+                                        robot.getGrabber().close(), // ensuring has good grip on block
+                                        firstDeposit,
+                                        robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.SPECIMEN_HANG_TO_UP_TIME + Arm.UP_TO_BASKET_SAFETY_TIME),
+                                        robot.getLiftingSystem().depositHighInitial(),
+                                        robot.getCollectingSystem().startCollectSequence(params.rightBlockExtensionAmount)
+                                ),
+                                // GET AND DEPOSIT RIGHT BLOCK
+                                // resetting lift, driving to position and extending and collecting right block
+                                new ParallelAction(
+                                        robot.getLiftingSystem().lowerFromDeposit(),
 
-                                robot.getCollectingSystem().startCollect(),
-                                new SequentialAction(
-                                        rightBlock,
-                                        rightBlockDriveThrough
-                                )
-                        ),
-                        // retracting extension, transferring block to lift, going to deposit position and depositing, and doing a short extend and hinge
-                        new ParallelAction(
-                                rightBlockDeposit,
-                                robot.retractAndDepositAndExtend(params.midBlockExtensionAmount)
-                        ),
+                                        robot.getCollectingSystem().startCollect(),
+                                        new SequentialAction(
+                                                rightBlock,
+                                                rightBlockDriveThrough
+                                        )
+                                ),
+                                // retracting extension, transferring block to lift, going to deposit position and depositing, and doing a short extend and hinge
+                                new ParallelAction(
+                                        rightBlockDeposit,
+                                        robot.retractAndDepositAndExtend(params.midBlockExtensionAmount)
+                                ),
 
-                        // GET AND DEPOSIT MIDDLE BLOCK
-                        new ParallelAction(
-                                robot.getLiftingSystem().lowerFromDeposit(),
-                                robot.getCollectingSystem().startCollect(),
-                                new SequentialAction(
-                                        midBlock,
-                                        midBlockDriveThrough
-                                )
-                        ),
-                        new ParallelAction(
-                                midBlockDeposit,
-                                robot.retractAndDepositAndExtend(params.leftBlockExtensionAmount)
-                        ),
+                                // GET AND DEPOSIT MIDDLE BLOCK
+                                new ParallelAction(
+                                        robot.getLiftingSystem().lowerFromDeposit(),
+                                        robot.getCollectingSystem().startCollect(),
+                                        new SequentialAction(
+                                                midBlock,
+                                                midBlockDriveThrough
+                                        )
+                                ),
+                                new ParallelAction(
+                                        midBlockDeposit,
+                                        robot.retractAndDepositAndExtend(params.leftBlockExtensionAmount)
+                                ),
 
-                        // GET AND DEPOSIT LEFT BLOCK
-                        new ParallelAction(
-                                robot.getLiftingSystem().lowerFromDeposit(),
-                                robot.getCollectingSystem().startCollect(),
-                                new SequentialAction(
-                                        leftBlock,
-                                        leftBlockDriveThrough
-                                )
-                        ),
-                        // DEPOSIT LEFT BLOCK, RESET, AND PARK
-                        new ParallelAction(
-                                // SET UP HANG
-                                robot.getHanger().moveTo(Hanger.HANG_PARK_ENCODER),
+                                // GET AND DEPOSIT LEFT BLOCK
+                                new ParallelAction(
+                                        robot.getLiftingSystem().lowerFromDeposit(),
+                                        robot.getCollectingSystem().startCollect(),
+                                        new SequentialAction(
+                                                leftBlock,
+                                                leftBlockDriveThrough
+                                        )
+                                ),
+                                // DEPOSIT LEFT BLOCK, RESET, AND PARK
+                                new ParallelAction(
+                                        // DEPOSIT LEFT BLOCK
+                                        new SequentialAction(
+                                                new ParallelAction(
+                                                        leftBlockDeposit,
+                                                        robot.retractAndDeposit()
+                                                ),
 
-                                // DEPOSIT LEFT BLOCK
-                                new SequentialAction(
-                                        new ParallelAction(
-                                                leftBlockDeposit,
-                                                robot.retractAndDeposit()
-                                        ),
-
-                                        // PARK ROBOT
-                                        new ParallelAction(
-                                                robot.getLiftingSystem().lowerFromDeposit(),
-                                                park
+                                                // PARK ROBOT
+                                                new ParallelAction(
+                                                        robot.getLiftingSystem().lowerFromDeposit(),
+                                                        park
+                                                )
                                         )
                                 )
                         )

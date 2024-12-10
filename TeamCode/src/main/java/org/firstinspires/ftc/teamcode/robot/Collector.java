@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 // state mechanics: once collector/spit state initiated, will power until time reached, them automatically turn off
@@ -34,9 +35,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @Config
 public class Collector extends Subsystem<Collector.StateType> {
 
-    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2, AUTO_MAX_COLLECT_FRAMES = 200;
+    public static int AUTO_COLOR_VALIDATION_REQUIRED = 2, AUTO_MAX_COLLECT_TIME = 7;
     public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
-    public static double COLLECT_TEMP_POWER = 0.4, SPIT_TEMP_POWER = -0.5, AUTO_SPIT_SLOW_POWER = -0.3;
+    public static double COLLECT_TEMP_POWER = 0.8, SPIT_TEMP_POWER = -0.7, AUTO_SPIT_SLOW_POWER = -0.3;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.4;
@@ -117,11 +118,22 @@ public class Collector extends Subsystem<Collector.StateType> {
         return stateManager.getActiveStateType() == StateType.SPITTING || stateManager.getActiveStateType() == StateType.SPITTING_TEMP;
     }
     public Action collect() {
-        return new TimedAction() {
+        return new Action() {
+            ElapsedTime autoCollectTimer = new ElapsedTime();
+            boolean isFirst = true;
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                telemetry.addData("time collecting", getTime());
-                updateFramesRunning();
+                if (isFirst) {
+                    autoCollectTimer.reset();
+                    isFirst = false;
+                }
+
+                telemetry.addData("time collecting", autoCollectTimer.seconds());
+                telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+                telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
+                telemetry.addData("motor power", spindleMotor.getPower());
+                telemetry.update();
+
                 // updating motor current check
                 autoCurrentTracker.updateCurrentTracking();
                 if (autoCurrentTracker.hasValidatedAbnormalCurrent())
@@ -135,20 +147,51 @@ public class Collector extends Subsystem<Collector.StateType> {
                 else
                     autoColorValidationFrames = 0;
 
-                telemetry.addData("motor current (milliAmps)", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
-                telemetry.addData("validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
-                telemetry.addData("motor power", spindleMotor.getPower());
-                telemetry.update();
-                return getFramesRunning() > AUTO_MAX_COLLECT_FRAMES ||
-                        autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                if (autoCollectTimer.seconds() >= AUTO_MAX_COLLECT_TIME) {
+                    return false;
+                }
+
+                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
                         && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
             }
         };
     }
-    public Action hasNoBlock() {
-        return telemetryPacket -> blockColorSensor.getRawBlockColor() == BlockColor.NONE;
+    /*
+    public Action collect() {
+        return new TimedAction() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateFramesRunning();
 
+                telemetry.addData("time collecting", getTime());
+                telemetry.addData("frames running", getFramesRunning());
+                telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+                telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
+                telemetry.addData("motor power", spindleMotor.getPower());
+                telemetry.update();
+
+                // updating motor current check
+                autoCurrentTracker.updateCurrentTracking();
+                if (autoCurrentTracker.hasValidatedAbnormalCurrent())
+                    setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
+                else
+                    setSpindleMotorPower(Collector.AUTO_COLLECT_POWER);
+
+                // checking for color sensor validation
+                if (blockColorSensor.getRawBlockColor() != BlockColor.NONE)
+                    autoColorValidationFrames++;
+                else
+                    autoColorValidationFrames = 0;
+
+                if (getTime() >= AUTO_MAX_COLLECT_TIME)
+                    return false;
+
+                return autoColorValidationFrames < AUTO_COLOR_VALIDATION_REQUIRED
+                        && blockColorSensor.getRawBlockColor() != BlockColor.NONE;
+            }
+        };
     }
+    */
     public Action collectUntilHardStop() {
         return telemetryPacket -> {
             setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);

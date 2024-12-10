@@ -14,14 +14,12 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Hanger extends Subsystem<Hanger.StateType> {
-
-    // TODO: find down and up tick values and threshold
     // down refers to the position the hanging goes to after it is on the bar
     public final static int FULL_DOWN_ENCODER = 0,
-            HANG_DOWN_ENCODER = 8100,
-            HANG_PARK_ENCODER = 11700,
+            HANG_DOWN_ENCODER = 8300,
+            HANG_PARK_ENCODER = 27700,
             UP_TICK = 33600,
-            DESTINATION_THRESHOLD = 70;
+            DESTINATION_THRESHOLD = 150;
     public final static double HANG_HOLD_POWER = -0.3;
 
     public enum StateType {
@@ -69,8 +67,7 @@ public class Hanger extends Subsystem<Hanger.StateType> {
     }
     public Action moveTo(int target) {
         return telemetryPacket -> {
-            pid.setTarget(target);
-            Subsystem.setMotorPower(hangMotor, Hanger.HANG_PARK_ENCODER);
+            Subsystem.setMotorPosition(hangMotor, Hanger.HANG_PARK_ENCODER);
             return Subsystem.inRange(hangMotor, target, DESTINATION_THRESHOLD);
         };
     }

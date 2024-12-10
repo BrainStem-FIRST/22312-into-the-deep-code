@@ -26,6 +26,7 @@ public class BrainSTEMRobot {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
+    private boolean setupDone;
     private boolean canTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
@@ -50,6 +51,8 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
+        setupDone = false;
+
         canTransfer = false;
         isHighDeposit = true;
         isHighRam = true;
@@ -73,49 +76,22 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
+        setupDone = false;
+
         canTransfer = true;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
     }
-
     public void setup() {
-        double start = System.currentTimeMillis() / 1000.0;
-        double time = 0;
-
-        setupHangingSystem();
-
-        while(!setupLiftingSystem() || !setupCollectingSystem()) {
-
-            telemetry.addData("", "");
-            telemetry.addData("robot status", "setting up");
-            telemetry.addData("time", time);
-            telemetry.update();
-            time = System.currentTimeMillis() / 1000.0 - start;
-        }
-    }
-    private boolean setupLiftingSystem() {
-        telemetry.addData("setting up lifting system", "");
-        grabber.getGrabServo().setPosition(Grabber.OPEN_POS);
-        Subsystem.setMotorPosition(lift.getLiftMotor(), Lift.TROUGH_SAFETY_POS);
-        if(lift.getLiftMotor().getCurrentPosition() >= Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
-            arm.getArmServo().setPosition(Arm.TRANSFER_POS);
-        return arm.getArmServo().getPosition() == Arm.TRANSFER_POS;
-    }
-    private boolean setupCollectingSystem() {
-        telemetry.addData("setting up collecting system", "");
-        ElapsedTime timer = new ElapsedTime();
+        // setting up hinge
         hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
 
-        if (timer.seconds() >= Hinge.HINGE_UP_TIME)
-            extension.retractExtensionMotor();
-        if (extension.hitRetractHardStop()) {
-            extension.getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-        return extension.hitRetractHardStop();
-    }
-    private void setupHangingSystem() {
-        hanger.getHangMotor().setTargetPosition(Hanger.FULL_DOWN_ENCODER);
+        // setting up lift
+        if(lift.getLiftMotor().getCurrentPosition() < Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
+            lift.getLiftMotor().setTargetPosition(Lift.TROUGH_SAFETY_POS);
+        else
+            arm.getArmServo().setPosition(Arm.TRANSFER_POS);
     }
 
     //  NOTE: COLLECTING SYSTEM NEEDS TO BE UPDATED BEFORE LIFTING SYSTEM TO ENSURE COLOR SENSOR VALUES ARE UP TO DATE WHEN LIFTING SYSTEM USES THEM

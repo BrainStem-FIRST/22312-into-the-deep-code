@@ -38,7 +38,6 @@ public class LiftTuneTele extends LinearOpMode {
         ServoImplEx grabberServo = hardwareMap.get(ServoImplEx.class, "LiftGrabServo");
         grabberServo.setPwmRange(new PwmControl.PwmRange(Grabber.MIN_TICK, Grabber.MAX_TICK));
 
-
         waitForStart();
         while(opModeIsActive()) {
             input.update();
