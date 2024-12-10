@@ -12,7 +12,7 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.TROUGH_TO_BASKET);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
             robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
 

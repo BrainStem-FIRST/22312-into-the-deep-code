@@ -14,7 +14,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.TROUGH);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // handling override of transfer if suddenly cannot transfer
         if(!robot.canTransfer()) {
             // handling the resetting of lift to trough safety
@@ -55,7 +55,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             // transfer stage 2: closing onto block once lift is down and raising lift
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
-                    robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
+                    robot.getGrabber().getTransitionState().overrideGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                     robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());
                     robot.setIsDepositing(robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW); // here I set isDepositing automatically (basically, it is reset every time transfer occurs)
                     robot.getLiftingSystem().setStayInTrough(false); // I also reset stayInTrough every time there is a transfer

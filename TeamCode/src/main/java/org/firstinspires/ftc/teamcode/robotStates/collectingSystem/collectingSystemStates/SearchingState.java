@@ -12,7 +12,7 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
         super(CollectingSystem.StateType.SEARCH);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         StateManager<Extension.StateType> extensionManager = robot.getExtension().getStateManager();
         StateManager<Hinge.StateType> hingeManager = robot.getHinge().getStateManager();
         StateManager<Collector.StateType> collectorManager = robot.getCollector().getStateManager();

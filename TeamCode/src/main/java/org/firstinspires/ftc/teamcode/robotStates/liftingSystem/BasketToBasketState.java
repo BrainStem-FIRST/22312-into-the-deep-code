@@ -10,7 +10,7 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.BASKET_TO_BASKET);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // accounting switching baskets after arm is already down
         if(robot.getArm().getTransitionState().getGoalStatePosition() == Arm.BASKET_DROP_POS)
             robot.getArm().getTransitionState().overrideGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);

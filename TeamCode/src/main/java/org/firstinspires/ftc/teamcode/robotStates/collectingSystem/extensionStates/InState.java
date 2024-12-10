@@ -11,7 +11,7 @@ public class InState extends RobotState<Extension.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if(!robot.getExtension().hitRetractHardStop())
             robot.getExtension().setTargetPower(Extension.RETRACT_POWER_IN);
         else if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.TROUGH)

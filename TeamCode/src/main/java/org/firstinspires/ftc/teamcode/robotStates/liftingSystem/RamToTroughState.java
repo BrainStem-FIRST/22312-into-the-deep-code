@@ -11,7 +11,7 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.RAM_TO_TROUGH);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // actually ramming using lift
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);

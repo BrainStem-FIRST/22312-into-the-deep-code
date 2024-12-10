@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robotStates;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
@@ -25,7 +24,7 @@ public class NothingState<StateType extends Enum<StateType>> extends RobotState<
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         for (DcMotorEx motor : motorList) {
             Subsystem.setMotorPower(motor, 0);
         }

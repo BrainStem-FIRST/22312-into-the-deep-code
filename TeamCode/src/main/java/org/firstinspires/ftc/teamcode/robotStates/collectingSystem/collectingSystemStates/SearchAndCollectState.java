@@ -11,7 +11,7 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
         super(CollectingSystem.StateType.SEARCH_AND_COLLECT);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if (isFirstTime()) {
             robot.getLiftingSystem().setStayInTrough(true);
 

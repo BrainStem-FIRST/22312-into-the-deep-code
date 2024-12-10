@@ -48,7 +48,7 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
         stateManager.tryEnterState(stateType);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         servo.setPosition(goalPosition);
     }
 

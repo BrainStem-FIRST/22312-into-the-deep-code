@@ -12,7 +12,7 @@ public class SpitState extends RobotState<Collector.StateType> {
 
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
 
         // spit
         robot.getCollector().setSpindleMotorPower(Collector.SPIT_POWER);

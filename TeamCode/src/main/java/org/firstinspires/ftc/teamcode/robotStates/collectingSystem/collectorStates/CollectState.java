@@ -10,7 +10,7 @@ public class CollectState extends RobotState<Collector.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if (robot.getCollector().getTeleCurrentTracker().hasValidatedAbnormalCurrent())
             robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
         else

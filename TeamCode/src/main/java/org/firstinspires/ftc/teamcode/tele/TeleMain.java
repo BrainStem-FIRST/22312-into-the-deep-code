@@ -46,6 +46,8 @@ public class TeleMain extends LinearOpMode {
 
         waitForStart();
 
+        robot.getStateManager().tryEnterState(BrainSTEMRobot.StateType.SETTING_UP); // setup robot
+
         long currentTime = System.currentTimeMillis();
         long prevTime;
         double dt;
@@ -54,7 +56,6 @@ public class TeleMain extends LinearOpMode {
         timeSinceStart = 0; // time since start of match; need for hanging
 
         // initial robot setup
-        robot.setup();
         while (opModeIsActive()) {
 
             // update dt
@@ -66,8 +67,17 @@ public class TeleMain extends LinearOpMode {
             // update custom input
             input.update();
 
-            listenForRobotControls();
+            // always allow driver control
+            listenForDriveTrainInput();
 
+            // only accept input if robot is playing
+            if (robot.getStateManager().getActiveStateType() == BrainSTEMRobot.StateType.PLAYING) {
+                listenForCollectionInput(input.getGamepadTracker1());
+                listenForLiftingInput(); // checks both gamepad input in this function
+                listenForHangingInput();
+            }
+
+            // update robot
             robot.update(dt);
 
             // for debugging: checking dt
@@ -91,6 +101,7 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
             telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
             telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
+            telemetry.addData("robot state", robot.getStateManager().getActiveStateType());
 
             // robot's lifting system
             telemetry.addData("", "");
@@ -134,17 +145,11 @@ public class TeleMain extends LinearOpMode {
             // robot's hanging system
             telemetry.addData("", "");
             telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
+            telemetry.addData("  hang motor power", robot.getHanger().getHangMotor().getPower());
             telemetry.addData("  hang motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
             telemetry.addData("  hang goal encoder", robot.getHanger().getTransitionState().getGoalStatePosition());
             telemetry.update();
         }
-    }
-
-    private void listenForRobotControls() {
-        listenForDriveTrainInput();
-        listenForCollectionInput(input.getGamepadTracker1());
-        listenForLiftingInput(); // checks both gamepad input in this function
-        listenForHangingInput();
     }
     private void listenForDriveTrainInput() {
         // final double STRAFE_X_AMP = 0.3;
@@ -316,15 +321,9 @@ public class TeleMain extends LinearOpMode {
         //if (timeSinceStart >= PARAMS.timeToHang && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
             //robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
 
-        // lower hanging to raise robot
-        if (input.getGamepadTracker2().isRightBumperPressed()) {
-            if (robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-                robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
-        }
-        else if (input.getGamepadTracker2().isRightTriggerPressed()) {
-            if (robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
+        if (input.getGamepadTracker2().isRightTriggerPressed()
+        && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_ENCODER, Hanger.StateType.HANG_DOWN);
-        }
     }
 
 

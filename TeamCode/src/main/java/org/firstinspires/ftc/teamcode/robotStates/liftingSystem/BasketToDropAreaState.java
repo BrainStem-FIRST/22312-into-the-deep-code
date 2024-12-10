@@ -12,7 +12,7 @@ public class BasketToDropAreaState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.BASKET_TO_DROP_AREA);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
 
         // if lift is still at/trying to reach position to deposit
         if(robot.getLift().getTransitionState().getGoalStatePosition() == robot.getLift().getBasketDepositPos()) {

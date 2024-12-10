@@ -79,7 +79,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // checking hardstops
         if(motor.getCurrentPosition() < absoluteMin)
             Subsystem.setMotorPosition(motor, absoluteMin);

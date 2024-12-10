@@ -10,7 +10,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if(isFirstTime()) {
             robot.setIsDepositing(false);
             robot.getLiftingSystem().setStayInTrough(false);

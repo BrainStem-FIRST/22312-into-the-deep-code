@@ -25,6 +25,7 @@ public class LiftingSystem {
     public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private boolean stayInTrough;
+    private boolean needManualTransfer;
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -49,6 +50,7 @@ public class LiftingSystem {
 
         buttonACued = false;
         stayInTrough = true;
+         needManualTransfer = false;
     }
 
     public void update(double dt) {

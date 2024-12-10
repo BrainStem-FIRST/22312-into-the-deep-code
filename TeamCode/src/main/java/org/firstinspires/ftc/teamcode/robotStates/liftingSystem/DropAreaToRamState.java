@@ -11,7 +11,7 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if (isFirstTime()) {
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
             robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_HANG_POS, Arm.StateType.SPECIMEN_HANG, Arm.DROP_AREA_TO_RAM_TIME);

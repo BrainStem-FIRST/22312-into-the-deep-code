@@ -10,17 +10,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.hangingStates.HoldHang;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class Hanger extends Subsystem<Hanger.StateType> {
     // down refers to the position the hanging goes to after it is on the bar
     public final static int FULL_DOWN_ENCODER = 0,
-            HANG_DOWN_ENCODER = 8300,
-            HANG_PARK_ENCODER = 27700,
-            UP_TICK = 33600,
-            DESTINATION_THRESHOLD = 150;
-    public final static double HANG_HOLD_POWER = -0.3;
+            HANG_DOWN_ENCODER = 2550,
+            HANG_PARK_ENCODER = 10750,
+            UP_TICK = 14500,
+            DESTINATION_THRESHOLD = 90;
+    public final static double HANG_HOLD_POWER = 0;
 
     public enum StateType {
         FULL_DOWN,
@@ -35,7 +34,7 @@ public class Hanger extends Subsystem<Hanger.StateType> {
         super(hwMap, telemetry, allianceColor, robot, StateType.FULL_DOWN);
 
         hangMotor = hwMap.get(DcMotorEx.class, "HangMotor");
-        hangMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        hangMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pid = new PIDController(0.004, 0.0005, 0);

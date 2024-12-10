@@ -58,7 +58,7 @@ public class StateManager<StateType extends Enum<StateType>> {
                 tryEnterState(defaultStateType);
         }
 
-        getActiveState().execute();
+        getActiveState().execute(dt);
         getActiveState().incrementTime(dt);
         getActiveState().incrementFramesRunning();
     }

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates;
 
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -11,7 +10,7 @@ public class CollectTempState extends RobotState<Collector.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // collect
         robot.getCollector().setSpindleMotorPower(Collector.COLLECT_TEMP_POWER);
     }

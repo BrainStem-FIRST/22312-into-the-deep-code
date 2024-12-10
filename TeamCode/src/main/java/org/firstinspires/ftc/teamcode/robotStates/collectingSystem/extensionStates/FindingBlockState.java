@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -13,7 +10,7 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
             robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));

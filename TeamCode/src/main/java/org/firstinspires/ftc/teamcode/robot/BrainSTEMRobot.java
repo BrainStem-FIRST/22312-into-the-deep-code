@@ -4,19 +4,15 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
+import org.firstinspires.ftc.teamcode.robotStates.robot.PlayingState;
+import org.firstinspires.ftc.teamcode.robotStates.robot.SettingUpState;
 
-public class BrainSTEMRobot {
-
-    public Telemetry telemetry;
-    private final AllianceColor allianceColor;
+public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     private final PinpointDrive driveTrain;
-
     private final Extension extension;
     private final Hinge hinge;
     private final Collector collector;
@@ -32,13 +28,12 @@ public class BrainSTEMRobot {
     private boolean isDepositing;
 
     public enum StateType {
-        SETTING_UP
+        SETTING_UP,
+        PLAYING
     }
 
-
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
-        this.telemetry = telemetry;
-        this.allianceColor = allianceColor;
+        super(hwMap, telemetry, allianceColor, null, StateType.SETTING_UP);
 
         driveTrain = new PinpointDrive(hwMap, new Pose2d(0, 0, 0));
 
@@ -54,6 +49,9 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
+        stateManager.addState(StateType.SETTING_UP, new SettingUpState());
+        stateManager.addState(StateType.PLAYING, new PlayingState());
+        stateManager.setupStates(this, stateManager);
 
         canTransfer = false;
         isHighDeposit = true;
@@ -61,8 +59,7 @@ public class BrainSTEMRobot {
         isDepositing = true;
     }
     public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, Pose2d beginPose) {
-        this.telemetry = telemetry;
-        this.allianceColor = allianceColor;
+        super(hwMap, telemetry, allianceColor, null, StateType.SETTING_UP);
 
         driveTrain = new PinpointDrive(hwMap, beginPose);
 
@@ -78,42 +75,19 @@ public class BrainSTEMRobot {
 
         hanger = new Hanger(hwMap, telemetry, allianceColor, this);
 
+        stateManager.addState(StateType.SETTING_UP, new SettingUpState());
+        stateManager.addState(StateType.PLAYING, new PlayingState());
+        stateManager.setupStates(this, stateManager);
 
         canTransfer = true;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
     }
-    public void setup() {
-        // setting up hinge
-        hinge.setHingeServoPosition(Hinge.HINGE_UP_POSITION);
 
-        // setting up lift
-        if(lift.getLiftMotor().getCurrentPosition() < Lift.TROUGH_SAFETY_POS - Lift.DESTINATION_THRESHOLD)
-            lift.getLiftMotor().setTargetPosition(Lift.TROUGH_SAFETY_POS);
-        else
-            arm.getArmServo().setPosition(Arm.TRANSFER_POS);
-    }
-
-    //  NOTE: COLLECTING SYSTEM NEEDS TO BE UPDATED BEFORE LIFTING SYSTEM TO ENSURE COLOR SENSOR VALUES ARE UP TO DATE WHEN LIFTING SYSTEM USES THEM
     public void update(double dt) {
-        // drive train
-        driveTrain.updatePoseEstimate();
-
-        // collecting system
-        collectingSystem.update(dt);
-        collector.update(dt);
-        hinge.update(dt);
-        extension.update(dt);
-
-        // lifting system
-        liftingSystem.update(dt);
-        grabber.update(dt);
-        arm.update(dt);
-        lift.update(dt);
-
-        // hanging system
-        hanger.update(dt);
+        // playing state now updates all the subsystems
+        stateManager.update(dt);
     }
 
     public PinpointDrive getDriveTrain() {

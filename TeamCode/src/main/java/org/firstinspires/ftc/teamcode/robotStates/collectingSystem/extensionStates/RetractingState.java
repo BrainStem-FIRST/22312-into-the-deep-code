@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
 import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class RetractingState extends RobotState<Extension.StateType> {
@@ -11,7 +10,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
         if (isFirstTime())
             robot.setCanTransfer(true);
         //if(isFirstTime())

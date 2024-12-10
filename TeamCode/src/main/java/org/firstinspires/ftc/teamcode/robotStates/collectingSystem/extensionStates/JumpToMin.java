@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class JumpToMin extends RobotState<Extension.StateType> {
@@ -16,7 +12,7 @@ public class JumpToMin extends RobotState<Extension.StateType> {
     }
 
     @Override
-    public void execute() {
+    public void execute(double dt) {
 
         // go to min position
         robot.getExtension().setTargetPower(0);

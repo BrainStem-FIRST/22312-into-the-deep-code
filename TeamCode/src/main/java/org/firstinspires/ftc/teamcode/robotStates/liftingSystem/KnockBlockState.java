@@ -11,7 +11,7 @@ public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.KNOCK_BLOCK);
     }
     @Override
-    public void execute() {
+    public void execute(double dt) {
         // prepping for knocking
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.getArm().getTransitionState().setGoalState(Arm.KNOCK_BLOCK_POS, Arm.StateType.KNOCK_BLOCK, Arm.TRANSFER_TO_KNOCK_BLOCK_TIME);
