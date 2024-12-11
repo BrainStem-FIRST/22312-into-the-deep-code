@@ -27,7 +27,7 @@ public class AutoSpecimen extends LinearOpMode {
 
         public double beginX = 7.175, beginY = -64.5, beginA = Math.toRadians(90);
         public double hang1X = 0, hang1Y = -28; // first hang is a strafe to
-
+        public double hangT;
         public double leftBlockX1 = 38, leftBlockY1 = -39, leftBlockT1 = Math.toRadians(90);
         public double leftBlockX2 = 47, leftBlockY2 = -15, leftBlockT2 = Math.toRadians(0);
         public double leftBlockPushDistance = 40;
@@ -35,6 +35,8 @@ public class AutoSpecimen extends LinearOpMode {
 
         public double midBlockX = 57, midBlockY = leftBlockY2, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0); // try to make it so the block can go in the divet in the back of the robot??:
         public double midBlockPushDistance = 40;
+
+        public double wallPickupX = 36, wallPickupY = -65, wallPickupA = Math.toRadians(90), wallPickupT = Math.toRadians(270);
     }
     public static Params params = new Params();
 
@@ -50,6 +52,8 @@ public class AutoSpecimen extends LinearOpMode {
 
         Pose2d midBlockPose = new Pose2d(params.midBlockX, params.midBlockY, params.midBlockA);
         Pose2d midBlockAfterPose = new Pose2d(params.midBlockX, params.midBlockY - params.midBlockPushDistance, params.midBlockA);
+
+        Pose2d wallPickupPose = new Pose2d(params.wallPickupX, params.wallPickupY, params.wallPickupA);
 
         BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
         PinpointDrive drive = robot.getDriveTrain();
@@ -75,13 +79,27 @@ public class AutoSpecimen extends LinearOpMode {
         TrajectoryActionBuilder driveToLeftSpecimenHangTrajectory = drive.actionBuilder(midBlockAfterPose)
                 .splineToLinearHeading(hangLeftPose, params.hangLeftA);
 
+        TrajectoryActionBuilder wallToHangTrajectory = drive.actionBuilder(wallPickupPose)
+                .splineToConstantHeading(new Vector2d(params.hang1X, params.hang1Y), params.beginA);
+        TrajectoryActionBuilder hangToWallTrajectory = drive.actionBuilder(hangLeftPose)
+                .splineToConstantHeading(new Vector2d(params.wallPickupX, params.wallPickupY), params.wallPickupT);
+
         Action driveToSpecimen1Hang = driveToSpecimen1HangTrajectory.build();
         Action pushLeftBlock = pushLeftBlockTrajectory.build();
         Action pushMidBlock = pushMidBlockTrajectory.build();
         Action driveToLeftSpecimenHang = driveToLeftSpecimenHangTrajectory.build();
 
+        Action wallToHang = wallToHangTrajectory.build();
+        Action hangToWall = hangToWallTrajectory.build();
+
         waitForStart();
 
+        Actions.runBlocking(new SequentialAction(
+                wallToHang,
+                new SleepAction(0.5),
+                hangToWall
+        ));
+        /*
         // actual auto path
         Actions.runBlocking(new SequentialAction(
                 // hang first specimen
@@ -112,6 +130,7 @@ public class AutoSpecimen extends LinearOpMode {
                 new SleepAction(0.5)
                 //robot.getLiftingSystem().ramHighSpecimen()
         ));
+         */
 
     }
 }

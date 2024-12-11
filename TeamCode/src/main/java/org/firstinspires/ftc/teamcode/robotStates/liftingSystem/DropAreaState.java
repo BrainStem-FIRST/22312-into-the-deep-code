@@ -15,6 +15,7 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
         if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA && robot.getGrabber().hasSpecimen()) {
             robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_AFTER_POS, Lift.StateType.DROP_AREA_AFTER);
             robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+            robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
         }
 
         // checking if grabber does not have specimen but lift is setup as if it does (means need to lower lift so grabber can grab onto specimen)

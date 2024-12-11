@@ -25,16 +25,16 @@ public class Lift extends Subsystem<Lift.StateType> {
         KNOCK_BLOCK_POS = 170,
         TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 50, // position where grabber can grab onto specimen
-        DROP_AREA_AFTER_POS = 200, // position to go to after grabber has specimen (to clear specimen off wall)
+        DROP_AREA_AFTER_POS = 250, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
         HIGH_RAM_BEFORE_POS = 1300, // position to go to to setup for high bar ram
-        HIGH_RAM_AFTER_POS = 1820, // position to go to after ramming high bar
+        HIGH_RAM_AFTER_POS = 1850, // position to go to after ramming high bar
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
         HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
-        HIGH_BASKET_SAFETY_POS = 2730, // position where arm can start rotating into position to deposit on high basket
+        HIGH_BASKET_SAFETY_POS = 2600, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
     public enum StateType {
@@ -43,7 +43,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     private final MotorTransitionState<StateType> transitionState;
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
-    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0015, ZERO_KD = 0;
+    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.002, ZERO_KD = 0;
     public static double OVERRIDE_POWER_OFFSET = 0.2;
     public static double MAX_TRANSITION_TIME = 4;
     private final DcMotorEx liftMotor;
@@ -81,10 +81,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     public void update(double dt) {
         stateManager.update(dt);
     }
-    public void updateLiftAutoPidMovement(int target) {
-        pid.setkI(SMALL_TRANSITION_KI);
-        pid.setTarget(target);
-        /*
+    public void updateLiftAutoPidMovement() {
         telemetry.addData("lift pid target", pid.getTarget());
         telemetry.addData("lift power", liftMotor.getPower());
         telemetry.addData("lift position", liftMotor.getCurrentPosition());
@@ -92,21 +89,44 @@ public class Lift extends Subsystem<Lift.StateType> {
         telemetry.addData("kI", pid.getkI());
         telemetry.addData("kD", pid.getkD());
         telemetry.update();
-         */
         Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
     }
     public Action moveTo(int target) {
+        pid.reset();
+        pid.setTarget(target);
         return (@NonNull TelemetryPacket telemetryPacket) -> {
-            updateLiftAutoPidMovement(target);
+            updateLiftAutoPidMovement();
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
         };
     }
     public Action moveTo(int target, int posToPass) {
         pid.reset();
+        pid.setTarget(target);
         return (@NonNull TelemetryPacket telemetryPacket) -> {
-            updateLiftAutoPidMovement(target);
+            updateLiftAutoPidMovement();
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
                     && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
+        };
+    }
+    public Action moveTo(int target, int posToPass, double kP, double kI) {
+        pid.reset();
+        pid.setkP(kP);
+        pid.setkI(kI);
+        pid.setTarget(target);
+        return (@NonNull TelemetryPacket telemetryPacket) -> {
+            updateLiftAutoPidMovement();
+            return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
+                    && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
+        };
+    }
+    public Action moveTo(int target, double kP, double kI) {
+        pid.reset();
+        pid.setkP(kP);
+        pid.setkI(kI);
+        pid.setTarget(target);
+        return telemetryPacket -> {
+            updateLiftAutoPidMovement();
+            return !Subsystem.inRange(liftMotor, target, Lift.AUTO_DESTINATION_THRESHOLD);
         };
     }
     public Action moveToWithoutPid(int target) {
