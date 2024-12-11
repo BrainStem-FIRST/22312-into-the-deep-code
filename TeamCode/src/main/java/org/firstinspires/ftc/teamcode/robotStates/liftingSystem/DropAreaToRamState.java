@@ -11,12 +11,13 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
     }
 
     @Override
-    public void execute(double dt) {
-        if (isFirstTime()) {
-            robot.getLift().getTransitionState().overrideGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
-            robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
-            robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_HANG_POS, Arm.StateType.SPECIMEN_HANG, Arm.DROP_AREA_TO_RAM_TIME);
-        }
+    public void execute(double dt) {}
+
+    @Override
+    public void executeOnEntered() {
+        robot.getLift().getTransitionState().overrideGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
+        robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+        robot.getArm().getTransitionState().setGoalState(Arm.SPECIMEN_HANG_POS, Arm.StateType.SPECIMEN_HANG, Arm.DROP_AREA_TO_RAM_TIME);
     }
 
     @Override

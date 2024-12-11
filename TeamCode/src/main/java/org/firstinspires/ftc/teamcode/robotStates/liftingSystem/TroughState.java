@@ -18,9 +18,6 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute(double dt) {
-        if(isFirstTime())
-            isFirstTransfer = true;
-
         // handling override of transfer if suddenly cannot transfer
         if(!robot.canTransfer() && !robot.getGrabber().hasBlock()) {
             // handling the resetting of lift to trough safety
@@ -35,7 +32,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         }
 
         // handling actual transfer
-        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor()) {
+        else if(robot.getLiftingSystem().needManualTransfer() || (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor())) {
             // transfer stage 1: opening grabber, setting arm to transfer pos, and lowering lift if at trough safety
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 // decrementing position if need to transfer again
@@ -81,6 +78,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         else if (!robot.getCollector().hasValidBlockColor()
         && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.setCanTransfer(true);
+            robot.getLiftingSystem().setNeedManualTransfer(false); // set to false bc only want transfer to happen once if manual
             // prepping for basket deposit (automatically happens once your close enough to basket)
             if (robot.getGrabber().hasBlock() && robot.isDepositing()) {
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
@@ -91,7 +89,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
         }
     }
-
+    @Override
+    public void executeOnEntered() {
+        isFirstTransfer = true;
+    }
     @Override
     public boolean canEnter() {
         // lift must properly be lowered and set before entering

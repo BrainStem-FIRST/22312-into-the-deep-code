@@ -84,6 +84,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public void execute(double dt) {
+
         if(maxTime != 0 && getTime() >= maxTime)
             stateManager.tryEnterState(goalStateType);
         // checking hardstops
@@ -102,12 +103,14 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
                 Subsystem.setMotorPower(motor, totalPower);
             }
     }
-
+    @Override
+    public void executeOnExited() {
+        powerOffset = 0;
+    }
     @Override
     public boolean canEnter() {
         return stateManager.getActiveStateType() != stateType; // stateType should equal TRANSITION enum
     }
-
     @Override
     public boolean canBeOverridden() {
         return true;
@@ -121,8 +124,10 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     public PIDController getPid() {
         return pid;
     }
-    public void setPowerOffset(double powerOffset) {
-        this.powerOffset = powerOffset;
+
+    // adds power offset in the same direction of the goal
+    public void setPowerMagnitude(double mag) {
+        powerOffset = mag * Math.signum(goalPosition - motor.getCurrentPosition());
     }
     public int getDirection() {
         return (int) Math.signum(getGoalStatePosition() - motor.getCurrentPosition());

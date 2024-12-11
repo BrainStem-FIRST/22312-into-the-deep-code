@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.stateMachine;
 public interface State<StateType extends Enum<StateType>> {
     void execute(double dt);
-    // are all of the safety requirements met so that mechanically, this state is able to be entered
+    default void executeOnEntered() {}
+    default void executeOnExited() {}
     boolean canEnter();
     boolean canBeOverridden();
     boolean isDone();

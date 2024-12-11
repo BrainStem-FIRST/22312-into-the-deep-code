@@ -53,7 +53,7 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
         stateManager.addState(StateType.PLAYING, new PlayingState());
         stateManager.setupStates(this, stateManager);
 
-        canTransfer = false;
+        canTransfer = false; // only set to false in collectTemp and spitTemp states; reset to true for every retraction and after every transfer
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;

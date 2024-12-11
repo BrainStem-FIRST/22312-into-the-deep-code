@@ -11,10 +11,6 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute(double dt) {
-        if(isFirstTime()) {
-            robot.setIsDepositing(true);
-            robot.getLiftingSystem().setStayInTrough(true);
-        }
         if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
             robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
             robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
@@ -25,6 +21,11 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
 
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF)
             robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
+    }
+    @Override
+    public void executeOnEntered() {
+        robot.setIsDepositing(true);
+        robot.getLiftingSystem().setStayInTrough(true);
     }
 
     @Override

@@ -13,13 +13,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
     public void execute(double dt) {
         if (isFirstTime())
             robot.setCanTransfer(true);
-        //if(isFirstTime())
-        //    robot.getExtension().getPid().reset();
-        //if(!robot.getInPidMode())
         robot.getExtension().retractExtensionMotor();
-        //else
-        //Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(),
-        //        robot.getExtension().getPid().update(robot.getExtension().getExtensionMotor().getCurrentPosition()));
     }
 
     @Override

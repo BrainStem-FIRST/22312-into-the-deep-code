@@ -47,7 +47,6 @@ public class Lift extends Subsystem<Lift.StateType> {
     public static double OVERRIDE_POWER_OFFSET = 0.2;
     public static double MAX_TRANSITION_TIME = 4;
     private final DcMotorEx liftMotor;
-    private double powerOffset;
     private final PIDController pid;
 
     public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
@@ -161,7 +160,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         return liftMotor;
     }
     public void setLiftPower(double power) {
-        Subsystem.setMotorPower(liftMotor, power + powerOffset);
+        Subsystem.setMotorPower(liftMotor, power);
     }
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
@@ -189,8 +188,5 @@ public class Lift extends Subsystem<Lift.StateType> {
     }
     public PIDController getPid() {
         return pid;
-    }
-    public void setPowerOffset(double powerOffset) {
-        this.powerOffset = powerOffset;
     }
 }

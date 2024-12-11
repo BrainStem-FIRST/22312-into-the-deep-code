@@ -108,6 +108,7 @@ public class TeleMain extends LinearOpMode {
 
             // robot's lifting system
             telemetry.addData("", "");
+            telemetry.addData("lift need manual transfer", "");
             telemetry.addData("is high basket", robot.isHighDeposit());
             telemetry.addData("can enter basket to basket", robot.getLiftingSystem().getStateManager().getState(LiftingSystem.StateType.BASKET_TO_BASKET).canEnter());
             telemetry.addData("is basketDeposit done", robot.getLiftingSystem().getStateManager().getState(LiftingSystem.StateType.BASKET_DEPOSIT).isDone());
@@ -250,9 +251,11 @@ public class TeleMain extends LinearOpMode {
         if(input.getGamepadTracker1().isFirstFrameA() || input.getGamepadTracker2().isFirstFrameA())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
-                    // activating manual transfer
-                    if(!robot.canTransfer() && robot.getCollector().hasValidBlockColor())
+                    // activating manual transfer if everything properly setup
+                    if(!robot.canTransfer() && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
+                        robot.getLiftingSystem().setNeedManualTransfer(true);
+                    }
                     // activating transition to deposit in basket once transfer is complete
                     else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
                     && robot.isDepositing() && robot.getGrabber().hasBlock())
@@ -319,9 +322,8 @@ public class TeleMain extends LinearOpMode {
             // checking if lift is in transition (if so, manually increase power if using pid)
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION
             && robot.getLift().getTransitionState().isUsingPid())
-                robot.getLift().setPowerOffset(Lift.OVERRIDE_POWER_OFFSET);
+                robot.getLift().getTransitionState().setPowerMagnitude(Lift.OVERRIDE_POWER_OFFSET);
             else {
-                robot.getLift().setPowerOffset(0);
                 // handling block knocking check
                 if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
                         && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
