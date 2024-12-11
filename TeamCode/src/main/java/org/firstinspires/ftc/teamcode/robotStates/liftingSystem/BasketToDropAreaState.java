@@ -15,7 +15,7 @@ public class BasketToDropAreaState extends RobotState<LiftingSystem.StateType> {
     public void execute(double dt) {
 
         // if lift is still at/trying to reach position to deposit
-        if(robot.getLift().getTransitionState().getGoalStatePosition() == robot.getLift().getBasketDepositPos()) {
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT) {
             // releasing block
             if(robot.getGrabber().hasBlock()) {
                 robot.getLiftingSystem().setStayInTrough(false); // resets need to stay in trough once block is deposited

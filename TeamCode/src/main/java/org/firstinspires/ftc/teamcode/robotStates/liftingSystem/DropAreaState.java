@@ -19,14 +19,12 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
         else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.DROP_AREA_AFTER && !robot.getGrabber().hasSpecimen()) {
             robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
             robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
+            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
         }
 
         // automatically transitions to trough once start collecting or if too close to basket and has block
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT || robot.getCollector().hasValidBlockColor())
             stateManager.tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
-        // automatically transitions to specimen ram if have specimen and close enough to specimen area
-        else if(robot.getGrabber().hasSpecimen())
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
     }
 
     @Override

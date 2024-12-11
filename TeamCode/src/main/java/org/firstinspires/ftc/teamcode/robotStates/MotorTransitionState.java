@@ -14,6 +14,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     public final int DESTINATION_THRESHOLD;
 
     private int startEncoder;
+    private double maxTime;
 
     private int absoluteMin;
     private int absoluteMax;
@@ -34,6 +35,9 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.pid = pid;
         usingPid = true;
         startEncoder = motor.getCurrentPosition();
+    }
+    public void setMaxTimeThreshold(double time) {
+        maxTime = time;
     }
     public void setEncoderBounds(int min, int max) {
         absoluteMin = min;
@@ -80,6 +84,8 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public void execute(double dt) {
+        if(maxTime != 0 && getTime() >= maxTime)
+            stateManager.tryEnterState(goalStateType);
         // checking hardstops
         if(motor.getCurrentPosition() < absoluteMin)
             Subsystem.setMotorPosition(motor, absoluteMin);
@@ -104,7 +110,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override

@@ -11,13 +11,18 @@ import org.firstinspires.ftc.teamcode.util.Helper;
 
 
 public class TroughState extends RobotState<LiftingSystem.StateType> {
+    private boolean isFirstTransfer;
     public TroughState() {
         super(LiftingSystem.StateType.TROUGH);
+        isFirstTransfer = true;
     }
     @Override
     public void execute(double dt) {
+        if(isFirstTime())
+            isFirstTransfer = true;
+
         // handling override of transfer if suddenly cannot transfer
-        if(!robot.canTransfer()) {
+        if(!robot.canTransfer() && !robot.getGrabber().hasBlock()) {
             // handling the resetting of lift to trough safety
             if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
                 robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
@@ -31,6 +36,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor()) {
             // transfer stage 1: opening grabber, setting arm to transfer pos, and lowering lift if at trough safety
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+                // decrementing position if need to transfer again
+                if(!isFirstTransfer)
+                    Lift.TROUGH_POS -= 10;
                 // resetting grabber to be ready to transfer
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
@@ -49,6 +57,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             }
             // transfer stage 2: closing onto block once lift is down and raising lift
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
+                // resetting isFirstTransfer because transfer already happen
+                isFirstTransfer = false;
+
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                     robot.getGrabber().getTransitionState().overrideGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                     robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());

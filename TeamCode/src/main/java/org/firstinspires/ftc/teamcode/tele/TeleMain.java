@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -107,6 +109,7 @@ public class TeleMain extends LinearOpMode {
             // robot's lifting system
             telemetry.addData("", "");
             telemetry.addData("is high basket", robot.isHighDeposit());
+            telemetry.addData("can enter basket to basket", robot.getLiftingSystem().getStateManager().getState(LiftingSystem.StateType.BASKET_TO_BASKET).canEnter());
             telemetry.addData("is basketDeposit done", robot.getLiftingSystem().getStateManager().getState(LiftingSystem.StateType.BASKET_DEPOSIT).isDone());
             telemetry.addData("is depositing", robot.isDepositing());
             telemetry.addData("can transfer", robot.canTransfer());
@@ -236,6 +239,7 @@ public class TeleMain extends LinearOpMode {
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
             robot.setIsHighDeposit(true);
+            Log.d("TRY ENTER BASKET BASKET", "" + robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET));
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
         }
         else if(input.getGamepadTracker2().isLeftTriggerPressed()) {

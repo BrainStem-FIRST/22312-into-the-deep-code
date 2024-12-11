@@ -27,8 +27,6 @@ public class LiftTuneTele extends LinearOpMode {
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
 
-        PIDController liftPid = new PIDController(0.03, 0, 0.005);
-
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -70,6 +68,8 @@ public class LiftTuneTele extends LinearOpMode {
                 grabberServo.setPosition(Grabber.CLOSE_POS);
                 transitionTime.reset();
             }
+            else if(input.getGamepadTracker1().isFirstFrameRightBumper())
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
             Subsystem.setMotorPower(motor, -gamepad1.left_stick_y);
@@ -87,6 +87,7 @@ public class LiftTuneTele extends LinearOpMode {
             telemetry.addData("left bumper", "stop timer");
             telemetry.addData("  lift", "");
             telemetry.addData("  left stick y", "moves lift up and down");
+            telemetry.addData("  right bumper", "reset lift encoder to zero");
             telemetry.addData("arm", "");
             telemetry.addData("  a", "move arm to transfer");
             telemetry.addData("  b", "move arm to specimen hang");

@@ -43,7 +43,8 @@ public class Lift extends Subsystem<Lift.StateType> {
     private final MotorTransitionState<StateType> transitionState;
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
-    public static double KP = 0.003, SMALL_TRANSITION_KP = 0.002, ZERO_KD = 0;
+    public static double KP = 0.0042, SMALL_TRANSITION_KP = 0.0015, ZERO_KD = 0;
+    public static double MAX_TRANSITION_TIME = 4;
     private final DcMotorEx liftMotor;
     private final PIDController pid;
 
@@ -68,6 +69,7 @@ public class Lift extends Subsystem<Lift.StateType> {
 
         this.transitionState = new MotorTransitionState<>(StateType.TRANSITION, liftMotor, DESTINATION_THRESHOLD, pid);
         this.transitionState.setEncoderBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
+        this.transitionState.setMaxTimeThreshold(MAX_TRANSITION_TIME);
         stateManager.addState(StateType.TRANSITION, this.transitionState);
 
         stateManager.setupStates(robot, stateManager);
