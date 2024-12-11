@@ -24,8 +24,10 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         // handling override of transfer if suddenly cannot transfer
         if(!robot.canTransfer() && !robot.getGrabber().hasBlock()) {
             // handling the resetting of lift to trough safety
-            if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY)
+            if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+            }
 
             // handling resetting of grabber
             if(robot.getGrabber().getStateManager().getActiveStateType() != Grabber.StateType.OPEN)
@@ -52,6 +54,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN
                 && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                    robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
                     robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
                 }
             }
@@ -69,6 +72,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                 // waiting for grabber to close on block before raising lift
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                    robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
                 }
             }
         }

@@ -32,6 +32,7 @@ public class BasketToDropAreaState extends RobotState<LiftingSystem.StateType> {
                 else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
                 || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
                     robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
+                    robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
                 }
             }
         }

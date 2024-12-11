@@ -101,10 +101,10 @@ public class LiftingSystem {
 
                 // moving lift down once pid is set to transfer down
                 if(robot.getLift().getPid().getTarget() == Lift.AUTO_TROUGH_POS)
-                    Subsystem.setMotorPower(robot.getLift().getLiftMotor(), robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
+                    robot.getLift().setLiftPower(robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
                 // moving lift up once pid set to move back up
                 else if(robot.getLift().getPid().getTarget() == Lift.TROUGH_SAFETY_POS)
-                    Subsystem.setMotorPower(robot.getLift().getLiftMotor(), robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
+                    robot.getLift().setLiftPower(robot.getLift().getPid().update(robot.getLift().getLiftMotor().getCurrentPosition()));
             }
 
             return !(robot.getCollector().getBlockColorSensor().getRawBlockColor() == BlockColor.NONE
@@ -155,13 +155,11 @@ public class LiftingSystem {
 
     // specimen actions
     public Action setupHighSpecimenRam() {
-        return new SequentialAction(
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                new ParallelAction(
-                    robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                    robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.UP_TO_TRANSFER_TIME + Arm.SPECIMEN_HANG_TO_UP_TIME)
-                )
+        return new ParallelAction(
+                robot.getLift().moveToWithoutPid(Lift.HIGH_RAM_BEFORE_POS),
+                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.UP_TO_TRANSFER_TIME + Arm.SPECIMEN_HANG_TO_UP_TIME)
         );
+
     }
     public Action ramHighSpecimen() {
         return new SequentialAction(
@@ -174,7 +172,7 @@ public class LiftingSystem {
             robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_HANG_TO_UP_TIME),
             new ParallelAction(
                 robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.UP_TO_TRANSFER_TIME),
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS))
+                robot.getLift().moveToWithoutPid(Lift.TROUGH_SAFETY_POS))
         );
     }
 }

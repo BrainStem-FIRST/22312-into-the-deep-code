@@ -36,9 +36,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Collector extends Subsystem<Collector.StateType> {
 
     public static int AUTO_COLOR_VALIDATION_REQUIRED = 2;
-    public static double AUTO_MAX_COLLECT_TIME = 5.5;
+    public static double AUTO_MAX_COLLECT_TIME = 5;
     public static double TELE_COLLECT_POWER = 1, AUTO_COLLECT_POWER = 1, SPIT_POWER = -1;
-    public static double COLLECT_TEMP_POWER = 0.8, SPIT_TEMP_POWER = -0.7, AUTO_JAM_SPIT_POWER = -0.35;
+    public static double COLLECT_TEMP_POWER = 0.8, SPIT_TEMP_POWER = -0.7, AUTO_JAM_SPIT_POWER = -0.4;
 
     // after the block color sensor stops detecting the block, still spit for 1 second
     public static double SAFETY_SPIT_TIME = 0.4;
@@ -52,8 +52,8 @@ public class Collector extends Subsystem<Collector.StateType> {
         VALID_BLOCK
     }
     public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 4500;
-    public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 10;
-    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 11;
+    public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 3;
+    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 12;
     private final MotorCurrentTracker teleCurrentTracker, autoCurrentTracker;
     private final DcMotorEx spindleMotor;
 

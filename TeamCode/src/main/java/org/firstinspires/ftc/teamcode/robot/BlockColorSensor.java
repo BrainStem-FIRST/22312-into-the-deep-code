@@ -137,43 +137,7 @@ public class BlockColorSensor {
     private boolean colorPercentInRange(double num, double max, double min) {
         return num <= max && num >= min;
     }
-    // methods used in finding color sensor values; not actually used in tele/auto
-    public String updateBlockColorTesting(BlockColor blockColor) {
-        if(dataMode)
-            collectTestingData(blockColor);
-        if(blockColor == BlockColor.NONE)
-            return "block color none; not printing values";
-        Double[] max = MAX_BLOCK_PERCENTS.get(blockColor);
-        Double[] min = MIN_BLOCK_PERCENTS.get(blockColor);
-        return "max percents: " + max[0] + "," + max[1] + "," + max[2] + " | min percents: " + min[0] + ", " + min[1] + ", " + min[2];
-        //return "max percents: " + MAX_BLOCK_PERCENTS.get(blockColor) + " | min percents: " + MIN_BLOCK_PERCENTS.get(blockColor);
-    }
-    private void collectTestingData(BlockColor blockColor) {
-
-        if(blockColor == BlockColor.NONE)
-            return;
-
-        int red = red(), green = green(), blue = blue();
-        int total = red + green + blue;
-        double redPercent = red * 1.0 / total, greenPercent = green * 1.0 / total, bluePercent = blue * 1.0 / total;
-
-        Double[] maxPercents = MAX_BLOCK_PERCENTS.get(blockColor);
-        Double[] minPercents = MIN_BLOCK_PERCENTS.get(blockColor);
-
-        maxPercents[0] = Math.max(maxPercents[0], redPercent);
-        maxPercents[1] = Math.max(maxPercents[1], greenPercent);
-        maxPercents[2] = Math.max(maxPercents[2], bluePercent);
-        minPercents[0] = Math.min(maxPercents[0], redPercent);
-        minPercents[1] = Math.min(maxPercents[1], greenPercent);
-        minPercents[2] = Math.min(maxPercents[2], bluePercent);
-    }
     public ColorSensor getColorSensor() {
         return colorSensor;
-    }
-    public boolean getDataMode() {
-        return dataMode;
-    }
-    public void setDataMode(boolean dataMode) {
-        this.dataMode = dataMode;
     }
 }

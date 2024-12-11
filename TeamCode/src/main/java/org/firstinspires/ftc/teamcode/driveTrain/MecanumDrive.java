@@ -508,7 +508,7 @@ public class MecanumDrive {
                 defaultVelConstraint, defaultAccelConstraint
         );
     }
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose, ProfileParams profileParams) {
+    public TrajectoryActionBuilder waypointActionBuilder(Pose2d beginPose, ProfileParams profileParams, double beginEndVel) {
         return new TrajectoryActionBuilder(
                 TurnAction::new,
                 FollowTrajectoryAction::new,
@@ -516,7 +516,7 @@ public class MecanumDrive {
                         1e-6,
                         profileParams
                 ),
-                beginPose, 0.0,
+                beginPose, beginEndVel,
                 defaultTurnConstraints,
                 defaultVelConstraint, defaultAccelConstraint
         );

@@ -19,10 +19,14 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
         else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
         || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
             // overriding lift to transition to high/low basket if not there and need to be there
-            if (robot.isHighDeposit() && !robot.getLift().atHighBasket())
+            if (robot.isHighDeposit() && !robot.getLift().atHighBasket()) {
                 robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
-            else if (!robot.isHighDeposit() && !robot.getLift().atLowBasket())
+                robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+            }
+            else if (!robot.isHighDeposit() && !robot.getLift().atLowBasket()) {
                 robot.getLift().getTransitionState().overrideGoalState(Lift.LOW_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);
+                robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+            }
 
             // setting arm to lower once lift done transitioning or is close enough
             if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT

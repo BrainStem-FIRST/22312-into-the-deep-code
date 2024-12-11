@@ -127,4 +127,7 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     public int getDirection() {
         return (int) Math.signum(getGoalStatePosition() - motor.getCurrentPosition());
     }
+    public boolean isUsingPid() {
+        return usingPid;
+    }
 }

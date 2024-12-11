@@ -13,8 +13,10 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute(double dt) {
         // actually ramming using lift
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE)
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE) {
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
+            robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+        }
 
         // resetting after ram
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER) {
@@ -31,6 +33,7 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
                 else if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER
                 || robot.getArm().getTransitionState().getTime() >= Arm.SPECIMEN_HANG_TO_UP_TIME) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                    robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
                     robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.UP_TO_TRANSFER_TIME);
                 }
             }

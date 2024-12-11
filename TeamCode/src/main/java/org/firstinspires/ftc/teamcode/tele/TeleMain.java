@@ -315,12 +315,19 @@ public class TeleMain extends LinearOpMode {
             }
 
         // x = perform safety override
-        else if(input.getGamepadTracker1().isFirstFrameX())
-            // handling block knocking check
-            if(robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
-            && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
-                robot.setCanTransfer(false);
-                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
+        else if(input.getGamepadTracker1().isFirstFrameX() || input.getGamepadTracker2().isFirstFrameX())
+            // checking if lift is in transition (if so, manually increase power if using pid)
+            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION
+            && robot.getLift().getTransitionState().isUsingPid())
+                robot.getLift().setPowerOffset(Lift.OVERRIDE_POWER_OFFSET);
+            else {
+                robot.getLift().setPowerOffset(0);
+                // handling block knocking check
+                if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+                        && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
+                    robot.setCanTransfer(false);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
+                }
             }
     }
     private void listenForHangingInput() {

@@ -24,7 +24,6 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
             else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF
             || robot.getArm().getTransitionState().getTime() >= Arm.TRANSFER_TO_KNOCK_BLOCK_TIME) {
                 robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
-                robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
                 robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
             }
     }

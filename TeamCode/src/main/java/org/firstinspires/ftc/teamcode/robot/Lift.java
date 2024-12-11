@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 @Config
 public class Lift extends Subsystem<Lift.StateType> {
     public static int DESTINATION_THRESHOLD = 40, // threshold in which I consider a lift transition done during tele
-            AUTO_DESTINATION_THRESHOLD = 50; // threshold in which I consider a lift transition done during auto
+            AUTO_DESTINATION_THRESHOLD = 80; // threshold in which I consider a lift transition done during auto
     public static int ABSOLUTE_MIN = -50,
         TROUGH_POS = 10,
         AUTO_TROUGH_POS = TROUGH_POS - AUTO_DESTINATION_THRESHOLD,
@@ -43,9 +43,11 @@ public class Lift extends Subsystem<Lift.StateType> {
     private final MotorTransitionState<StateType> transitionState;
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
-    public static double KP = 0.0042, SMALL_TRANSITION_KP = 0.0015, ZERO_KD = 0;
+    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0015, ZERO_KD = 0;
+    public static double OVERRIDE_POWER_OFFSET = 0.2;
     public static double MAX_TRANSITION_TIME = 4;
     private final DcMotorEx liftMotor;
+    private double powerOffset;
     private final PIDController pid;
 
     public Lift(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
@@ -54,7 +56,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        pid = new PIDController(KP, ZERO_KI, ZERO_KD);
+        pid = new PIDController(SMALL_TRANSITION_KP, ZERO_KI, ZERO_KD);
         pid.setInputBounds(ABSOLUTE_MIN, ABSOLUTE_MAX);
         pid.setOutputBounds(-1, 1);
 
@@ -138,6 +140,9 @@ public class Lift extends Subsystem<Lift.StateType> {
     public DcMotorEx getLiftMotor() {
         return liftMotor;
     }
+    public void setLiftPower(double power) {
+        Subsystem.setMotorPower(liftMotor, power + powerOffset);
+    }
     public MotorTransitionState<StateType> getTransitionState() {
         return transitionState;
     }
@@ -164,5 +169,8 @@ public class Lift extends Subsystem<Lift.StateType> {
     }
     public PIDController getPid() {
         return pid;
+    }
+    public void setPowerOffset(double powerOffset) {
+        this.powerOffset = powerOffset;
     }
 }

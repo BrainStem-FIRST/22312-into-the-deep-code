@@ -17,21 +17,18 @@ public class ColorTele extends LinearOpMode {
         BlockColorSensor blockColorSensor = new BlockColorSensor(hardwareMap);
         BlockColor curBlockColor = BlockColor.NONE;
 
-        telemetry.addData("Opmode Status :", "Init");
-        telemetry.update();
+        boolean collectingData = false;
+
+        int maxR = -1;
+        int minR = 10000000;
+        int maxG = -1;
+        int minG = 10000000;
+        int maxB = -1;
+        int minB = 10000000;
+
         waitForStart();
 
-
-        long currentTime = System.currentTimeMillis();
-        long prevTime;
-        double dt;
-
         while (opModeIsActive()) {
-            // update dt
-            prevTime = currentTime;
-            currentTime = System.currentTimeMillis();
-            dt = (currentTime - prevTime) / 1000.;
-
             input.update();
 
             int r = blockColorSensor.getColorSensor().red();
@@ -39,29 +36,54 @@ public class ColorTele extends LinearOpMode {
             int b = blockColorSensor.getColorSensor().blue();
             double sum = r + g + b;
 
-            // checking switch of block color input
-            if(input.getGamepadTracker1().isFirstFrameB())
-                curBlockColor = BlockColor.RED;
-            else if(input.getGamepadTracker1().isFirstFrameX())
-                curBlockColor = BlockColor.BLUE;
-            else if(input.getGamepadTracker1().isFirstFrameY())
-                curBlockColor = BlockColor.YELLOW;
-            else if(input.getGamepadTracker1().isFirstFrameA())
-                curBlockColor = BlockColor.NONE;
+            if(collectingData) {
+                // updating border values
+                if (r > maxR)
+                    maxR = r;
+                if (r < minR)
+                    minR = r;
 
-            // checking switch of dataMode input
-            if(input.getGamepadTracker1().isFirstFrameDpadDown())
-                blockColorSensor.setDataMode(!blockColorSensor.getDataMode());
+                if (g > maxG)
+                    maxG = g;
+                if (g < minG)
+                    minG = g;
 
-            telemetry.addData("collecting data", blockColorSensor.getDataMode());
-            telemetry.addData("manually selected block", curBlockColor);
+                if (b > maxB)
+                    maxB = b;
+                if (b < minB)
+                    minB = b;
+            }
 
-            telemetry.addData("", blockColorSensor.updateBlockColorTesting(curBlockColor));
+            // toggling collection mode
+            if(input.getGamepadTracker1().isFirstFrameA())
+                collectingData = !collectingData;
 
-            telemetry.addData("r percent", r / sum);
-            telemetry.addData("g percent", g / sum);
-            telemetry.addData("b percent", b / sum);
-            telemetry.addData("validated block color", blockColorSensor.getValidatedColor());
+            // resetting color values
+            if(!collectingData) {
+                maxR = -1;
+                minR = 10000000;
+                maxG = -1;
+                minG = 10000000;
+                maxB = -1;
+                minB = 10000000;
+            }
+
+
+            telemetry.addData("controls", "");
+            telemetry.addData("  a", "toggle data collection");
+
+            telemetry.addData("collectingData", collectingData);
+            telemetry.addData("", "");
+            telemetry.addData("current color values", "");
+            telemetry.addData("  r percent", r / sum);
+            telemetry.addData("  g percent", g / sum);
+            telemetry.addData("  b percent", b / sum);
+
+            telemetry.addData("", "");
+            telemetry.addData("max r, min r", maxR + ", " + minR);
+            telemetry.addData("max g, min g", maxG + ", " + minG);
+            telemetry.addData("max b, min b", maxB + ", " + minB);
+
             telemetry.update();
         }
     }

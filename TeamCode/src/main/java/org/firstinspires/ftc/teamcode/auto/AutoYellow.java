@@ -26,6 +26,8 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 @Config
 public class AutoYellow extends LinearOpMode {
     public static class Params {
+        public double dispResolution = 1, angResolution = Math.toRadians(20), anglSamplingEps = 1e-2, beginEndVel=10;
+
         public double beginX = -40.825, beginY = -64.5, beginA = 0;
         public double depositX = -57, depositY = -57, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
         public double rightBlockX = -49.35, rightBlockY = -45, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
@@ -52,7 +54,6 @@ public class AutoYellow extends LinearOpMode {
         Pose2d leftBlockPose = new Pose2d(params.leftBlockX1, params.leftBlockY1, params.leftBlockA);
         Pose2d leftBlockCollectedPose = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.leftBlockA);
 
-        ProfileParams wayPointProfileParams = new ProfileParams(2, Math.toRadians(20), 1e-2);
 
         BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
         PinpointDrive drive = robot.getDriveTrain();
@@ -92,7 +93,7 @@ public class AutoYellow extends LinearOpMode {
                 .strafeToConstantHeading(new Vector2d(params.leftBlockX2, params.leftBlockY2));
                 //.lineToX(params.leftBlockX - params.leftBlockDriveForwardDistance);
 
-        TrajectoryActionBuilder parkTrajectory = drive.actionBuilder(depositPose, wayPointProfileParams)
+        TrajectoryActionBuilder parkTrajectory = drive.waypointActionBuilder(depositPose, new ProfileParams(params.dispResolution, params.angResolution, params.anglSamplingEps), params.beginEndVel)
                 .strafeToLinearHeading(new Vector2d(params.parkX1, params.parkY1), params.parkA)
                 .strafeToConstantHeading(new Vector2d(params.parkX2, params.parkY2));
 

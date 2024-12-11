@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,7 +8,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
+@Config
 public abstract class Subsystem<StateType extends Enum<StateType>> {
+    public static double runToPositionPower = 0.8;
     /**
      * standardized function to set motor to go to target position
      * @param motor motor to run
@@ -16,7 +19,7 @@ public abstract class Subsystem<StateType extends Enum<StateType>> {
     public static void setMotorPosition(DcMotorEx motor, int position) {
         motor.setTargetPosition(position);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setPower(1);
+        motor.setPower(runToPositionPower);
     }
 
     /**
