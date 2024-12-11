@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
+import org.firstinspires.ftc.teamcode.util.Helper;
 import org.firstinspires.ftc.teamcode.util.Input;
 
 @Config
@@ -35,7 +36,7 @@ public class TeleMain extends LinearOpMode {
     private double timeSinceStart;
     private Input input;
     private BrainSTEMRobot robot;
-    private final Pose2d BEGIN_POSE = new Pose2d(-24, -7.5, 0);
+    private final Pose2d BEGIN_POSE = new Pose2d(-24, -7.5, Math.toRadians(90));
     @Override
     public void runOpMode() throws InterruptedException {
         input = new Input(gamepad1, gamepad2);
@@ -105,6 +106,8 @@ public class TeleMain extends LinearOpMode {
 
             // robot's lifting system
             telemetry.addData("", "");
+            telemetry.addData("is high basket", robot.isHighDeposit());
+            telemetry.addData("is basketDeposit done", robot.getLiftingSystem().getStateManager().getState(LiftingSystem.StateType.BASKET_DEPOSIT).isDone());
             telemetry.addData("is depositing", robot.isDepositing());
             telemetry.addData("can transfer", robot.canTransfer());
             telemetry.addData("stay in trough", robot.getLiftingSystem().getStayInTrough());
@@ -232,12 +235,12 @@ public class TeleMain extends LinearOpMode {
     private void listenForLiftingInput() {
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(true);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
         }
         else if(input.getGamepadTracker2().isLeftTriggerPressed()) {
-            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
             robot.setIsHighDeposit(false);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
         }
         // a = button for state progression
         if(input.getGamepadTracker1().isFirstFrameA() || input.getGamepadTracker2().isFirstFrameA())
@@ -285,7 +288,7 @@ public class TeleMain extends LinearOpMode {
             }
 
         // b = button for "going back" a state
-        else if(input.getGamepadTracker1().isFirstFrameB())
+        else if(input.getGamepadTracker1().isFirstFrameB() || input.getGamepadTracker2().isFirstFrameB())
             switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
                 case TROUGH:
                     if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)

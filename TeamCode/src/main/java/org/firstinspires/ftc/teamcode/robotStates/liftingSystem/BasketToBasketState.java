@@ -13,10 +13,11 @@ public class BasketToBasketState extends RobotState<LiftingSystem.StateType> {
     public void execute(double dt) {
         // accounting switching baskets after arm is already down
         if(robot.getArm().getTransitionState().getGoalStatePosition() == Arm.BASKET_DROP_POS)
-            robot.getArm().getTransitionState().overrideGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+            robot.getArm().getTransitionState().overrideGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
 
         // accounting switching baskets before arm is down/once arm not down
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY) {
+        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
+        || robot.getArm().getTransitionState().getTime() >= Arm.BASKET_DROP_TO_UP_TIME) {
             // overriding lift to transition to high/low basket if not there and need to be there
             if (robot.isHighDeposit() && !robot.getLift().atHighBasket())
                 robot.getLift().getTransitionState().overrideGoalState(Lift.HIGH_BASKET_POS, Lift.StateType.BASKET_DEPOSIT);

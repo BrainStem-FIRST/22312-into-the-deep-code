@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCapt
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
@@ -23,8 +24,9 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
     public void execute(double dt) {
         if (isFirstTime()) {
             done = false;
-            // setting up hinge
+            // setting up servos
             robot.getHinge().setHingeServoPosition(Hinge.HINGE_UP_POSITION);
+            robot.getGrabber().getGrabServo().setPosition(Grabber.OPEN_POS);
             startHingeTime = getTime();
         }
 

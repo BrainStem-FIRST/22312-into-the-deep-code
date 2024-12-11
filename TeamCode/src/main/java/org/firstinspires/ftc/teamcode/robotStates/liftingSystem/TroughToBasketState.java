@@ -13,37 +13,30 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute(double dt) {
-        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
-            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
+        // only want to set lift state to be in transition if in trough; not if its already going up
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+            robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
+        }
 
-        // can simultaneously raise lift during raising of arm if state is triggered when robot is far enough away from basket
-        if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
-        || LiftingSystem.DEPOSIT_SAFETY_DIST < Helper.dist(LiftingSystem.DEPOSIT_CORNER, robot.getDriveTrain().pose.position)) {
-            // only want to set lift state to be in transition if in trough; not if its already going up
-            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-                robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
+        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
+            // if and else if below checks for basket overriding
+            if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
+                robot.getLift().getTransitionState().overrideGoalPosition(Lift.HIGH_BASKET_POS);
+                // robot.telemetry.addData("basket overriding during transition", "");
             }
-
-            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
-                // if and else if below checks for basket overriding
-                if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
-                    robot.getLift().getTransitionState().overrideGoalPosition(Lift.HIGH_BASKET_POS);
-                    // robot.telemetry.addData("basket overriding during transition", "");
-                }
-                else if(!robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS) {
-                    robot.getLift().getTransitionState().overrideGoalPosition(Lift.LOW_BASKET_POS);
-                    // robot.telemetry.addData("basket overriding during transition", "");
-                }
-                // optimization did not work as of 12/1; i don't know why
-                // moves arm down once lift is within range of basket (not necessarily there yet)
-                if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
-                && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
-                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
+            else if(!robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS) {
+                robot.getLift().getTransitionState().overrideGoalPosition(Lift.LOW_BASKET_POS);
+                // robot.telemetry.addData("basket overriding during transition", "");
             }
-            // lowers arm once lift reach destination
-            else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
+            // optimization did not work as of 12/1; i don't know why
+            // moves arm down once lift is within range of basket (not necessarily there yet)
+            if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
+            && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
                 robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
         }
+        // lowers arm once lift reach destination
+        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
     }
 
     @Override

@@ -30,10 +30,7 @@ public class PlayingState extends RobotState<BrainSTEMRobot.StateType> {
         robot.getLift().update(dt);
 
         // hanging system
-        robot.getHanger().update(dt);
-
-        if (isFirstTime())
-            robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
+        //robot.getHanger().update(dt);
     }
 
     @Override

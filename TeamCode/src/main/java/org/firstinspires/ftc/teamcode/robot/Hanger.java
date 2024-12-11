@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,14 +13,15 @@ import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.hangingStates.HoldHang;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
+@Config
 public class Hanger extends Subsystem<Hanger.StateType> {
     // down refers to the position the hanging goes to after it is on the bar
-    public final static int FULL_DOWN_ENCODER = 0,
-            HANG_DOWN_ENCODER = 2550,
-            HANG_PARK_ENCODER = 10750,
-            UP_TICK = 14500,
+    public static DcMotorSimple.Direction motorDirection = DcMotorSimple.Direction.FORWARD;
+    public static int HANG_DOWN_ENCODER = -8000,
+            HANG_PARK_ENCODER = 0,
+            UP_TICK = 3000,
             DESTINATION_THRESHOLD = 90;
-    public final static double HANG_HOLD_POWER = 0;
+    public static double HANG_HOLD_POWER = 0;
 
     public enum StateType {
         FULL_DOWN,
@@ -29,22 +31,18 @@ public class Hanger extends Subsystem<Hanger.StateType> {
     }
     private final MotorTransitionState<StateType> transitionState;
     private final DcMotorEx hangMotor;
-    private final PIDController pid;
     public Hanger(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot, StateType.FULL_DOWN);
 
         hangMotor = hwMap.get(DcMotorEx.class, "HangMotor");
-        hangMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        hangMotor.setDirection(motorDirection);
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        pid = new PIDController(0.004, 0.0005, 0);
 
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
-        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD, pid);
-        transitionState.setEncoderBounds(FULL_DOWN_ENCODER, UP_TICK);
+        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);

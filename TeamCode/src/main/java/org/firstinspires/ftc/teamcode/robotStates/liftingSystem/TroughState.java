@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
+import org.firstinspires.ftc.teamcode.util.Helper;
 
 
 public class TroughState extends RobotState<LiftingSystem.StateType> {
@@ -65,10 +66,12 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         else if (!robot.getCollector().hasValidBlockColor()
         && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.setCanTransfer(true);
-            // prepping for basket deposit
-            if (robot.getGrabber().hasBlock() && robot.isDepositing())
-                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
-                // prepping for specimen pickup at human player station
+            // prepping for basket deposit (automatically happens once your close enough to basket)
+            if (robot.getGrabber().hasBlock() && robot.isDepositing()) {
+                if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
+                    robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);
+            }
+            // prepping for specimen pickup at human player station
             else if (!robot.getLiftingSystem().getStayInTrough())
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
         }

@@ -19,10 +19,6 @@ public class LiftingSystem {
         TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_DROP_AREA, // depositing block in basket
         TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
     }
-    public static final Vector2d DEPOSIT_SAFETY_POS = new Vector2d(-48, -48);
-    public static final Vector2d DEPOSIT_CORNER = new Vector2d(-72, -72);
-    public static final double DEPOSIT_OVERRIDE_DIST = 48;
-    public static final double DEPOSIT_SAFETY_DIST = Helper.dist(DEPOSIT_SAFETY_POS, DEPOSIT_CORNER);
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private boolean stayInTrough;
     private boolean needManualTransfer;
@@ -74,6 +70,12 @@ public class LiftingSystem {
     }
     public void setStayInTrough(boolean stayInTrough) {
         this.stayInTrough = stayInTrough;
+    }
+    public boolean needManualTransfer() {
+        return needManualTransfer;
+    }
+    public void setNeedManualTransfer(boolean needManualTransfer) {
+        this.needManualTransfer = needManualTransfer;
     }
 
     // continuous block transfer until block is grabbed onto (also uses pid)

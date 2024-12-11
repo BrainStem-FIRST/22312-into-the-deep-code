@@ -33,7 +33,7 @@ public class Lift extends Subsystem<Lift.StateType> {
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
-        HIGH_BASKET_POS = 3300, // position to go to so arm and grabber can deposit block on high basket
+        HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
         HIGH_BASKET_SAFETY_POS = 2730, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
