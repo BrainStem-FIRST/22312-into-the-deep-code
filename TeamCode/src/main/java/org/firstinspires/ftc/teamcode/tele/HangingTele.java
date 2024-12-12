@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.Subsystem;
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "HangingTele")
 public class HangingTele extends LinearOpMode {
-    public static DcMotorSimple.Direction motorDirection = DcMotorSimple.Direction.FORWARD;
+    public static DcMotorSimple.Direction motorDirection = DcMotorSimple.Direction.REVERSE;
     @Override
     public void runOpMode() throws InterruptedException {
 

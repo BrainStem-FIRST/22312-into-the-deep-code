@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
+import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
@@ -27,6 +28,7 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
             // setting up servos
             robot.getHinge().setHingeServoPosition(Hinge.HINGE_UP_POSITION);
             robot.getGrabber().getGrabServo().setPosition(Grabber.OPEN_POS);
+            //robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
             startHingeTime = getTime();
         }
 

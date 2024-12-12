@@ -155,7 +155,12 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  hang motor power", robot.getHanger().getHangMotor().getPower());
             telemetry.addData("  hang motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
             telemetry.addData("  hang goal encoder", robot.getHanger().getTransitionState().getGoalStatePosition());
+            telemetry.addData("  hang goal state", robot.getHanger().getTransitionState().getNextStateType());
             telemetry.update();
+            Log.d("HANG CUR POSITION", "" + robot.getHanger().getHangMotor().getCurrentPosition());
+            Log.d("HANG STATE", "" + robot.getHanger().getStateManager().getActiveStateType());
+            Log.d("HANG GOAL ENCODER", "" + robot.getHanger().getTransitionState().getGoalStatePosition());
+
         }
     }
     private void listenForDriveTrainInput() {
@@ -254,7 +259,6 @@ public class TeleMain extends LinearOpMode {
                     // activating manual transfer if everything properly setup
                     if(!robot.canTransfer() && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
-                        robot.getLiftingSystem().setNeedManualTransfer(true);
                     }
                     // activating transition to deposit in basket once transfer is complete
                     else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
@@ -316,27 +320,17 @@ public class TeleMain extends LinearOpMode {
                     }
                     break;
             }
-
         // x = perform safety override
         else if(input.getGamepadTracker1().isFirstFrameX() || input.getGamepadTracker2().isFirstFrameX())
-            // checking if lift is in transition (if so, manually increase power if using pid)
-            if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION
-            && robot.getLift().getTransitionState().isUsingPid())
-                robot.getLift().getTransitionState().setPowerMagnitude(Lift.OVERRIDE_POWER_OFFSET);
-            else {
-                // handling block knocking check
-                if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
-                        && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
-                    robot.setCanTransfer(false);
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
-                }
+            // handling block knocking check
+            if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+                    && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
+                robot.setCanTransfer(false);
+                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
             }
+
     }
     private void listenForHangingInput() {
-        // automatically start raising hanging at 2:20
-        //if (timeSinceStart >= PARAMS.timeToHang && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.FULL_DOWN)
-            //robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
-
         if (input.getGamepadTracker2().isRightTriggerPressed()
         && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_ENCODER, Hanger.StateType.HANG_DOWN);

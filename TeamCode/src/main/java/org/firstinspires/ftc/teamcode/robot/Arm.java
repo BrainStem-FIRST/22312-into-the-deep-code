@@ -38,7 +38,7 @@ public class Arm extends Subsystem<Arm.StateType> {
     public static final double TRANSFER_POS = 0.01,
         KNOCK_BLOCK_POS = 0.15,
         DROP_OFF_POS = 0.33,
-        BASKET_DROP_POS = 0.30,
+        BASKET_DROP_POS = 0.32,
         UP_POS = 0.67,
         SPECIMEN_HANG_POS = 0.99,
         BASKET_SAFETY_POS = 0.85;

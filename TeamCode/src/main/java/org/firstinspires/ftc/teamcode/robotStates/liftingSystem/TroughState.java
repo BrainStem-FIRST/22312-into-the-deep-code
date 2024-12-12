@@ -16,6 +16,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.TROUGH);
         isFirstTransfer = true;
     }
+
     @Override
     public void execute(double dt) {
         // handling override of transfer if suddenly cannot transfer
@@ -32,12 +33,9 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         }
 
         // handling actual transfer
-        else if(robot.getLiftingSystem().needManualTransfer() || (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor())) {
+        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor()) {
             // transfer stage 1: opening grabber, setting arm to transfer pos, and lowering lift if at trough safety
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-                // decrementing position if need to transfer again
-                if(!isFirstTransfer)
-                    Lift.TROUGH_POS -= 10;
                 // resetting grabber to be ready to transfer
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
@@ -53,6 +51,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                     robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
                     robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+                    robot.getLift().getTransitionState().setDoneWhenPassPosition();
                 }
             }
             // transfer stage 2: closing onto block once lift is down and raising lift
@@ -78,7 +77,6 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         else if (!robot.getCollector().hasValidBlockColor()
         && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.setCanTransfer(true);
-            robot.getLiftingSystem().setNeedManualTransfer(false); // set to false bc only want transfer to happen once if manual
             // prepping for basket deposit (automatically happens once your close enough to basket)
             if (robot.getGrabber().hasBlock() && robot.isDepositing()) {
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)

@@ -120,7 +120,7 @@ public class AutoYellow extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        robot.getHanger().moveTo(Hanger.HANG_PARK_ENCODER),
+                        //robot.getHanger().moveTo(Hanger.HANG_PARK_ENCODER),
                         new SequentialAction(
                                 // DEPOSIT FIRST BLOCK & PREP FOR RIGHT BLOCK COLLECTION
                                 // depositing block that you start with

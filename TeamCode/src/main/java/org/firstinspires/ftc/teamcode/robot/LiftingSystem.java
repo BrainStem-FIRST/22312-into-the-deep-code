@@ -21,7 +21,6 @@ public class LiftingSystem {
     }
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private boolean stayInTrough;
-    private boolean needManualTransfer;
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -46,7 +45,6 @@ public class LiftingSystem {
 
         buttonACued = false;
         stayInTrough = true;
-         needManualTransfer = false;
     }
 
     public void update(double dt) {
@@ -70,12 +68,6 @@ public class LiftingSystem {
     }
     public void setStayInTrough(boolean stayInTrough) {
         this.stayInTrough = stayInTrough;
-    }
-    public boolean needManualTransfer() {
-        return needManualTransfer;
-    }
-    public void setNeedManualTransfer(boolean needManualTransfer) {
-        this.needManualTransfer = needManualTransfer;
     }
 
     // continuous block transfer until block is grabbed onto (also uses pid)
@@ -154,20 +146,31 @@ public class LiftingSystem {
     }
 
     // specimen actions
+    public Action setupHighSpecimenRamInitial() {
+        robot.telemetry.addData("in setup ram initial", "");
+        robot.telemetry.update();
+        return robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI);
+    }
     public Action setupHighSpecimenRam() {
+        robot.telemetry.addData("in normal setup ram", "");
+        robot.telemetry.update();
         return new ParallelAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS, Lift.MEDIUM_TRANSITION_KP, Lift.ZERO_KI),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.UP_TO_TRANSFER_TIME + Arm.SPECIMEN_HANG_TO_UP_TIME)
+                robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
+                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.DROP_AREA_TO_RAM_TIME)
         );
 
     }
     public Action ramHighSpecimen() {
+        robot.telemetry.addData("ramming specimen", "");
+        robot.telemetry.update();
         return new SequentialAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
+                robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
                 robot.getGrabber().open()
         );
     }
     public Action resetSpecimenRam() {
+        robot.telemetry.addData("resetting after ramming", "");
+        robot.telemetry.update();
         return new SequentialAction(
             robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_HANG_TO_UP_TIME),
             new ParallelAction(

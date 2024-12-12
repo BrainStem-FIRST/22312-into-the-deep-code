@@ -6,9 +6,14 @@ import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
-
+    private boolean knockedYet;
     public KnockBlockState() {
         super(LiftingSystem.StateType.KNOCK_BLOCK);
+        knockedYet = false;
+    }
+    @Override
+    public void executeOnEntered() {
+        knockedYet = false;
     }
     @Override
     public void execute(double dt) {
@@ -23,7 +28,9 @@ public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
             if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.KNOCK_BLOCK)
                 robot.getArm().getTransitionState().setGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER, Arm.TRANSFER_TO_KNOCK_BLOCK_TIME);
             else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER) {
-                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH);
+                knockedYet = true;
+                robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+                robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
             }
         }
 
@@ -37,16 +44,17 @@ public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
-    }
-
-    @Override
-    public boolean isDone() {
         return false;
     }
 
     @Override
+    public boolean isDone() {
+        return robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                && knockedYet;
+    }
+
+    @Override
     public LiftingSystem.StateType getNextStateType() {
-        return null;
+        return LiftingSystem.StateType.TROUGH;
     }
 }

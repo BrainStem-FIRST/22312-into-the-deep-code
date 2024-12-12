@@ -16,11 +16,12 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 @Config
 public class Hanger extends Subsystem<Hanger.StateType> {
     // down refers to the position the hanging goes to after it is on the bar
-    public static DcMotorSimple.Direction motorDirection = DcMotorSimple.Direction.FORWARD;
-    public static int HANG_DOWN_ENCODER = -8000,
+    public static DcMotorSimple.Direction motorDirection = DcMotorSimple.Direction.REVERSE;
+    public static int HANG_DOWN_ENCODER = -1300,
             HANG_PARK_ENCODER = 0,
-            UP_TICK = 3000,
+            UP_TICK = 2100,
             DESTINATION_THRESHOLD = 90;
+    public static double KP = 0.0042, KI = 0.0008;
     public static double HANG_HOLD_POWER = 0;
 
     public enum StateType {
@@ -31,18 +32,20 @@ public class Hanger extends Subsystem<Hanger.StateType> {
     }
     private final MotorTransitionState<StateType> transitionState;
     private final DcMotorEx hangMotor;
+    private final PIDController pid;
     public Hanger(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot, StateType.FULL_DOWN);
 
         hangMotor = hwMap.get(DcMotorEx.class, "HangMotor");
         hangMotor.setDirection(motorDirection);
         hangMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pid = new PIDController(KP, KI, 0);
 
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
-        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD);
+        transitionState = new MotorTransitionState<>(StateType.TRANSITION, hangMotor, DESTINATION_THRESHOLD, pid);
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
