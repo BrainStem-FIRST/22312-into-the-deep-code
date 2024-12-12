@@ -39,7 +39,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.driveTrain.useless.Localizer;
@@ -56,7 +55,7 @@ import java.util.List;
 
 @Config
 public class MecanumDrive {
-    public static class Params {
+    public static class NormalParams {
         // IMU orientation
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
@@ -99,8 +98,62 @@ public class MecanumDrive {
         public double headingVelGain = 0.0; // shared with turn
     }
 
-    public static Params PARAMS = new Params();
+    public static class SpecimenParams {
+        // IMU orientation
+        // TODO: fill in these values based on
+        //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
+        public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
+                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
+        // drive model parameters
+        public double inPerTick = 1; // SparkFun OTOS Note: you can probably leave this at 1
+        public double lateralInPerTick = inPerTick;
+        public double trackWidthTicks = 13.3;
+
+        // feedforward parameters (in tick units)
+        //kV: 0.12504742479896142, kS: 1.3485526249886965 - old drive train wheel
+
+        //kV: 0.11317455989887892, kS: 1.8700713414390546
+        //kV: 0.1266521585226321, kS: 1.5614699855777028 - using this one
+        //kV: 0.1201806128479095, kS: 1.6376632409738496
+        public double kS = 1.5614699855777028;
+        public double kV = 0.1266521585226321;
+        public double kA = 0.052;
+
+        // path profile parameters (in inches)
+        public double maxWheelVel = 50;
+        public double minProfileAccel = -30;
+        public double maxProfileAccel = 50;
+
+        // turn profile parameters (in radians)
+        public double maxAngVel = Math.PI; // shared with path
+        public double maxAngAccel = Math.PI;
+
+        // path controller gains
+        public double axialGain = 4;
+        public double lateralGain = 6;
+        public double headingGain = 6; // shared with turn
+
+        public double axialVelGain = 0;
+        public double lateralVelGain = 0;
+        public double headingVelGain = 0.0; // shared with turn
+    }
+
+    public static NormalParams PARAMS = new NormalParams();
+    public static SpecimenParams PARAMS_SPECIMEN = new SpecimenParams();
+
+    // i know this is bad code, but we just need to tune rr for specimen auto
+    public void setParamsForSpecimen() {
+        PARAMS.axialGain = PARAMS_SPECIMEN.axialGain;
+        PARAMS.lateralGain = PARAMS_SPECIMEN.lateralGain;
+        PARAMS.headingGain = PARAMS_SPECIMEN.headingGain;
+
+        PARAMS.axialVelGain = PARAMS_SPECIMEN.axialVelGain;
+        PARAMS.lateralVelGain = PARAMS_SPECIMEN.lateralVelGain;
+        PARAMS.headingVelGain = PARAMS_SPECIMEN.headingVelGain;
+    }
     public final MecanumKinematics kinematics = new MecanumKinematics(
             PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
 

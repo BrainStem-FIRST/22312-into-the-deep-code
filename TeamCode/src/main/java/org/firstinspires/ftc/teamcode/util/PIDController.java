@@ -50,6 +50,12 @@ public class PIDController {
         kI = KI;
         kD = KD;
     }
+    public void reset(double kP, double kI, double kD) {
+        shouldReset = true;
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+    }
 
 
     // returns motor power given current position of motor

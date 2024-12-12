@@ -21,7 +21,7 @@ public class Hanger extends Subsystem<Hanger.StateType> {
             HANG_PARK_ENCODER = 0,
             UP_TICK = 2100,
             DESTINATION_THRESHOLD = 90;
-    public static double KP = 0.0042, KI = 0.0008;
+    public static double KP = 0.004, KI = 0.0008;
     public static double HANG_HOLD_POWER = 0;
 
     public enum StateType {

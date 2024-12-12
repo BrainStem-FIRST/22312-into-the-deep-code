@@ -28,19 +28,17 @@ public class Arm extends Subsystem<Arm.StateType> {
     public static double TRANSFER_TO_KNOCK_BLOCK_TIME = 0.14,
         TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
         BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
-        BASKET_DROP_TO_DROP_OFF_TIME = 0.5,
         BASKET_DROP_TO_UP_TIME = 0.18,
         UP_TO_BASKET_SAFETY_TIME = 0.42,
-        SPECIMEN_HANG_TO_UP_TIME = 0.18,
+        SPECIMEN_HANG_TO_UP_TIME = 0.14,
         TRANSFER_TO_DROP_AREA_TIME = 0.28,
-        DROP_AREA_TO_RAM_TIME = 0.66,
+        DROP_AREA_TO_RAM_TIME = 0.62,
         UP_TO_TRANSFER_TIME = 0.55;
-    public static final double TRANSFER_POS = 0.01,
+    public static double TRANSFER_POS = 0.01,
         KNOCK_BLOCK_POS = 0.15,
         DROP_OFF_POS = 0.33,
         BASKET_DROP_POS = 0.32,
-        UP_POS = 0.67,
-        SPECIMEN_HANG_POS = 0.99,
+        SPECIMEN_HANG_POS = 0.85,
         BASKET_SAFETY_POS = 0.85;
     public enum StateType {
         TRANSFER,

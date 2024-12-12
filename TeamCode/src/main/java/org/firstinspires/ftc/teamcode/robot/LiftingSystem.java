@@ -105,7 +105,7 @@ public class LiftingSystem {
     }
     public Action transferBlockOnce() {
         return new SequentialAction(
-                robot.getLift().moveTo(Lift.AUTO_TROUGH_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
+                robot.getLift().moveToThreshold(Lift.TROUGH_SAFETY_POS, Lift.AUTO_TROUGH_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
                 robot.getGrabber().close(),
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.MEDIUM_TRANSITION_KP, Lift.ZERO_KI)
         );
@@ -114,7 +114,7 @@ public class LiftingSystem {
     public Action transferToDropOff() {
         return new SequentialAction(
                 robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.TRANSFER_TO_DROP_AREA_TIME),
-                robot.getLift().moveTo(Lift.DROP_AREA_POS)
+                robot.getLift().moveTo(Lift.DROP_AREA_POS, Lift.SMALL_TRANSITION_KP, Lift.SMALL_TRANSITION_KI)
         );
     }
     public Action depositHighInitial() {
@@ -149,14 +149,17 @@ public class LiftingSystem {
     public Action setupHighSpecimenRamInitial() {
         robot.telemetry.addData("in setup ram initial", "");
         robot.telemetry.update();
-        return robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI);
+        return robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS);
     }
     public Action setupHighSpecimenRam() {
         robot.telemetry.addData("in normal setup ram", "");
         robot.telemetry.update();
-        return new ParallelAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
-                robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.DROP_AREA_TO_RAM_TIME)
+        return new SequentialAction(
+                robot.getGrabber().close(),
+                new ParallelAction(
+                        robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
+                        robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.DROP_AREA_TO_RAM_TIME)
+                )
         );
 
     }
@@ -164,18 +167,16 @@ public class LiftingSystem {
         robot.telemetry.addData("ramming specimen", "");
         robot.telemetry.update();
         return new SequentialAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
+                robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS),
                 robot.getGrabber().open()
         );
     }
     public Action resetSpecimenRam() {
         robot.telemetry.addData("resetting after ramming", "");
         robot.telemetry.update();
-        return new SequentialAction(
-            robot.getArm().rotateTo(Arm.UP_POS, Arm.SPECIMEN_HANG_TO_UP_TIME),
-            new ParallelAction(
-                robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.UP_TO_TRANSFER_TIME),
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.SMALL_TRANSITION_KP, Lift.ZERO_KI))
+        return new ParallelAction(
+                robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.DROP_AREA_TO_RAM_TIME),
+                robot.getLift().moveTo(Lift.DROP_AREA_POS)
         );
     }
 }

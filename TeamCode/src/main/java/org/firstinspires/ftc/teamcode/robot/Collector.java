@@ -10,16 +10,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 
 // state mechanics: once collector/spit state initiated, will power until time reached, them automatically turn off
@@ -96,13 +95,12 @@ public class Collector extends Subsystem<Collector.StateType> {
     public void setSpindleMotorPower(double power) {
         Subsystem.setMotorPower(spindleMotor, power);
     }
-
     @Override
     public void update(double dt) {
-        teleCurrentTracker.updateCurrentTracking();
         blockColorSensor.update(dt);
         stateManager.update(dt);
     }
+
     public BlockColor getBlockColorInTrough() {
         return blockColorInTrough;
     }
@@ -120,7 +118,7 @@ public class Collector extends Subsystem<Collector.StateType> {
     }
     public Action collect() {
         return new Action() {
-            ElapsedTime autoCollectTimer = new ElapsedTime();
+            final ElapsedTime autoCollectTimer = new ElapsedTime();
             boolean isFirst = true;
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {

@@ -331,6 +331,11 @@ public class TeleMain extends LinearOpMode {
 
     }
     private void listenForHangingInput() {
+        // temporary gamepad input; need to remove
+        if (input.getGamepadTracker2().isRightBumperPressed())
+            robot.getHanger().getTransitionState().overrideGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
+        
+        // permanent gamepad input; keep
         if (input.getGamepadTracker2().isRightTriggerPressed()
         && robot.getHanger().getStateManager().getActiveStateType() == Hanger.StateType.UP)
                 robot.getHanger().getTransitionState().setGoalState(Hanger.HANG_DOWN_ENCODER, Hanger.StateType.HANG_DOWN);

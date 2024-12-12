@@ -16,6 +16,7 @@ public class RamToTroughState extends RobotState<LiftingSystem.StateType> {
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_BEFORE) {
             robot.getLift().getTransitionState().setGoalState(robot.getLift().getRamAfterPos(), Lift.StateType.RAM_AFTER);
             robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
+            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
         }
 
         // resetting after ram

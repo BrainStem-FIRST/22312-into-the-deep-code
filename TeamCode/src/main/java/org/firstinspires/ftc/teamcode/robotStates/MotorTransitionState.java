@@ -77,10 +77,9 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public void overrideGoalState(double goalPosition, StateType goalStateType) {
-        if(pid != null) {
-            usingPid = true;
+        if(usingPid)
             pid.setTarget(goalPosition);
-        }
+
         this.startPos = motor.getCurrentPosition();
         this.goalPosition = goalPosition;
         this.goalStateType = goalStateType;
