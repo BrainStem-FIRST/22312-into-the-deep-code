@@ -10,22 +10,18 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
     }
     @Override
-    public void execute(double dt) {
-        if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
-            robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
-            robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
-            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
-            if(robot.getGrabber().hasBlock())
-                robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
-        }
-
-        else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF)
-            robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
-    }
-    @Override
     public void executeOnEntered() {
         robot.setIsDepositing(true);
         robot.getLiftingSystem().setStayInTrough(true);
+
+        robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
+        robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
+        robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+
+        if(robot.getGrabber().hasBlock())
+            robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+        else
+            robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
     }
 
     @Override
@@ -35,12 +31,13 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDone() {
-        return robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER || robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY;
+        return (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER || robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY)
+                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -17,10 +18,10 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 
 @Config
 public class Lift extends Subsystem<Lift.StateType> {
-    public static int DESTINATION_THRESHOLD = 40, // threshold in which I consider a lift transition done during tele
+    public static int DESTINATION_THRESHOLD = 70, // threshold in which I consider a lift transition done during tele
             AUTO_DESTINATION_THRESHOLD = 60; // threshold in which I consider a lift transition done during auto
     public static int ABSOLUTE_MIN = -50,
-        TROUGH_POS = 10,
+        TROUGH_POS = 20,
         AUTO_TROUGH_POS = TROUGH_POS - AUTO_DESTINATION_THRESHOLD,
         KNOCK_BLOCK_POS = 200,
         TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
@@ -28,12 +29,12 @@ public class Lift extends Subsystem<Lift.StateType> {
         DROP_AREA_AFTER_POS = 250, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
-        HIGH_RAM_BEFORE_POS = 1300, // position to go to to setup for high bar ram
-        HIGH_RAM_AFTER_POS = 1850, // position to go to after ramming high bar
+        HIGH_RAM_BEFORE_POS = 1000, // position to go to to setup for high bar ram
+        HIGH_RAM_AFTER_POS = 1630, // position to go to after ramming high bar
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
-        HIGH_BASKET_POS = 3400, // position to go to so arm and grabber can deposit block on high basket
+        HIGH_BASKET_POS = 3350, // position to go to so arm and grabber can deposit block on high basket
         HIGH_BASKET_SAFETY_POS = 2600, // position where arm can start rotating into position to deposit on high basket
         ABSOLUTE_MAX = 3420;
 
@@ -42,9 +43,10 @@ public class Lift extends Subsystem<Lift.StateType> {
     }
     private final MotorTransitionState<StateType> transitionState;
 
-    public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0008;
-    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.002, ZERO_KD = 0;
+    public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0011;
+    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0023, ZERO_KD = 0;
     public static double MAX_TRANSITION_TIME = 4;
+    public static DcMotorSimple.Direction LIFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
     private final DcMotorEx liftMotor;
     private final PIDController pid;
 
@@ -52,6 +54,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         super(hwMap, telemetry, allianceColor, robot, StateType.TROUGH_SAFETY);
 
         liftMotor = (DcMotorEx) hwMap.dcMotor.get("LiftMotor");
+        liftMotor.setDirection(LIFT_DIRECTION);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pid = new PIDController(SMALL_TRANSITION_KP, ZERO_KI, ZERO_KD);

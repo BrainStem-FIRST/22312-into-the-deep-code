@@ -54,12 +54,17 @@ public class CollectingSystemTestingTele extends LinearOpMode {
     private MotorCurrentTracker spindleCurrentTracker;
     private ServoImplEx hingeServo;
     private boolean collectingData;
-    private PrintWriter printWriter;
     private String collectionFilePath = "spindleData.txt";
+    private PrintWriter printWriter;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Input input = new Input(gamepad1, gamepad2);
+        try {
+            printWriter = new PrintWriter(collectionFilePath);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -95,6 +100,10 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             telemetry.addData("is abnormal raw", spindleCurrentTracker.hasRawAbnormalCurrent());
             telemetry.addData("collecting collector data", collectingData);
 
+            telemetry.addData("", "");
+            telemetry.addData("controls", "");
+            telemetry.addData("  x", "togge collecting mode");
+
             telemetry.update();
         }
     }
@@ -123,15 +132,7 @@ public class CollectingSystemTestingTele extends LinearOpMode {
         if(gamepadTracker.isFirstFrameX()) {
             collectingData = !collectingData;
 
-            // initializing print writer once collection started
-            if(collectingData) {
-                try {
-                    printWriter = new PrintWriter(collectionFilePath);
-                } catch (FileNotFoundException e) {
-                    telemetry.addData("file not found", collectionFilePath);
-                }
-            }
-            else {
+            if(!collectingData) {
                 printWriter.close();
                 telemetry.addData("file successfully closed", "");
             }

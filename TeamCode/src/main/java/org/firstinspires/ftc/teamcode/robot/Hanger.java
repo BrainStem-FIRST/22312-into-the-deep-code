@@ -26,10 +26,13 @@ public class Hanger extends Subsystem<Hanger.StateType> {
 
     public enum StateType {
         FULL_DOWN,
+        PARK,
         UP,
         HANG_DOWN,
         TRANSITION
     }
+    private boolean movingUp;
+    private boolean hangingDown;
     private final MotorTransitionState<StateType> transitionState;
     private final DcMotorEx hangMotor;
     private final PIDController pid;
@@ -42,6 +45,7 @@ public class Hanger extends Subsystem<Hanger.StateType> {
         pid = new PIDController(KP, KI, 0);
 
         stateManager.addState(StateType.FULL_DOWN, new NothingState<>(StateType.FULL_DOWN));
+        stateManager.addState(StateType.PARK, new NothingState<>(StateType.PARK));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.HANG_DOWN, new HoldHang());
 
@@ -49,6 +53,9 @@ public class Hanger extends Subsystem<Hanger.StateType> {
         stateManager.addState(StateType.TRANSITION, transitionState);
 
         stateManager.setupStates(robot, stateManager);
+
+        movingUp = true;
+        hangingDown = false;
     }
 
     public DcMotorEx getHangMotor() {
@@ -63,12 +70,38 @@ public class Hanger extends Subsystem<Hanger.StateType> {
 
     @Override
     public void update(double dt) {
-        stateManager.update(dt);
+        // hanging down if need
+        if(hangingDown && hangMotor.getCurrentPosition() > Hanger.HANG_DOWN_ENCODER + Hanger.DESTINATION_THRESHOLD) {
+            Subsystem.setMotorPower(hangMotor, -1);
+            movingUp = false;
+        }
+        // setting up for hang if need
+        else if(movingUp && hangMotor.getCurrentPosition() < Hanger.UP_TICK - Hanger.DESTINATION_THRESHOLD) {
+            Subsystem.setMotorPower(hangMotor, 1);
+            hangingDown = false;
+        }
+        // resting if need
+        else {
+            Subsystem.setMotorPower(hangMotor, 0);
+            hangingDown = false;
+            movingUp = false;
+        }
+
+        // old code
+        //stateManager.update(dt);
     }
     public Action moveTo(int target) {
         return telemetryPacket -> {
             Subsystem.setMotorPosition(hangMotor, Hanger.HANG_PARK_ENCODER);
             return Subsystem.inRange(hangMotor, target, DESTINATION_THRESHOLD);
         };
+    }
+    public void startMovingUp() {
+        movingUp = true;
+        hangingDown = false;
+    }
+    public void startHangingDown() {
+        hangingDown = true;
+        movingUp = false;
     }
 }

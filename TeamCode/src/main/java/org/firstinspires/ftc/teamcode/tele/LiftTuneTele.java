@@ -28,6 +28,7 @@ public class LiftTuneTele extends LinearOpMode {
         telemetry.update();
 
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
+        motor.setDirection(Lift.LIFT_DIRECTION);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         ServoImplEx armServo = hardwareMap.get(ServoImplEx.class, "LiftArmServo");

@@ -35,7 +35,7 @@ public class Extension extends Subsystem<Extension.StateType> {
             RETRACT_POWER_FAST = -1,
             RETRACT_POWER_SLOW = -0.7,
             RETRACT_POWER_IN = -0.5,
-            TRANSFER_POWER_IN = -0.2;
+            TRANSFER_POWER_IN = -0.35;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING

@@ -38,7 +38,7 @@ public class Arm extends Subsystem<Arm.StateType> {
         KNOCK_BLOCK_POS = 0.15,
         DROP_OFF_POS = 0.33,
         BASKET_DROP_POS = 0.32,
-        SPECIMEN_HANG_POS = 0.85,
+        SPECIMEN_HANG_POS = 0.95,
         BASKET_SAFETY_POS = 0.85;
     public enum StateType {
         TRANSFER,

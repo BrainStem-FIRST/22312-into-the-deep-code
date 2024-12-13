@@ -39,7 +39,8 @@ public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean canEnter() {
         return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
-                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY;
+                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER;
     }
 
     @Override

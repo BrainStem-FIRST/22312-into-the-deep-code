@@ -30,7 +30,7 @@ public class PlayingState extends RobotState<BrainSTEMRobot.StateType> {
         robot.getLift().update(dt);
 
         // hanging system
-        //robot.getHanger().update(dt);
+        robot.getHanger().update(dt);
     }
 
     @Override

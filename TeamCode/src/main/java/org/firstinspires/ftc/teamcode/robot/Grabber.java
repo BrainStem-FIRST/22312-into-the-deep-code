@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -16,10 +17,11 @@ import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
+@Config
 public class Grabber extends Subsystem<Grabber.StateType> {
-    public static final int MIN_TICK = 1210, MAX_TICK = 2400;
-    public static final double CLOSE_POS = 0.01, OPEN_POS = 0.99;
-    public static final double FULL_ROTATION_TIME = 0.3;
+    public static int MIN_TICK = 1210, MAX_TICK = 2400;
+    public static double CLOSE_POS = 0.02, OPEN_POS = 0.99;
+    public static double FULL_ROTATION_TIME = 0.15;
     private BlockColor blockColorHeld;
     private boolean hasSpecimen;
 
