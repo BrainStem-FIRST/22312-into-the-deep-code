@@ -32,10 +32,8 @@ import org.firstinspires.ftc.teamcode.util.Input;
 public class TeleMain extends LinearOpMode {
     public static class Params {
         public AllianceColor allianceColor = AllianceColor.BLUE;
-        public double timeToHang = 100;
     }
     public static Params PARAMS = new Params();
-    private double timeSinceStart;
     private Input input;
     private BrainSTEMRobot robot;
     private final Pose2d BEGIN_POSE = new Pose2d(-24, -7.5, Math.toRadians(90));
@@ -51,21 +49,20 @@ public class TeleMain extends LinearOpMode {
 
         robot.getStateManager().tryEnterState(BrainSTEMRobot.StateType.SETTING_UP); // setup robot
 
-        long currentTime = System.currentTimeMillis();
-        long prevTime;
+        long currentAbsoluteTime = System.currentTimeMillis();
+        long prevAbsoluteTime;
         double dt;
         double maxDt = 0;
         double minDt = 10;
-        timeSinceStart = 0; // time since start of match; need for hanging
+        double currentGameTime = 0;
 
-        // initial robot setup
         while (opModeIsActive()) {
 
             // update dt
-            prevTime = currentTime;
-            currentTime = System.currentTimeMillis();
-            dt = (currentTime - prevTime) / 1000.;
-            timeSinceStart += dt;
+            prevAbsoluteTime = currentAbsoluteTime;
+            currentAbsoluteTime = System.currentTimeMillis();
+            dt = (currentAbsoluteTime - prevAbsoluteTime) / 1000.;
+            currentGameTime += dt;
 
             // update custom input
             input.update();
@@ -91,12 +88,12 @@ public class TeleMain extends LinearOpMode {
 
             // for debugging
             telemetry.addData("", "");
+            telemetry.addData("game time", currentGameTime);
             telemetry.addData("dt", dt);
             telemetry.addData("max dt", maxDt);
             telemetry.addData("min dt", minDt);
 
             // general stats
-            telemetry.addData("time remaining", 120 - timeSinceStart);
             telemetry.addData("robot alliance", robot.getColorFromAlliance());
 
             // robot's pose

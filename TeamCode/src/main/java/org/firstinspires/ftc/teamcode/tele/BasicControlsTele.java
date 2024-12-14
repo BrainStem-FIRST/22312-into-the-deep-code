@@ -92,7 +92,7 @@ public class BasicControlsTele extends LinearOpMode {
             telemetry.addData("  bumpers", "extension");
             telemetry.addData("  left trigger", "spit collector");
             telemetry.addData("  right trigger", "toggle hinge and collect when hinged down");
-            
+
             telemetry.update();
         }
     }
