@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
+
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "DriveTrainTestTele")
 public class DriveTrainTele extends LinearOpMode {
     private DcMotorEx fl, fr, bl, br;
     @Override
