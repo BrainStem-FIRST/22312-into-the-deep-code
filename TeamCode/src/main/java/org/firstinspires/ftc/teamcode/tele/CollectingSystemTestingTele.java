@@ -17,8 +17,6 @@ import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 import org.firstinspires.ftc.teamcode.util.Input;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingSystemTestingTele")
 @Config
@@ -53,18 +51,9 @@ public class CollectingSystemTestingTele extends LinearOpMode {
     private DcMotorEx extensionMotor, spindleMotor;
     private MotorCurrentTracker spindleCurrentTracker;
     private ServoImplEx hingeServo;
-    private boolean collectingData;
-    private String collectionFilePath = "spindleData.txt";
-    private PrintWriter printWriter;
-
     @Override
     public void runOpMode() throws InterruptedException {
         Input input = new Input(gamepad1, gamepad2);
-        try {
-            printWriter = new PrintWriter(collectionFilePath);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();
@@ -98,7 +87,6 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             telemetry.addData("is abnormal validated", spindleCurrentTracker.hasValidatedAbnormalCurrent());
             telemetry.addData("abnormal frames", spindleCurrentTracker.getConsecutiveAbnormalFrames());
             telemetry.addData("is abnormal raw", spindleCurrentTracker.hasRawAbnormalCurrent());
-            telemetry.addData("collecting collector data", collectingData);
 
             telemetry.addData("", "");
             telemetry.addData("controls", "");
@@ -126,26 +114,6 @@ public class CollectingSystemTestingTele extends LinearOpMode {
                 Subsystem.setMotorPower(spindleMotor, Collector.TELE_COLLECT_POWER);
             else
                 Subsystem.setMotorPower(spindleMotor, 0);
-        }
-
-        // checking for when to write data into file
-        if(gamepadTracker.isFirstFrameX()) {
-            collectingData = !collectingData;
-
-            if(!collectingData) {
-                printWriter.close();
-                telemetry.addData("file successfully closed", "");
-            }
-        }
-
-        // actually writing to file
-        if(collectingData) {
-            telemetry.addData("writing to file", "");
-            // prints in format: power current hasRawAbnormal hasValidatedAbnormal
-            printWriter.print(spindleMotor.getPower() + " ");
-            printWriter.print(spindleMotor.getCurrent( CurrentUnit.MILLIAMPS) + " ");
-            printWriter.print(spindleCurrentTracker.hasRawAbnormalCurrent() + " ");
-            printWriter.println(spindleCurrentTracker.hasValidatedAbnormalCurrent());
         }
 
     }
