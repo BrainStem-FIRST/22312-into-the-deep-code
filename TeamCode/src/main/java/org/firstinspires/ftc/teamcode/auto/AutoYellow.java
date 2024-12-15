@@ -26,8 +26,8 @@ import org.firstinspires.ftc.teamcode.robot.Extension;
 public class AutoYellow extends LinearOpMode {
     public static class Params {
         public double beginX = -40.825, beginY = -64.5, beginA = 0;
-        public double normalDepositX = -58.75, normalDepositY = -58.75, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
-        public double midDepositX = -57, midDepositY = -60.9;
+        public double normalDepositX = -59.75, normalDepositY = -59.75, depositA = Math.toRadians(45), depositT = Math.toRadians(225);
+        public double midDepositX = -58, midDepositY = -61.9;
         public double depositSafetyDisp = 2;
         public double rightBlockX = -48.35, rightBlockY = -47, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
         public double midBlockX = -61.25, midBlockY = -43, midBlockA1 = Math.toRadians(95), midBlockA2 = Math.toRadians(90), midBlockT = Math.toRadians(90);

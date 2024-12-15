@@ -14,7 +14,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -31,32 +30,34 @@ import java.util.Arrays;
 
 @Autonomous
 @Config
-public class AutoSpecimen extends LinearOpMode {
+public class AutoSpecimenGreenLemon extends LinearOpMode {
     public static class DriveParams {
         public double dispResolution = 4, angResolution = Math.toRadians(20), anglSamplingEps = 1e-1;
     }
     public static class Params {
 
-        public double beginX = -0.325, beginY = -64.5, beginA = Math.toRadians(90);
-        public double hang0X = 10, hang0Y = -28, hang0VelConstraint = 38,
+        public double waitTime = 3;
+        public double beginX = 16.725, beginY = -64.5, beginA = Math.toRadians(90);
+        public double hang0X = 2, hang0Y = -28, hang0VelConstraint = 38,
                 hang1X = -3.5, hang1Y = -27,
                 hang2X = -7, hang2Y = -27,
                 hang3X = -11, hang3Y = -27,
                 hangA = Math.toRadians(90), hangT = Math.toRadians(90), hangWaitSeconds = 0.1;
         public double hangAlignDrivePower = 0.6;
         public double leftBlockX1 = 38, leftBlockY1 = -41, leftBlockT1 = Math.toRadians(90), leftBlockMinVel1 = 60;
-        public double leftBlockX2 = 49, leftBlockY2 = -20, leftBlockT2 = Math.toRadians(0), leftBlockMinVel2 = 70;
-        public double leftBlockX3 = 47, leftBlockY3 = -50, leftBlockAAfter = Math.toRadians(80), leftBlockT3 = Math.toRadians(90), leftBlockMinVel3 = 65;
+        public double leftBlockX2 = 43.5, leftBlockY2 = -15, leftBlockT2 = Math.toRadians(0), leftBlockMinVel2 = 70;
+        public double leftBlockX3 = 43.5, leftBlockY3 = -50, leftBlockAAfter = Math.toRadians(80), leftBlockT3 = Math.toRadians(90), leftBlockMinVel3 = 65;
 
-        public double midBlockX = 60.5, midBlockY = -22, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
-        public double midBlockX2 = 44, midBlockY2 = -66.5, midBlockT2 = Math.toRadians(270), midBlockMinVel2 = 35;
+        public double midBlockX = 51, midBlockY = -15, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
+        public double midBlockX2 = 51, midBlockY2 = -67, midBlockT2 = Math.toRadians(270), midBlockMinVel2 = 35;
 
-        public double wallPickupWaitTime = 0.1, wallPickupGrabberWaitTime = 0.08;
-        public double wallPickupX1 = 40.75, wallPickupY1 = -66.5,
+        public double wallPickupWaitTime = 0.1, wallPickupGrabberWaitTime = 0.12;
+        public double wallPickupX1 = 68, wallPickupY1 = -66,
                 wallPickupX2 = 40.5, wallPickupY2 = -68.5,
                 wallPickupX3 = 40.75, wallPickupY3 = -69.5,
                 wallPickupA = Math.toRadians(90), wallPickupT = Math.toRadians(270),
-                wallToHangMinVel = 50, hangToWallMinVel = 50, wallAlignPower = -0.6;
+                wallToHangMinVel = 50, hangToWallMinVel = 50, wallAlignPower = -0.85;
+        public double delayTime = 5;
     }
     public static DriveParams driveParams = new DriveParams();
     public static Params params = new Params();
@@ -155,7 +156,7 @@ public class AutoSpecimen extends LinearOpMode {
 
         // hang first specimen
         TrajectoryActionBuilder driveToSpecimenHang0Trajectory = drive.actionBuilder(beginPose)
-                .strafeTo(hang0Pose.position, hang0VelConstraint);
+                .splineToConstantHeading(hang0Pose.position, params.beginA, hang0VelConstraint);
 
         // push first block into human player area
         TrajectoryActionBuilder pushLeftBlockTrajectory = drive.actionBuilder(hang0Pose)
@@ -207,37 +208,39 @@ public class AutoSpecimen extends LinearOpMode {
 
         // actual auto path
         Actions.runBlocking(
-                new ParallelAction(
-                        robot.getExtension().retractContinuously(),
-                        new SequentialAction(
-                                // hang first specimen
-                                new ParallelAction(
-                                        driveToSpecimen1Hang,
-                                        robot.getLiftingSystem().setupHighSpecimenRam()
-                                ),
-                                new ParallelAction(
-                                        keepRobotAlignedHang(robot),
-                                        new SequentialAction(
-                                                new SleepAction(params.hangWaitSeconds),
-                                                robot.getLiftingSystem().ramHighSpecimen()
-                                        )
-                                ),
-                                // push first block into human player area
-                                new ParallelAction(
-                                        robot.getLiftingSystem().resetSpecimenRam(),
-                                        pushLeftBlock
-                                ),
+                new SequentialAction(
+                        new SleepAction(params.waitTime),
+                    new ParallelAction(
+                            robot.getExtension().retractContinuously(),
+                            new SequentialAction(
+                                    // hang first specimen
+                                    new ParallelAction(
+                                            driveToSpecimen1Hang,
+                                            robot.getLiftingSystem().setupHighSpecimenRam()
+                                    ),
+                                    new ParallelAction(
+                                            keepRobotAlignedHang(robot),
+                                            new SequentialAction(
+                                                    new SleepAction(params.hangWaitSeconds),
+                                                    robot.getLiftingSystem().ramHighSpecimen()
+                                            )
+                                    ),
+                                    // push first block into human player area
+                                    new ParallelAction(
+                                            robot.getLiftingSystem().resetSpecimenRam(),
+                                            pushLeftBlock
+                                    ),
 
-                                // push second block into human player
-                                pushMidBlock,
+                                    // push second block into human player
+                                    pushMidBlock,
 
-                                // repeat 4x
-                                //get specimen from wall and hang it on bar
-                                // go back to wall to pick up another specimen
-                                cycleSpecimenHang1,
-                                cycleSpecimenHang2,
-                                cycleSpecimenHang3
-                        )
+                                    // repeat 4x
+                                    //get specimen from wall and hang it on bar
+                                    // go back to wall to pick up another specimen
+                                    cycleSpecimenHang1,
+                                    cycleSpecimenHang2
+                            )
+                    )
                 )
         );
 

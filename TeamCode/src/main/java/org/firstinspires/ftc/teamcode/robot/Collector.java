@@ -53,7 +53,7 @@ public class Collector extends Subsystem<Collector.StateType> {
     }
     public static int TELE_JAM_CURRENT_THRESHOLD = 5000, AUTO_JAM_CURRENT_THRESHOLD = 4500;
     public static int TELE_JAM_VALIDATION_FRAMES = 5, AUTO_JAM_VALIDATION_FRAMES = 3;
-    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 12;
+    public static int TELE_JAM_SAFETY_FRAMES = 3, AUTO_JAM_SAFETY_FRAMES = 17;
     private final MotorCurrentTracker teleCurrentTracker, autoCurrentTracker;
     private final DcMotorEx spindleMotor;
 

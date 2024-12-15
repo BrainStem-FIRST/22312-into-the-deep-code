@@ -25,7 +25,7 @@ public class Hinge extends Subsystem<Hinge.StateType> {
     private boolean isFullyDown;
     public static double HINGE_SHAKE_DOWN_POSITION = 0.6;
     public static int HINGE_UP_TICK = 2250, HINGE_DOWN_TICK = 1480;
-    public static double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.65;
+    public static double HINGE_UP_POSITION = 0.01, HINGE_DOWN_POSITION = 0.99, HINGE_MIDDLE_POSITION = 0.67;
     public static double HINGE_DOWN_TIME = 0.15, HINGE_UP_TIME = 0.25;
 
     public enum StateType {
