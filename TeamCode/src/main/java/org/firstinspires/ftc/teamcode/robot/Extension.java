@@ -146,6 +146,15 @@ public class Extension extends Subsystem<Extension.StateType> {
             }
         };
     }
+    public Action retractContinuously() {
+        return telemetryPacket -> {
+            if (!hitRetractHardStop())
+                retractExtensionMotor();
+            else
+                setExtensionMotorPower(0);
+            return false;
+        };
+    }
 
     public PIDController getPid() {
         return pid;

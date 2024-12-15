@@ -126,7 +126,7 @@ public class LiftingSystem {
     }
     public Action depositHighInitial() {
         return new SequentialAction(
-            robot.getLift().moveTo(Lift.HIGH_BASKET_POS, Lift.HIGH_BASKET_SAFETY_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
+            robot.getLift().moveTo(Lift.HIGH_BASKET_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
             robot.getArm().rotateTo(Arm.BASKET_DROP_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
             robot.getGrabber().open()
         );
@@ -160,7 +160,7 @@ public class LiftingSystem {
         robot.telemetry.addData("ramming specimen", "");
         robot.telemetry.update();
         return new SequentialAction(
-                robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS, 1, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
+                robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS + 80, 2, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
                 robot.getGrabber().open()
         );
     }

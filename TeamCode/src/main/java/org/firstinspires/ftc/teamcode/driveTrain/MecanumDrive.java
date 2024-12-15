@@ -303,6 +303,15 @@ public class MecanumDrive {
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
+    // returns the motor powers as FL, FR, BL, FR
+    public double[] getMotorPowers() {
+        return new double[]{
+                leftFront.getPower(),
+                rightFront.getPower(),
+                leftBack.getPower(),
+                rightBack.getPower()
+        };
+    }
 
     public void setMotorPowers(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
         leftFront.setPower(frontLeftPower);
