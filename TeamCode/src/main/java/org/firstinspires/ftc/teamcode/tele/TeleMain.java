@@ -156,7 +156,7 @@ public class TeleMain extends LinearOpMode {
         }
     }
     private void listenForDriveTrainInput() {
-        final double STRAFE_Y_AMP = 0.6;
+        final double STRAFE_Y_AMP = 0.8;
         final double TURN_AMP = 0.8;
         final double hangAndExtendPower = 0.2;
 
@@ -236,7 +236,6 @@ public class TeleMain extends LinearOpMode {
         // checking changes in basket/bar heights
         if(input.getGamepadTracker2().isLeftBumperPressed()) {
             robot.setIsHighDeposit(true);
-            Log.d("TRY ENTER BASKET BASKET", "" + robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET));
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
         }
         else if(input.getGamepadTracker2().isLeftTriggerPressed()) {
@@ -326,7 +325,7 @@ public class TeleMain extends LinearOpMode {
 
             case DROP_AREA_TO_TROUGH:
                 // checking for overriding to immediately transition to basket to save time
-                if(input.getGamepadTracker1().isFirstFrameA()
+                if(input.getGamepadTracker2().isFirstFrameA()
                 && robot.getGrabber().hasBlock())
                     robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
                 break;

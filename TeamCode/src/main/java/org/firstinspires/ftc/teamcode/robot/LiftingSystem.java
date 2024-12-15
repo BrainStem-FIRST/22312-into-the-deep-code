@@ -70,6 +70,12 @@ public class LiftingSystem {
     public void setStayInTrough(boolean stayInTrough) {
         this.stayInTrough = stayInTrough;
     }
+    public boolean getNeedManualTransfer() {
+        return needManualTransfer;
+    }
+    public void setNeedManualTransfer(boolean needManualTransfer) {
+        this.needManualTransfer = needManualTransfer;
+    }
 
     // continuous block transfer until block is grabbed onto (also uses pid)
     public Action transferBlock() {
@@ -140,7 +146,7 @@ public class LiftingSystem {
         return new SequentialAction(
                 robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
                 new ParallelAction(
-                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.SMALL_TRANSITION_KP, Lift.ZERO_KI),
+                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
                         robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
                 )
         );

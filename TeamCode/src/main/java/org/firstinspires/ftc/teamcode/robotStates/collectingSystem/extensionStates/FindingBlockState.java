@@ -10,6 +10,10 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
     }
 
     @Override
+    public void executeOnEntered() {
+        robot.setCanTransfer(false); // to override any current transfer
+    }
+    @Override
     public void execute(double dt) {
         // hard stop
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)

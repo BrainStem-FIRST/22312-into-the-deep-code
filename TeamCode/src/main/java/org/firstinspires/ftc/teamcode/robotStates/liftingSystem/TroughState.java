@@ -7,16 +7,12 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
-import org.firstinspires.ftc.teamcode.util.Helper;
 
 
 public class TroughState extends RobotState<LiftingSystem.StateType> {
-    private boolean isFirstTransfer;
     public TroughState() {
         super(LiftingSystem.StateType.TROUGH);
-        isFirstTransfer = true;
     }
-
     @Override
     public void execute(double dt) {
         // handling override of transfer if suddenly cannot transfer
@@ -33,7 +29,8 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
         }
 
         // handling actual transfer
-        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN && robot.getCollector().hasValidBlockColor()) {
+        else if(robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN
+                && (robot.getCollector().hasValidBlockColor() || robot.getLiftingSystem().getNeedManualTransfer())) {
             // transfer stage 1: opening grabber, setting arm to transfer pos, and lowering lift if at trough safety
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 // resetting grabber to be ready to transfer
@@ -56,9 +53,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             }
             // transfer stage 2: closing onto block once lift is down and raising lift
             else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH) {
-                // resetting isFirstTransfer because transfer already happen
-                isFirstTransfer = false;
-
+                robot.getLiftingSystem().setNeedManualTransfer(false);
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                     robot.getGrabber().getTransitionState().overrideGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                     robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorInTrough());
@@ -86,10 +81,6 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
             else if (!robot.getLiftingSystem().getStayInTrough())
                 robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
         }
-    }
-    @Override
-    public void executeOnEntered() {
-        isFirstTransfer = true;
     }
     @Override
     public boolean canEnter() {

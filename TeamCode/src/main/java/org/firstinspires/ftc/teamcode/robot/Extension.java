@@ -34,8 +34,8 @@ public class Extension extends Subsystem<Extension.StateType> {
     public static double SEARCH_POWER = 0.6,
             RETRACT_POWER_FAST = -1,
             RETRACT_POWER_SLOW = -0.7,
-            RETRACT_POWER_IN = -0.5,
-            TRANSFER_POWER_IN = -0.35;
+            RETRACT_POWER_IN = -0.3,
+            TRANSFER_POWER_IN = -0.2;
 
     public enum StateType {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING

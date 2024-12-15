@@ -19,9 +19,9 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 @Config
 public class Lift extends Subsystem<Lift.StateType> {
     public static int DESTINATION_THRESHOLD = 70, // threshold in which I consider a lift transition done during tele
-            AUTO_DESTINATION_THRESHOLD = 60; // threshold in which I consider a lift transition done during auto
+        AUTO_DESTINATION_THRESHOLD = 60; // threshold in which I consider a lift transition done during auto
     public static int ABSOLUTE_MIN = -50,
-        TROUGH_POS = 20,
+        TROUGH_POS = 10,
         AUTO_TROUGH_POS = TROUGH_POS - AUTO_DESTINATION_THRESHOLD,
         KNOCK_BLOCK_POS = 200,
         TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
@@ -29,8 +29,8 @@ public class Lift extends Subsystem<Lift.StateType> {
         DROP_AREA_AFTER_POS = 250, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
         LOW_RAM_AFTER_POS = 595, // position to go to after ramming low bar
-        HIGH_RAM_BEFORE_POS = 1000, // position to go to to setup for high bar ram
-        HIGH_RAM_AFTER_POS = 1630, // position to go to after ramming high bar
+        HIGH_RAM_BEFORE_POS = 1100, // position to go to to setup for high bar ram
+        HIGH_RAM_AFTER_POS = 1660, // position to go to after ramming high bar
 
         LOW_BASKET_POS = 1940, // position to go to so arm and grabber can deposit block on low basket
         LOW_BASKET_SAFETY_POS = 1360, // position where arm can start rotating into position to deposit on low basket
@@ -44,7 +44,7 @@ public class Lift extends Subsystem<Lift.StateType> {
     private final MotorTransitionState<StateType> transitionState;
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0011;
-    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0023, ZERO_KD = 0;
+    public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0025, ZERO_KD = 0;
     public static double MAX_TRANSITION_TIME = 4;
     public static DcMotorSimple.Direction LIFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
     private final DcMotorEx liftMotor;
@@ -134,13 +134,6 @@ public class Lift extends Subsystem<Lift.StateType> {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
 
             Subsystem.setMotorPosition(liftMotor, target);
-
-            /*
-            telemetry.addData("lift target", liftMotor.getTargetPosition());
-            telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
-            telemetry.update();
-             */
-
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
                     && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
         };

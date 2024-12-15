@@ -148,12 +148,16 @@ public class Collector extends Subsystem<Collector.StateType> {
                         && blockColorSensor.getRawBlockColor() != BlockColor.NONE);
 
                 telemetry.addData("time collecting", autoCollectTimer.seconds());
+                telemetry.addData("auto max collect time", AUTO_MAX_COLLECT_TIME);
                 telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
                 telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
                 telemetry.addData("motor power", spindleMotor.getPower());
                 telemetry.addData("raw block color", blockColorSensor.getRawBlockColor());
                 telemetry.addData("should end", end);
                 telemetry.update();
+
+                if(end)
+                    Subsystem.setMotorPower(spindleMotor, 0);
 
                 return !end;
             }

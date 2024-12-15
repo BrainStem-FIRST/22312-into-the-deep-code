@@ -20,14 +20,14 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 @Config
 public class Arm extends Subsystem<Arm.StateType> {
-    public static final int MIN_TICK = 935, MAX_TICK = 2450;
+    public static final int MIN_TICK = 930, MAX_TICK = 2450;
 
 
     // describes time needed for arm to rotate from 0.01 pwm to 0.99 pwm
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
     public static double TRANSFER_TO_KNOCK_BLOCK_TIME = 0.14,
         TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
-        BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.35,
+        BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.4,
         BASKET_DROP_TO_UP_TIME = 0.18,
         UP_TO_BASKET_SAFETY_TIME = 0.42,
         SPECIMEN_HANG_TO_UP_TIME = 0.14,
@@ -36,9 +36,9 @@ public class Arm extends Subsystem<Arm.StateType> {
         UP_TO_TRANSFER_TIME = 0.55;
     public static double TRANSFER_POS = 0.01,
         KNOCK_BLOCK_POS = 0.15,
-        DROP_OFF_POS = 0.33,
-        BASKET_DROP_POS = 0.32,
-        SPECIMEN_HANG_POS = 0.95,
+        DROP_OFF_POS = 0.32,
+        BASKET_DROP_POS = 0.31,
+        SPECIMEN_HANG_POS = 0.925,
         BASKET_SAFETY_POS = 0.85;
     public enum StateType {
         TRANSFER,

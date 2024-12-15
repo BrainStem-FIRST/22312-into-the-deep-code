@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
@@ -20,7 +19,6 @@ import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.Input;
-import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "BasicControlsTele")

@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 @Config
 public class Grabber extends Subsystem<Grabber.StateType> {
     public static int MIN_TICK = 1210, MAX_TICK = 2400;
-    public static double CLOSE_POS = 0.02, OPEN_POS = 0.99;
-    public static double FULL_ROTATION_TIME = 0.15;
+    public static double CLOSE_POS = 0.04, OPEN_POS = 0.99;
+    public static double FULL_ROTATION_TIME = 0.19;
     private BlockColor blockColorHeld;
     private boolean hasSpecimen;
 

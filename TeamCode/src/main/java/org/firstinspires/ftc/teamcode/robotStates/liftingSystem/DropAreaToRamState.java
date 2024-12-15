@@ -9,10 +9,6 @@ public class DropAreaToRamState extends RobotState<LiftingSystem.StateType> {
     public DropAreaToRamState() {
         super(LiftingSystem.StateType.DROP_AREA_TO_RAM);
     }
-
-    @Override
-    public void execute(double dt) {}
-
     @Override
     public void executeOnEntered() {
         robot.getLift().getTransitionState().overrideGoalState(robot.getLift().getRamBeforePos(), Lift.StateType.RAM_BEFORE);
