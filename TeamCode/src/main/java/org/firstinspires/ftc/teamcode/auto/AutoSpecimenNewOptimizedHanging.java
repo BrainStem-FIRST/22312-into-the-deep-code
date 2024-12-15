@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 @Autonomous
 @Config
-public class AutoSpecimenNew extends LinearOpMode {
+public class AutoSpecimenNewOptimizedHanging extends LinearOpMode {
     public static class DriveParams {
         public double dispResolution = 4, angResolution = Math.toRadians(20), anglSamplingEps = 1e-1;
     }
@@ -46,8 +46,7 @@ public class AutoSpecimenNew extends LinearOpMode {
         public double leftBlockX2 = 43.5, leftBlockY2 = -15, leftBlockT2 = Math.toRadians(0), leftBlockMinVel2 = 70;
         public double leftBlockX3 = 43.5, leftBlockY3 = -50, leftBlockAAfter = Math.toRadians(80), leftBlockT3 = Math.toRadians(90), leftBlockMinVel3 = 65;
 
-        public double midBlockX = 45, midBlockY = -15, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
-        public double minBlockIntermediateX = 45, midBlockIntermediateY = -35;
+        public double midBlockX = 51, midBlockY = -15, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
         public double midBlockX2 = 66, midBlockY2 = -67, midBlockT2 = Math.toRadians(270), midBlockMinVel2 = 35;
 
         public double wallPickupWaitTime = 0.1, wallPickupGrabberWaitTime = 0.12;
@@ -75,7 +74,9 @@ public class AutoSpecimenNew extends LinearOpMode {
                 // hang block
                 new ParallelAction(
                         driveToHang,
-                        robot.getLiftingSystem().setupHighSpecimenRam()
+                        new SequentialAction(
+                                robot.getLiftingSystem().setupHighSpecimenRam()
+                        )
                 ),
                 new ParallelAction(
                         keepRobotAlignedHang(robot),
@@ -132,7 +133,6 @@ public class AutoSpecimenNew extends LinearOpMode {
         Pose2d leftBlockAfterPose = new Pose2d(params.leftBlockX3, params.leftBlockY3, params.leftBlockAAfter);
 
         Pose2d midBlockPose = new Pose2d(params.midBlockX, params.midBlockY, params.midBlockA);
-        Pose2d midBlockIntermediatePose = new Pose2d(params.minBlockIntermediateX, params.midBlockIntermediateY, params.midBlockA);
         Pose2d midBlockAfterPose = new Pose2d(params.midBlockX2, params.midBlockY2, params.midBlockA);
 
         Pose2d wallPickupPose1 = new Pose2d(params.wallPickupX1, params.wallPickupY1, params.wallPickupA);
@@ -170,7 +170,6 @@ public class AutoSpecimenNew extends LinearOpMode {
         // push second block into human player area
         TrajectoryActionBuilder pushMidBlockTrajectory = drive.actionBuilder(leftBlockAfterPose)
                 .splineToLinearHeading(midBlockPose, params.midBlockT, midBlock1VelConstraint)
-                .strafeTo(midBlockIntermediatePose.position)
                 .splineToLinearHeading(midBlockAfterPose, params.midBlockT2, midBlock2VelConstraint);
 
         // drive from wall pickup positions to specimen hang positions

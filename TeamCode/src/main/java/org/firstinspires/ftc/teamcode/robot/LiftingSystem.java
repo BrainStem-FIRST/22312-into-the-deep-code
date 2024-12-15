@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -160,6 +163,21 @@ public class LiftingSystem {
         robot.telemetry.addData("ramming specimen", "");
         robot.telemetry.update();
         return new SequentialAction(
+                robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS + 80, 2, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
+                robot.getGrabber().open()
+        );
+    }
+    public Action tryRamHighSpecimen() {
+        robot.telemetry.addData("trying to ram specimen", "");
+        robot.telemetry.update();
+        return new SequentialAction(
+                new Action() {
+                    @Override
+                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                        //return robot.getLift().get;
+                        return false;
+                    }
+                },
                 robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS + 80, 2, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
                 robot.getGrabber().open()
         );

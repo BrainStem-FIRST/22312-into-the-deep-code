@@ -14,7 +14,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -31,7 +30,7 @@ import java.util.Arrays;
 
 @Autonomous
 @Config
-public class AutoSpecimen extends LinearOpMode {
+public class AutoSpecimenOld extends LinearOpMode {
     public static class DriveParams {
         public double dispResolution = 4, angResolution = Math.toRadians(20), anglSamplingEps = 1e-1;
     }

@@ -30,9 +30,11 @@ public class AutoYellow extends LinearOpMode {
         public double midDepositX = -58, midDepositY = -61.9;
         public double depositSafetyDisp = 2;
         public double rightBlockX = -48.35, rightBlockY = -47, rightBlockA = Math.toRadians(90), rightBlockT = Math.toRadians(90);
-        public double midBlockX = -61.25, midBlockY = -43, midBlockA1 = Math.toRadians(95), midBlockA2 = Math.toRadians(90), midBlockT = Math.toRadians(90);
+        public double midBlockX = -60.25, midBlockY = -43, midBlockA1 = Math.toRadians(95), midBlockA2 = Math.toRadians(90), midBlockT = Math.toRadians(90);
         public double leftBlockX1 = -59, leftBlockY1 = -40, leftBlockX2 = -59.5, leftBlockY2 = -21, leftBlockA = Math.toRadians(136);
-        public double parkX1 = -36, parkY1 = -8, parkX2 = -15, parkY2 = -6, parkA = Math.toRadians(270);
+        public double parkX1 = -36, parkY1 = -8,
+                parkX2 = -15, parkY2 = -11,
+                parkA = Math.toRadians(270);
         public int rightBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int midBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
         public int leftBlockExtensionAmount = Extension.MIN_SEARCH_AND_COLLECT_POSITION;
