@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.Range;
@@ -16,11 +17,14 @@ import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 import org.firstinspires.ftc.teamcode.util.Input;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingSystemTestingTele")
 @Config
 public class CollectingSystemTestingTele extends LinearOpMode {
+    private static final Logger log = LoggerFactory.getLogger(CollectingSystemTestingTele.class);
 
     /*
     controls
@@ -82,6 +86,13 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             telemetry.addData("manual pid value", Range.clip(0.01 * (Extension.MIN_POSITION - extensionMotor.getCurrentPosition()), -1, 1));
 
             telemetry.addData("", "");
+
+            Log.d("SPINDLE CURRENT", "" + spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
+            Log.d("SPINDLE POWER", "" + spindleMotor.getPower());
+            Log.d("is abnormal validated", "" + spindleCurrentTracker.hasValidatedAbnormalCurrent());
+            Log.d("abnormal frames", "" + spindleCurrentTracker.getConsecutiveAbnormalFrames());
+            Log.d("is abnormal raw", "" + spindleCurrentTracker.hasRawAbnormalCurrent());
+
             telemetry.addData("collector motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
             telemetry.addData("collector motor power", spindleMotor.getPower());
             telemetry.addData("is abnormal validated", spindleCurrentTracker.hasValidatedAbnormalCurrent());
@@ -115,7 +126,6 @@ public class CollectingSystemTestingTele extends LinearOpMode {
             else
                 Subsystem.setMotorPower(spindleMotor, 0);
         }
-
     }
     public void listenForHingeControls(GamepadTracker gamepadTracker) {
         if (gamepadTracker.isRightTriggerPressed())

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.CollectTempState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectorStates.SpitTempState;
+import org.firstinspires.ftc.teamcode.util.Drawing;
 import org.firstinspires.ftc.teamcode.util.MotorCurrentTracker;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -99,6 +100,7 @@ public class Collector extends Subsystem<Collector.StateType> {
     public void update(double dt) {
         blockColorSensor.update(dt);
         stateManager.update(dt);
+
     }
 
     public BlockColor getBlockColorInTrough() {
@@ -149,6 +151,7 @@ public class Collector extends Subsystem<Collector.StateType> {
                 telemetry.addData("motor current", spindleMotor.getCurrent(CurrentUnit.MILLIAMPS));
                 telemetry.addData("has validated abnormal current", autoCurrentTracker.hasValidatedAbnormalCurrent());
                 telemetry.addData("motor power", spindleMotor.getPower());
+                telemetry.addData("raw block color", blockColorSensor.getRawBlockColor());
                 telemetry.addData("should end", end);
                 telemetry.update();
 

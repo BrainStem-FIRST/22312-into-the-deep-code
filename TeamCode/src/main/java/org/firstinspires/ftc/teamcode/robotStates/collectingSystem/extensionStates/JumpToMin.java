@@ -21,7 +21,8 @@ public class JumpToMin extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.IN
+                || robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.RETRACTING;
     }
 
     // can retract when going here if needed

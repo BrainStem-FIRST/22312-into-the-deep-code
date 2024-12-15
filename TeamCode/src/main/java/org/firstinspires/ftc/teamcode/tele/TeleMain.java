@@ -19,12 +19,10 @@ import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Collector;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
-import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
-import org.firstinspires.ftc.teamcode.util.Helper;
 import org.firstinspires.ftc.teamcode.util.Input;
 
 @Config
@@ -153,25 +151,19 @@ public class TeleMain extends LinearOpMode {
             telemetry.addData("  hang motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
             telemetry.addData("  hang goal encoder", robot.getHanger().getTransitionState().getGoalStatePosition());
             telemetry.addData("  hang goal state", robot.getHanger().getTransitionState().getNextStateType());
-            telemetry.update();
-            Log.d("HANG CUR POSITION", "" + robot.getHanger().getHangMotor().getCurrentPosition());
-            Log.d("HANG STATE", "" + robot.getHanger().getStateManager().getActiveStateType());
-            Log.d("HANG GOAL ENCODER", "" + robot.getHanger().getTransitionState().getGoalStatePosition());
 
+            telemetry.update();
         }
     }
     private void listenForDriveTrainInput() {
-        // final double STRAFE_X_AMP = 0.3;
         final double STRAFE_Y_AMP = 0.6;
         final double TURN_AMP = 0.8;
         final double hangAndExtendPower = 0.2;
-
 
         if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER
         && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(new Vector2d(hangAndExtendPower, 0), 0));
 
-        //int strafeDirX = input.getGamepadTracker1().isDpadUpPressed() ? 1 : input.getGamepadTracker1().isDpadDownPressed() ? -1 : 0;
         int strafeDirY = input.getGamepadTracker1().isDpadRightPressed() ? 1 : input.getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
 
         if (strafeDirY != 0)
@@ -183,13 +175,15 @@ public class TeleMain extends LinearOpMode {
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
                     new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x),
                     -gamepad1.right_stick_x * TURN_AMP
-            ));
+            ));;
     }
     private void listenForCollectionInput(@NonNull GamepadTracker gamepadTracker) {
         StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
 
         // go into search mode
-        if (gamepadTracker.isRightBumperPressed() && collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN)
+        if (gamepadTracker.isRightBumperPressed()
+                && (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN
+                || collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.RETRACTING))
             collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
 
         // set extension target power
@@ -250,82 +244,99 @@ public class TeleMain extends LinearOpMode {
             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
         }
         // a = button for state progression
-        if(input.getGamepadTracker1().isFirstFrameA() || input.getGamepadTracker2().isFirstFrameA())
-            switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
-                case TROUGH:
-                    // activating manual transfer if everything properly setup
-                    if(!robot.canTransfer() && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
+        // b = button for state regression
+        // x = button for safety overrides
+        switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
+            case TROUGH:
+                // checking for transition to basket
+                if (input.getGamepadTracker2().isFirstFrameA()
+                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY
+                && robot.isDepositing() && robot.getGrabber().hasBlock())
+                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
+
+                // activating manual transfer if everything properly setup
+                else if ((input.getGamepadTracker2().isFirstFrameA() || input.getGamepadTracker1().isFirstFrameA())
+                && !robot.canTransfer() && robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
                         robot.setCanTransfer(true); // I set to true so that next frame the execute in TroughState will lower lift and actually transfer block
-                    }
-                    // activating transition to deposit in basket once transfer is complete
-                    else if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.BASKET_SAFETY
-                    && robot.isDepositing() && robot.getGrabber().hasBlock())
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
-                    break;
 
-                case TROUGH_TO_BASKET:
+                // transitioning to drop area if need to
+                if(input.getGamepadTracker1().isFirstFrameB()
+                && robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
+
+                // handling block knocking check
+                if ((input.getGamepadTracker1().isFirstFrameX() || input.getGamepadTracker2().isFirstFrameX())
+                && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
+                    robot.setCanTransfer(false);
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
+                }
+                break;
+
+            case TROUGH_TO_BASKET:
+                if(input.getGamepadTracker2().isFirstFrameA())
                     robot.getLiftingSystem().setButtonACued(true);
-                    break;
+                break;
 
-                case BASKET_DEPOSIT:
+            case BASKET_DEPOSIT:
+                if(input.getGamepadTracker2().isFirstFrameA())
                     robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_DROP_AREA);
-                    break;
+                break;
 
-                case DROP_AREA:
+            case TROUGH_TO_DROP_AREA:
+                if (input.getGamepadTracker2().isFirstFrameB())
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+                break;
+
+            case DROP_AREA:
+                if (input.getGamepadTracker1().isFirstFrameA()) {
                     // what to do if grabber is closed
-                    if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
+                    if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
                         // if doesn't have specimen (means has block) then open grabber to drop off block
-                        if(!robot.getGrabber().hasSpecimen()) {
+                        if (!robot.getGrabber().hasSpecimen()) {
                             robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                             robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                         }
                         // if has specimen then proceed to prep for ram
                         else
                             robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
-                    // grabbing specimen if grabber is open
-                    else if(robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+                        // grabbing specimen if grabber is open
+                    else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                         robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                         robot.getGrabber().setHasSpecimen(true);
                     }
-                    break;
+                }
 
-                case SPECIMEN_RAM:
-                    // moving lift to ram specimen into bar
-                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
-                    break;
-            }
-
-        // b = button for "going back" a state
-        else if(input.getGamepadTracker1().isFirstFrameB() || input.getGamepadTracker2().isFirstFrameB())
-            switch(robot.getLiftingSystem().getStateManager().getActiveStateType()) {
-                case TROUGH:
-                    if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY)
-                        robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_DROP_AREA);
-                case DROP_AREA:
-                    // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
-                    if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
-                        if(!robot.getGrabber().hasSpecimen())
-                            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
-                        else {
-                            robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
-                            robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
-                        }
-                    }
-                    // resetting lifting system to trough for transfer again
-                    else if (robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS) {
+                // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
+                if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+                    // transitioning to trough for deposit bc u have block
+                    if(!robot.getGrabber().hasSpecimen() && input.getGamepadTracker2().isFirstFrameB())
                         robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+                    else if (robot.getGrabber().hasSpecimen() && input.getGamepadTracker1().isFirstFrameB()){
+                        robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                        robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
                     }
-                    break;
-            }
-        // x = perform safety override
-        else if(input.getGamepadTracker1().isFirstFrameX() || input.getGamepadTracker2().isFirstFrameX())
-            // handling block knocking check
-            if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
-                    && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.IN) {
-                robot.setCanTransfer(false);
-                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.KNOCK_BLOCK);
-            }
+                }
+                // resetting lifting system to trough for transfer again
+                else if ((input.getGamepadTracker2().isFirstFrameB() || input.getGamepadTracker1().isFirstFrameB())
+                && robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS) {
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+                }
 
+                break;
+
+            case DROP_AREA_TO_TROUGH:
+                // checking for overriding to immediately transition to basket to save time
+                if(input.getGamepadTracker1().isFirstFrameA()
+                && robot.getGrabber().hasBlock())
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
+                break;
+
+            case SPECIMEN_RAM:
+                // moving lift to ram specimen into bar
+                if(input.getGamepadTracker1().isFirstFrameA())
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
+                break;
+        }
     }
     private void listenForHangingInput() {
         if (input.getGamepadTracker2().isRightBumperPressed())
@@ -333,7 +344,6 @@ public class TeleMain extends LinearOpMode {
         if (input.getGamepadTracker2().isRightTriggerPressed())
             robot.getHanger().startHangingDown();
     }
-
 
     private void listenForDriveTrainInputOld() {
         // drivetrain
@@ -357,9 +367,9 @@ public class TeleMain extends LinearOpMode {
 
 
             //Set motor speed variables
-            robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+            //robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
         } else {
-            robot.getDriveTrain().stop();
+            //robot.getDriveTrain().stop();
         }
     }
 }

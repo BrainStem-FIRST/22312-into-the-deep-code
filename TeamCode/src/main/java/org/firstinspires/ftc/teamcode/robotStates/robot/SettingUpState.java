@@ -23,12 +23,14 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
 
     @Override
     public void execute(double dt) {
+        // ensuring odometry pose is updated when setting up
+        robot.getDriveTrain().updatePoseEstimate();
+
         if (isFirstTime()) {
             done = false;
             // setting up servos
             robot.getHinge().setHingeServoPosition(Hinge.HINGE_UP_POSITION);
             robot.getGrabber().getGrabServo().setPosition(Grabber.OPEN_POS);
-            //robot.getHanger().getTransitionState().setGoalState(Hanger.UP_TICK, Hanger.StateType.UP);
             startHingeTime = getTime();
         }
 

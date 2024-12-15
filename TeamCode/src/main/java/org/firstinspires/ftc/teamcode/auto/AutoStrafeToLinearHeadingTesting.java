@@ -28,8 +28,6 @@ public class AutoStrafeToLinearHeadingTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
-
         Pose2d beginPose = new Pose2d(params.x1, params.y1, params.h1);
         Vector2d pos1 = new Vector2d(params.x2, params.y2);
 

@@ -26,13 +26,13 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
-                stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT;
+        return stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH
+                || stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT;
     }
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override

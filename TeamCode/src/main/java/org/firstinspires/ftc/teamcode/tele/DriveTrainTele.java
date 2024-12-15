@@ -1,35 +1,37 @@
 package org.firstinspires.ftc.teamcode.tele;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "DriveTrainTestTele")
+@Config
 public class DriveTrainTele extends LinearOpMode {
-    private DcMotorEx fl, fr, bl, br;
+    public static RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
+            RevHubOrientationOnRobot.LogoFacingDirection.UP;
+    public static RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
+            RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+    private PinpointDrive drive;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        fl = hardwareMap.get(DcMotorEx.class, "FL");
-        fr = hardwareMap.get(DcMotorEx.class, "FR");
-        bl = hardwareMap.get(DcMotorEx.class, "BL");
-        br = hardwareMap.get(DcMotorEx.class, "BR");
-
+        drive = new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0));
         waitForStart();
         ElapsedTime timer = new ElapsedTime();
         while(opModeIsActive()) {
             listenForDriveTrainInputOld();
+            drive.updatePoseEstimate();
             telemetry.addData("timer (to ensure opmode is continuously running", timer.seconds());
+            telemetry.addData("pinpoint position", drive.pose);
             telemetry.update();
         }
-    }
-    private void setMotorPowers(double fl, double fr, double bl, double br) {
-        Subsystem.setMotorPower(this.fl, fl);
-        Subsystem.setMotorPower(this.fr, fr);
-        Subsystem.setMotorPower(this.bl, bl);
-        Subsystem.setMotorPower(this.br, br);
     }
     private void listenForDriveTrainInputOld() {
         telemetry.addData("listening for drive train input (not using roadrunner)", "");
@@ -54,9 +56,9 @@ public class DriveTrainTele extends LinearOpMode {
 
 
             //Set motor speed variables
-            setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+            drive.setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
         } else {
-            setMotorPowers(0, 0, 0, 0);
+            drive.setMotorPowers(0, 0, 0, 0);
         }
     }
 }

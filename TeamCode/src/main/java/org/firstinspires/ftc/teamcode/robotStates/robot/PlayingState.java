@@ -10,7 +10,6 @@ public class PlayingState extends RobotState<BrainSTEMRobot.StateType> {
         super(BrainSTEMRobot.StateType.PLAYING);
     }
 
-    //  NOTE: COLLECTING SYSTEM NEEDS TO BE UPDATED BEFORE LIFTING SYSTEM TO ENSURE COLOR SENSOR VALUES ARE UP TO DATE WHEN LIFTING SYSTEM USES THEM
     @Override
     public void execute(double dt) {
 

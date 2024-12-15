@@ -23,7 +23,8 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.JUMP_TO_MIN;
+        return robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.JUMP_TO_MIN
+                || robot.getExtension().getStateManager().getActiveStateType() == Extension.StateType.RETRACTING;
     }
 
     @Override

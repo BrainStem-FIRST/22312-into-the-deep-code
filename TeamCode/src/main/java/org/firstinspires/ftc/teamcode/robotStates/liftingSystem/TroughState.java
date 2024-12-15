@@ -20,7 +20,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void execute(double dt) {
         // handling override of transfer if suddenly cannot transfer
-        if(!robot.canTransfer() && !robot.getGrabber().hasBlock()) {
+        if(!robot.canTransfer()) {
             // handling the resetting of lift to trough safety
             if(robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().overrideGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);

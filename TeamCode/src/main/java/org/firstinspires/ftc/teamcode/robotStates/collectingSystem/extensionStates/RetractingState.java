@@ -23,7 +23,7 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return false;
+        return true;
     }
 
     @Override

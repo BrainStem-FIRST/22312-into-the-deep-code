@@ -21,6 +21,7 @@ public class LiftingSystem {
     }
     private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
     private boolean stayInTrough;
+    private boolean needManualTransfer;
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {

@@ -12,14 +12,15 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
         super(LiftingSystem.StateType.TROUGH_TO_BASKET);
     }
     @Override
-    public void execute(double dt) {
-        // only want to set lift state to be in transition if in trough; not if its already going up
-        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
-            robot.getLift().getTransitionState().setGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
-            robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
-        }
+    public void executeOnEntered() {
+        robot.getLift().getTransitionState().overrideGoalState(robot.getLift().getBasketDepositPos(), Lift.StateType.BASKET_DEPOSIT);
+        robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
+        robot.getArm().getTransitionState().overrideGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
+    }
 
-        else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
+    @Override
+    public void execute(double dt) {
+        if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
             // if and else if below checks for basket overriding
             if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
                 robot.getLift().getTransitionState().overrideGoalPosition(Lift.HIGH_BASKET_POS);
@@ -44,7 +45,8 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public boolean canEnter() {
-        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH;
+        return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.DROP_AREA_TO_TROUGH;
     }
 
     @Override
