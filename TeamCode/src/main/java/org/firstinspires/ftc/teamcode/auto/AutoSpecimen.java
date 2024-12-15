@@ -44,11 +44,11 @@ public class AutoSpecimen extends LinearOpMode {
                 hang3X = -11, hang3Y = -27,
                 hangA = Math.toRadians(90), hangT = Math.toRadians(90), hangWaitSeconds = 0.1;
         public double hangAlignDrivePower = 0.6;
-        public double leftBlockX1 = 38, leftBlockY1 = -41, leftBlockT1 = Math.toRadians(90), leftBlockMinVel1 = 60, leftBlockBeginEndVel = 60;
-        public double leftBlockX2 = 48, leftBlockY2 = -20, leftBlockT2 = Math.toRadians(0), leftBlockMinVel2 = 70;
-        public double leftBlockPushDistance = 35, leftBlockT3 = Math.toRadians(90), leftBlockMinVel3 = 65;
+        public double leftBlockX1 = 38, leftBlockY1 = -41, leftBlockT1 = Math.toRadians(90), leftBlockMinVel1 = 60;
+        public double leftBlockX2 = 49, leftBlockY2 = -20, leftBlockT2 = Math.toRadians(0), leftBlockMinVel2 = 70;
+        public double leftBlockX3 = 47, leftBlockY3 = -50, leftBlockAAfter = Math.toRadians(80), leftBlockT3 = Math.toRadians(90), leftBlockMinVel3 = 65;
 
-        public double midBlockX = 60.5, midBlockY = -21, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
+        public double midBlockX = 60.5, midBlockY = -22, midBlockA = Math.toRadians(90), midBlockT = Math.toRadians(0), midBlockMinVel1 = 65; // try to make it so the block can go in the divet in the back of the robot??:
         public double midBlockX2 = 44, midBlockY2 = -66.5, midBlockT2 = Math.toRadians(270), midBlockMinVel2 = 35;
 
         public double wallPickupWaitTime = 0.1, wallPickupGrabberWaitTime = 0.08;
@@ -130,7 +130,7 @@ public class AutoSpecimen extends LinearOpMode {
 
         Pose2d leftBlockPose1 = new Pose2d(params.leftBlockX1, params.leftBlockY1, params.beginA);
         Pose2d leftBlockPose2 = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.beginA);
-        Pose2d leftBlockAfterPose = new Pose2d(params.leftBlockX2, params.leftBlockY2 - params.leftBlockPushDistance, params.beginA);
+        Pose2d leftBlockAfterPose = new Pose2d(params.leftBlockX3, params.leftBlockY3, params.leftBlockAAfter);
 
         Pose2d midBlockPose = new Pose2d(params.midBlockX, params.midBlockY, params.midBlockA);
         Pose2d midBlockAfterPose = new Pose2d(params.midBlockX2, params.midBlockY2, params.midBlockA);
