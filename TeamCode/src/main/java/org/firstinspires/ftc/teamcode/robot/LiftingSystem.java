@@ -112,9 +112,9 @@ public class LiftingSystem {
     }
     public Action transferBlockOnce() {
         return new SequentialAction(
-                robot.getLift().moveToThreshold(Lift.TROUGH_SAFETY_POS, Lift.AUTO_TROUGH_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
+                robot.getLift().moveTo(Lift.AUTO_TROUGH_POS, Lift.MEDIUM_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
                 robot.getGrabber().close(),
-                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.MEDIUM_TRANSITION_KP, Lift.ZERO_KI)
+                robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.MEDIUM_TRANSITION_KP * 1.2, Lift.ZERO_KI)
         );
     }
 
@@ -127,13 +127,8 @@ public class LiftingSystem {
     public Action depositHighInitial() {
         return new SequentialAction(
             robot.getLift().moveTo(Lift.HIGH_BASKET_POS, Lift.HIGH_BASKET_SAFETY_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
-            new ParallelAction(
-                    robot.getArm().rotateTo(Arm.BASKET_DROP_POS, 0),
-                    new SequentialAction(
-                            new SleepAction(Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME - Grabber.FULL_ROTATION_TIME/2),
-                            robot.getGrabber().open()
-                    )
-            )
+            robot.getArm().rotateTo(Arm.BASKET_DROP_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
+            robot.getGrabber().open()
         );
     }
     public Action depositHigh() {
@@ -143,29 +138,20 @@ public class LiftingSystem {
         );
     }
     public Action lowerFromDeposit() {
-        return new SequentialAction(
-                robot.getArm().rotateTo(Arm.BASKET_SAFETY_POS, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME),
-                new ParallelAction(
-                        robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS),
-                        robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
-                )
+        return new ParallelAction(
+                robot.getLift().moveToTime(Lift.AUTO_TROUGH_SAFETY_POS, 2.7, Lift.MEDIUM_TRANSITION_KP * 0.9, Lift.ZERO_KI),
+                robot.getArm().rotateTo(Arm.TRANSFER_POS, Arm.TRANSFER_TO_BASKET_SAFETY_TIME)
         );
     }
 
-    // specimen actions
-    public Action setupHighSpecimenRamInitial() {
-        robot.telemetry.addData("in setup ram initial", "");
-        robot.telemetry.update();
-        return robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS);
-    }
     public Action setupHighSpecimenRam() {
         robot.telemetry.addData("in normal setup ram", "");
         robot.telemetry.update();
         return new SequentialAction(
                 robot.getGrabber().close(),
                 new ParallelAction(
-                        robot.getLift().moveTo(Lift.HIGH_RAM_BEFORE_POS),
-                        robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, Arm.DROP_AREA_TO_RAM_TIME)
+                        robot.getLift().moveToTime(Lift.HIGH_RAM_BEFORE_POS, 1.5, Lift.MEDIUM_TRANSITION_KP, Lift.ZERO_KI),
+                        robot.getArm().rotateTo(Arm.SPECIMEN_HANG_POS, 0)
                 )
         );
 
@@ -174,7 +160,7 @@ public class LiftingSystem {
         robot.telemetry.addData("ramming specimen", "");
         robot.telemetry.update();
         return new SequentialAction(
-                robot.getLift().moveTo(Lift.HIGH_RAM_AFTER_POS),
+                robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS, 1, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
                 robot.getGrabber().open()
         );
     }

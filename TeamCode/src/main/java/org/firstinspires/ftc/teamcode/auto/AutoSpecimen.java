@@ -173,7 +173,10 @@ public class AutoSpecimen extends LinearOpMode {
         // actual auto path
         Actions.runBlocking(new SequentialAction(
                 // hang first specimen
-                driveToSpecimen1Hang,
+                new ParallelAction(
+                        driveToSpecimen1Hang,
+                        robot.getLiftingSystem().setupHighSpecimenRam()
+                ),
                 new ParallelAction(
                         robot.getLiftingSystem().ramHighSpecimen(),
                         keepRobotAligned(robot)

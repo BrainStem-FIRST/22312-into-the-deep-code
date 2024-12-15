@@ -27,17 +27,17 @@ public class Arm extends Subsystem<Arm.StateType> {
     // not sure if it fully works tho bc the angular velocity will change depending on the load of the arm
     public static double TRANSFER_TO_KNOCK_BLOCK_TIME = 0.14,
         TRANSFER_TO_BASKET_SAFETY_TIME = 0.62,
-        BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.4,
+        BASKET_SAFETY_TO_BASKET_DROP_TIME = 0.5,
         BASKET_DROP_TO_UP_TIME = 0.18,
         UP_TO_BASKET_SAFETY_TIME = 0.42,
         SPECIMEN_HANG_TO_UP_TIME = 0.14,
-        TRANSFER_TO_DROP_AREA_TIME = 0.28,
+        TRANSFER_TO_DROP_AREA_TIME = 0.32,
         DROP_AREA_TO_RAM_TIME = 0.62,
         UP_TO_TRANSFER_TIME = 0.55;
     public static double TRANSFER_POS = 0.01,
         KNOCK_BLOCK_POS = 0.15,
         DROP_OFF_POS = 0.32,
-        BASKET_DROP_POS = 0.31,
+        BASKET_DROP_POS = 0.31, // might need to
         SPECIMEN_HANG_POS = 0.925,
         BASKET_SAFETY_POS = 0.85;
     public enum StateType {

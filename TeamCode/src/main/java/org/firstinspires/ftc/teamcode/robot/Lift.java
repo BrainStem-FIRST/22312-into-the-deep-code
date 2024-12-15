@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
@@ -19,12 +20,13 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 @Config
 public class Lift extends Subsystem<Lift.StateType> {
     public static int DESTINATION_THRESHOLD = 70, // threshold in which I consider a lift transition done during tele
-        AUTO_DESTINATION_THRESHOLD = 60; // threshold in which I consider a lift transition done during auto
+        AUTO_DESTINATION_THRESHOLD = 80; // threshold in which I consider a lift transition done during auto
     public static int ABSOLUTE_MIN = -50,
         TROUGH_POS = 10,
         AUTO_TROUGH_POS = TROUGH_POS - AUTO_DESTINATION_THRESHOLD,
         KNOCK_BLOCK_POS = 200,
-        TROUGH_SAFETY_POS = 450, // position where arm can safely raise without colliding with collector
+        TROUGH_SAFETY_POS = 450,
+        AUTO_TROUGH_SAFETY_POS = 600, // position where arm can safely raise without colliding with collector
         DROP_AREA_POS = 70, // position where grabber can grab onto specimen
         DROP_AREA_AFTER_POS = 250, // position to go to after grabber has specimen (to clear specimen off wall)
         LOW_RAM_BEFORE_POS = 320, // position to go to to setup for low bar ram
@@ -82,13 +84,12 @@ public class Lift extends Subsystem<Lift.StateType> {
     public void update(double dt) {
         stateManager.update(dt);
     }
-    public void updateLiftAutoPidMovement(int target, double kP, double kI) {
-        pid.setkP(kP);
-        pid.setkI(kI);
+    public void updateLiftAutoPidMovement(int target, PIDController pid) {
         pid.setTarget(target);
         telemetry.addData("lift pid target", pid.getTarget());
         telemetry.addData("lift power", liftMotor.getPower());
         telemetry.addData("lift position", liftMotor.getCurrentPosition());
+        telemetry.addData("pid power value", pid.update(liftMotor.getCurrentPosition()));
         telemetry.addData("kP", pid.getkP());
         telemetry.addData("kI", pid.getkI());
         telemetry.addData("kD", pid.getkD());
@@ -96,43 +97,72 @@ public class Lift extends Subsystem<Lift.StateType> {
         Subsystem.setMotorPower(liftMotor, pid.update(liftMotor.getCurrentPosition()));
     }
     public Action moveTo(int target, int posToPass, double kP, double kI) {
-        pid.reset();
-        return telemetryPacket -> {
-            updateLiftAutoPidMovement(target, kP, kI);
-            return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
-                    && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
+        return new Action() {
+            PIDController pid = new PIDController(kP, kI, 0);
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateLiftAutoPidMovement(target, pid);
+                return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
+                        && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);
+            }
         };
     }
     public Action moveTo(int target, double kP, double kI) {
-        pid.reset();
-        return telemetryPacket -> {
-            updateLiftAutoPidMovement(target, kP, kI);
-            return !Subsystem.inRange(liftMotor, target, Lift.AUTO_DESTINATION_THRESHOLD);
+        return new Action() {
+            PIDController pid = new PIDController(kP, kI, 0);
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateLiftAutoPidMovement(target, pid);
+                return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
+            }
+        };
+    }
+    public Action moveToTime(int target, double maxTime, double kP, double kI) {
+        return new Action() {
+            PIDController pid = new PIDController(kP, kI, 0);
+            ElapsedTime timer = new ElapsedTime();
+            boolean first = true;
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if(first) {
+                    timer.reset();
+                    first = false;
+                }
+                updateLiftAutoPidMovement(target, pid);
+                return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
+                        && timer.seconds() < maxTime;
+            }
         };
     }
 
     // returns true once you pass threshold
     public Action moveToThreshold(int start, int target, double kP, double kI) {
-        return telemetryPacket -> {
-            updateLiftAutoPidMovement(target, kP, kI);
-            return Math.signum(liftMotor.getCurrentPosition() - target) == Math.signum(target - start);
+        return new Action() {
+            PIDController pid = new PIDController(kP, kI, 0);
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                updateLiftAutoPidMovement(target, pid);
+                return Math.signum(liftMotor.getCurrentPosition() - target) == Math.signum(target - start);
+            }
         };
     }
     public Action moveTo(int target) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
             Subsystem.setMotorPosition(liftMotor, target);
-            /*
+
             telemetry.addData("lift target", liftMotor.getTargetPosition());
             telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
             telemetry.update();
-            */
+
 
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD);
         };
     }
     public Action moveTo(int target, int posToPass) {
         return (@NonNull TelemetryPacket telemetryPacket) -> {
-
+            telemetry.addData("lift target", liftMotor.getTargetPosition());
+            telemetry.addData("lift encoder", liftMotor.getCurrentPosition());
+            telemetry.update();
             Subsystem.setMotorPosition(liftMotor, target);
             return !Subsystem.inRange(liftMotor, target, AUTO_DESTINATION_THRESHOLD)
                     && !Subsystem.inRange(liftMotor, posToPass, AUTO_DESTINATION_THRESHOLD);

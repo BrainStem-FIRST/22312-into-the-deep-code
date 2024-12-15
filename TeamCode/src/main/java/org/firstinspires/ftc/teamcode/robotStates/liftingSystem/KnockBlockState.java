@@ -21,7 +21,7 @@ public class KnockBlockState extends RobotState<LiftingSystem.StateType> {
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
             robot.getArm().getTransitionState().setGoalState(Arm.KNOCK_BLOCK_POS, Arm.StateType.KNOCK_BLOCK, Arm.TRANSFER_TO_KNOCK_BLOCK_TIME);
             robot.getLift().getTransitionState().setGoalState(Lift.KNOCK_BLOCK_POS, Lift.StateType.KNOCK_BLOCK);
-            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+            robot.getLift().getTransitionState().getPid().setkI(Lift.ZERO_KI);
         }
         // actually knocking and then resetting
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.KNOCK_BLOCK) {

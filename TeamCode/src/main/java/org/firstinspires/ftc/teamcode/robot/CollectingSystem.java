@@ -72,18 +72,16 @@ public class CollectingSystem {
         );
     }
 
-    public Action startCollect() {
-        return new ParallelAction(
+    public Action collect() {
+        return new SequentialAction(
                 getRobot().getCollector().collect(),
-                getRobot().getHinge().shakeHingeDown()
+                getRobot().getHinge().hingeUpAction()
         );
     }
     public Action retractAction() {
         return new ParallelAction(
-            getRobot().getCollector().collectUntilHardStop(),
-            new SequentialAction(
-                getRobot().getHinge().hingeUpAction(),
+                getRobot().getCollector().collectUntilHardStop(),
                 getRobot().getExtension().retractAction()
-        ));
+        );
     }
 }

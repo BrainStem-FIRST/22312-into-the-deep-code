@@ -72,7 +72,6 @@ public class TeleMain extends LinearOpMode {
             if (robot.getStateManager().getActiveStateType() == BrainSTEMRobot.StateType.PLAYING) {
                 listenForCollectionInput(input.getGamepadTracker1());
                 listenForLiftingInput(); // checks both gamepad input in this function
-                listenForHangingInput();
             }
 
             // update robot
@@ -336,12 +335,6 @@ public class TeleMain extends LinearOpMode {
                     robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.RAM_TO_TROUGH);
                 break;
         }
-    }
-    private void listenForHangingInput() {
-        if (input.getGamepadTracker2().isRightBumperPressed())
-            robot.getHanger().startMovingUp();
-        if (input.getGamepadTracker2().isRightTriggerPressed())
-            robot.getHanger().startHangingDown();
     }
 
     private void listenForDriveTrainInputOld() {

@@ -32,6 +32,7 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
             robot.getHinge().setHingeServoPosition(Hinge.HINGE_UP_POSITION);
             robot.getGrabber().getGrabServo().setPosition(Grabber.OPEN_POS);
             startHingeTime = getTime();
+            robot.getHanger().startMovingUp();
         }
 
         boolean inRange = Subsystem.inRange(robot.getLift().getLiftMotor(), Lift.TROUGH_SAFETY_POS, Lift.DESTINATION_THRESHOLD);

@@ -21,7 +21,7 @@ public class AutoSpecimenHanging extends LinearOpMode {
         waitForStart();
 
         Actions.runBlocking(new SequentialAction(
-                robot.getLiftingSystem().setupHighSpecimenRamInitial(),
+                robot.getLiftingSystem().setupHighSpecimenRam(),
                 new SleepAction(1),
                 robot.getLiftingSystem().ramHighSpecimen(),
                 new SleepAction(1),
