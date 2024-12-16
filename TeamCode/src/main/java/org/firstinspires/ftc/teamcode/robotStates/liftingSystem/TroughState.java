@@ -49,6 +49,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
                     robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
                     robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
                     robot.getLift().getTransitionState().setDoneWhenPassPosition();
+                    robot.getLift().getTransitionState().setMaxTimeThreshold(Lift.MAX_TRANSFER_TIME);
                 }
             }
             // transfer stage 2: closing onto block once lift is down and raising lift

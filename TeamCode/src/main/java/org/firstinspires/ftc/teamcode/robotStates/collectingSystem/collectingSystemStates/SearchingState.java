@@ -16,6 +16,7 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
     @Override
     public void executeOnEntered() {
         Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), 0);
+        robot.setCanTransfer(false);
 
         // make the extension go to min position
         if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)

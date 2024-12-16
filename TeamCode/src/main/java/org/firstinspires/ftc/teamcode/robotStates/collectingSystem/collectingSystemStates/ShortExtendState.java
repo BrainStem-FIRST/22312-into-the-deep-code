@@ -9,9 +9,9 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
         super(CollectingSystem.StateType.SHORT_EXTEND);
     }
     @Override
-    public void execute(double dt) {
-        if (isFirstTime())
-            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.JUMP_TO_MIN);
+    public void executeOnEntered() {
+        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.JUMP_TO_MIN);
+        robot.setCanTransfer(false);
     }
 
     @Override

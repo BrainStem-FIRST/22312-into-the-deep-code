@@ -12,10 +12,8 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 
 @Config

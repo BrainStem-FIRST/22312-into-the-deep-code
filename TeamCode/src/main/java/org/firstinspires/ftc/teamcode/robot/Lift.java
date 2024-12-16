@@ -22,8 +22,8 @@ public class Lift extends Subsystem<Lift.StateType> {
     public static int DESTINATION_THRESHOLD = 70, // threshold in which I consider a lift transition done during tele
         AUTO_DESTINATION_THRESHOLD = 80; // threshold in which I consider a lift transition done during auto
     public static int ABSOLUTE_MIN = -50,
-        TROUGH_POS = 10,
-        AUTO_TROUGH_POS = TROUGH_POS - AUTO_DESTINATION_THRESHOLD,
+        TROUGH_POS = -20,
+        AUTO_TROUGH_POS = -70,
         KNOCK_BLOCK_POS = 200,
         TROUGH_SAFETY_POS = 450,
         AUTO_TROUGH_SAFETY_POS = 600, // position where arm can safely raise without colliding with collector
@@ -47,7 +47,7 @@ public class Lift extends Subsystem<Lift.StateType> {
 
     public static double ZERO_KI = 0, SMALL_TRANSITION_KI = 0.0011;
     public static double BIG_TRANSITION_KP = 0.0042, MEDIUM_TRANSITION_KP = 0.003, SMALL_TRANSITION_KP = 0.0025, ZERO_KD = 0;
-    public static double MAX_TRANSITION_TIME = 4;
+    public static double MAX_TRANSITION_TIME = 4, MAX_TRANSFER_TIME = 1.2;
     public static DcMotorSimple.Direction LIFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
     private final DcMotorEx liftMotor;
     private final PIDController pid;

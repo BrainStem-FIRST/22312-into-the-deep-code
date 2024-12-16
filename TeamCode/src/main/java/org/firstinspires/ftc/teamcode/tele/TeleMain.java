@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.util.Input;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
 public class TeleMain extends LinearOpMode {
     public static class Params {
-        public AllianceColor allianceColor = AllianceColor.BLUE;
+        public AllianceColor allianceColor = AllianceColor.RED;
     }
     public static Params PARAMS = new Params();
     private Input input;

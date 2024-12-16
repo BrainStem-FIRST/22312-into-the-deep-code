@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStat
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.JumpToMin;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
