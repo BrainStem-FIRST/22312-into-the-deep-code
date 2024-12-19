@@ -1,13 +1,16 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.tele;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
-public class LimeLight extends LinearOpMode {
 
+@Config
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
+public class LimeLightTele extends LinearOpMode {
     private Limelight3A limelight;
 
     @Override
