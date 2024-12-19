@@ -6,36 +6,48 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.util.Input;
 
 
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "LimeLightTele")
 public class LimeLightTele extends LinearOpMode {
-    private Limelight3A limelight;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
+        Input input = new Input(gamepad1, gamepad2);
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
-
-        /*
-         * Starts polling for data.
-         */
+        int currentPipeline = 0;
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(currentPipeline);
         limelight.start();
 
         while (opModeIsActive()) {
+            input.update();
+
+            // listening for toggling input
+            if(input.getGamepadTracker1().isFirstFrameA()) {
+                currentPipeline++;
+                currentPipeline %= 4;
+            }
+
+            telemetry.addData("current pipeline:", currentPipeline);
+
             LLResult result = limelight.getLatestResult();
             if (result != null) {
                 if (result.isValid()) {
-                    Pose3D botpose = result.getBotpose();
-                    telemetry.addData("tx", result.getTx());
-                    telemetry.addData("ty", result.getTy());
-                    telemetry.addData("Botpose", botpose.toString());
+                    telemetry.addData("target x", result.getTx());
+                    telemetry.addData("target y", result.getTy());
                 }
             }
+            else
+                telemetry.addData("no target found", "");
+
+            telemetry.addData("", "");
+            telemetry.addData("controls", "");
+            telemetry.addData("  a", "toggle current pipeline");
+            telemetry.update();
         }
     }
 }
