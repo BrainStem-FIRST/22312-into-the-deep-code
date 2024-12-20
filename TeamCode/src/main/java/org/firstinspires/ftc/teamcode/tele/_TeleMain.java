@@ -1,37 +1,22 @@
 package org.firstinspires.ftc.teamcode.tele;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
-import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
-import org.firstinspires.ftc.teamcode.robot.Collector;
-import org.firstinspires.ftc.teamcode.robot.Extension;
-import org.firstinspires.ftc.teamcode.robot.Lift;
-import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 import org.firstinspires.ftc.teamcode.util.Input;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleMain")
-public class TeleMain extends LinearOpMode {
-    public static class Params {
-        public AllianceColor allianceColor = AllianceColor.RED;
-    }
-    public static Params PARAMS = new Params();
-    private BrainSTEMRobot robot;
-    private final Pose2d BEGIN_POSE = new Pose2d(-24, -7.5, Math.toRadians(90));
+public class _TeleMain extends LinearOpMode {
+    public static AllianceColor allianceColor = AllianceColor.RED;
+    public static boolean sampleMode = false;
+    public static Pose2d beginPose = new Pose2d(-24, -7.5, Math.toRadians(90));
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, PARAMS.allianceColor, BEGIN_POSE, new Input(gamepad1, gamepad2));
+        BrainSTEMRobot robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, allianceColor, beginPose, new Input(gamepad1, gamepad2));
 
         telemetry.addData("Opmode Status :", "Init");
         telemetry.update();

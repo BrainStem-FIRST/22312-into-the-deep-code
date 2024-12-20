@@ -27,7 +27,7 @@ public class SpecimenRamState extends RobotState<LiftingSystem.StateType> {
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.RAM_AFTER) {
             robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
             robot.getGrabber().setHasSpecimen(false);
-            robot.setIsDepositing(true); // resets depositing mode to true
+            robot.getLiftingSystem().setIsDepositing(true); // resets depositing mode to true
         }
     }
     @Override

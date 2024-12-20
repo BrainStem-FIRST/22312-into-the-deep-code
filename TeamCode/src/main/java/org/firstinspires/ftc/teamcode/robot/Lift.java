@@ -182,16 +182,16 @@ public class Lift extends Subsystem<Lift.StateType> {
     }
 
     public int getRamBeforePos() {
-        return robot.isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
+        return robot.getLiftingSystem().isHighRam() ? HIGH_RAM_BEFORE_POS : LOW_RAM_BEFORE_POS;
     }
     public int getRamAfterPos() {
-        return robot.isHighRam() ? HIGH_RAM_AFTER_POS : LOW_RAM_AFTER_POS;
+        return robot.getLiftingSystem().isHighRam() ? HIGH_RAM_AFTER_POS : LOW_RAM_AFTER_POS;
     }
     public int getBasketSafetyPos() {
-        return robot.isHighDeposit() ? HIGH_BASKET_SAFETY_POS : LOW_BASKET_SAFETY_POS;
+        return robot.getLiftingSystem().isHighDeposit() ? HIGH_BASKET_SAFETY_POS : LOW_BASKET_SAFETY_POS;
     }
     public int getBasketDepositPos() {
-        return robot.isHighDeposit() ? HIGH_BASKET_POS : LOW_BASKET_POS;
+        return robot.getLiftingSystem().isHighDeposit() ? HIGH_BASKET_POS : LOW_BASKET_POS;
     }
     public boolean atHighBasket() {
         return stateManager.getActiveStateType() == StateType.BASKET_DEPOSIT &&

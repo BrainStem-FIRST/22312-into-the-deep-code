@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
+import org.firstinspires.ftc.teamcode.tele._TeleMain;
 
 public class TransferState extends RobotState<LiftingSystem.StateType> {
     private boolean transferredOnce;
@@ -45,6 +46,7 @@ public class TransferState extends RobotState<LiftingSystem.StateType> {
                 if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                     robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorSensor().getValidatedColor());
+                    robot.getLiftingSystem().setIsDepositing(_TeleMain.sampleMode || robot.getGrabber().getBlockColorHeld() == BlockColor.YELLOW);
                 }
                 // moving lift back up
                 else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {

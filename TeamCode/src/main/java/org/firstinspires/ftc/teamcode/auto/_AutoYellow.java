@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.util.Input;
 
 @Autonomous(name="AutoYellow")
 @Config
-public class AutoYellow extends LinearOpMode {
+public class _AutoYellow extends LinearOpMode {
     public static class Params {
         public double beginX = -40.825, beginY = -64.5, beginA = 0;
         public double normalDepositX = -59.75, normalDepositY = -59.75, depositA = Math.toRadians(45), depositT = Math.toRadians(225);

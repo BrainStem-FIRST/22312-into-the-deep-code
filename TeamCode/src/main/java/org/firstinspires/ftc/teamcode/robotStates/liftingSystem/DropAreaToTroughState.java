@@ -11,7 +11,7 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void executeOnEntered() {
-        robot.setIsDepositing(true);
+        robot.getLiftingSystem().setIsDepositing(true);
 
         robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);

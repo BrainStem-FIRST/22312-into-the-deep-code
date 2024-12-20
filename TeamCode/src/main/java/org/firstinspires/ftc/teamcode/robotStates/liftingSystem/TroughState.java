@@ -42,7 +42,7 @@ public class TroughState extends RobotState<LiftingSystem.StateType> {
 
         // handling what to do once have successful transfer
         if (robot.getGrabber().hasBlock()) {
-            if (robot.isDepositing()) {
+            if (robot.getLiftingSystem().isDepositing()) {
                 // prepping for basket deposit (automatically happens once your close enough to basket)
                 if (robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.TRANSFER)
                     robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY, Arm.TRANSFER_TO_BASKET_SAFETY_TIME);

@@ -25,7 +25,7 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void executeOnEntered() {
-        robot.setIsDepositing(false);
+        robot.getLiftingSystem().setIsDepositing(false);
         robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.TRANSFER_TO_DROP_AREA_TIME);
 
     }

@@ -24,9 +24,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean isHighDeposit;
-    private boolean isHighRam;
-    private boolean isDepositing;
 
     public enum StateType {
         SETTING_UP,
@@ -55,10 +52,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
         stateManager.addState(StateType.SETTING_UP, new SettingUpState());
         stateManager.addState(StateType.PLAYING, new PlayingState());
         stateManager.setupStates(this, stateManager);
-
-        isHighDeposit = true;
-        isHighRam = true;
-        isDepositing = true;
     }
 
     public void update(double dt) {
@@ -114,25 +107,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     public boolean canCollect() {
         return !grabber.hasBlock();
     }
-    public boolean isHighDeposit() {
-        return isHighDeposit;
-    }
-    public void setIsHighDeposit(boolean isHighDeposit) {
-        this.isHighDeposit = isHighDeposit;
-    }
-    public boolean isHighRam() {
-        return isHighRam;
-    }
-    public void setIsHighRam(boolean isHighRam) {
-        this.isHighRam = isHighRam;
-    }
-    public boolean isDepositing() {
-        return isDepositing;
-    }
-    public void setIsDepositing(boolean isDepositing) {
-        this.isDepositing = isDepositing;
-    }
-
     public Action retractAndDepositAndExtend(int extensionTick) {
         return new SequentialAction(
                 getCollectingSystem().retractAction(),

@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -11,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
+import org.firstinspires.ftc.teamcode.tele._TeleMain;
 
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
@@ -20,6 +18,10 @@ public class LiftingSystem {
         TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, SPECIMEN_RAM // ramming specimen on bar
     }
     private final StateManager<StateType> stateManager;
+
+    private boolean isHighDeposit;
+    private boolean isHighRam;
+    private boolean isDepositing;
 
     public LiftingSystem(BrainSTEMRobot robot) {
         this.robot = robot;
@@ -42,16 +44,34 @@ public class LiftingSystem {
 
         stateManager.setupStates(robot, stateManager);
 
+        isHighDeposit = true;
+        isHighRam = true;
+        isDepositing = true;
     }
 
     public void update(double dt) {
         stateManager.update(dt);
+
+        // input listeners that I want to run constantly
+        // checking for toggling in basket heights
+        if(robot.getInput().getGamepadTracker2().isLeftBumperPressed()) {
+            robot.getLiftingSystem().setIsHighDeposit(true);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
+        }
+        else if(robot.getInput().getGamepadTracker2().isLeftTriggerPressed()) {
+            robot.getLiftingSystem().setIsHighDeposit(false);
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.BASKET_TO_BASKET);
+        }
+        // checking for toggling between forceDepositing
+        if(robot.getInput().getGamepadTracker2().isFirstFrameY())
+            _TeleMain.sampleMode = !_TeleMain.sampleMode; // I have TeleMain store this so we can quickly change it on FTC dashboard before a game
     }
 
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addData("", "");
-        telemetry.addData("is high basket", robot.isHighDeposit());
-        telemetry.addData("depositing mode", robot.isDepositing());
+        telemetry.addData("is high basket", isHighDeposit);
+        telemetry.addData("depositing mode", isDepositing);
+        telemetry.addData("sample mode", _TeleMain.sampleMode);
         telemetry.addData("lifting system", robot.getLiftingSystem().getStateManager().getActiveState().toString());
         telemetry.addData("lift", robot.getLift().getStateManager().getActiveState().toString());
         telemetry.addData("arm", robot.getArm().getStateManager().getActiveStateType());
@@ -65,6 +85,24 @@ public class LiftingSystem {
     }
     public StateManager<StateType> getStateManager() {
         return stateManager;
+    }
+    public boolean isHighDeposit() {
+        return isHighDeposit;
+    }
+    public void setIsHighDeposit(boolean isHighDeposit) {
+        this.isHighDeposit = isHighDeposit;
+    }
+    public boolean isHighRam() {
+        return isHighRam;
+    }
+    public void setIsHighRam(boolean isHighRam) {
+        this.isHighRam = isHighRam;
+    }
+    public boolean isDepositing() {
+        return isDepositing;
+    }
+    public void setIsDepositing(boolean isDepositing) {
+        this.isDepositing = isDepositing;
     }
 
     // continuous block transfer until block is grabbed onto (also uses pid)

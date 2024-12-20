@@ -22,12 +22,12 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     public void execute(double dt) {
         if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TRANSITION) {
             // if and else if below checks for basket overriding
-            if(robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
+            if(robot.getLiftingSystem().isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.HIGH_BASKET_POS) {
                 robot.getLift().getTransitionState().overrideGoalPosition(Lift.HIGH_BASKET_POS);
                 robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
                 // robot.telemetry.addData("basket overriding during transition", "");
             }
-            else if(!robot.isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS) {
+            else if(!robot.getLiftingSystem().isHighDeposit() && robot.getLift().getTransitionState().getGoalStatePosition() != Lift.LOW_BASKET_POS) {
                 robot.getLift().getTransitionState().overrideGoalPosition(Lift.LOW_BASKET_POS);
                 robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
                 // robot.telemetry.addData("basket overriding during transition", "");
