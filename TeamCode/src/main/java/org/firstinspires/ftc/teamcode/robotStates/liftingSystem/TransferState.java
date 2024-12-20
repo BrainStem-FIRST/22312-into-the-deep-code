@@ -37,6 +37,7 @@ public class TransferState extends RobotState<LiftingSystem.StateType> {
             // moving lift down
             if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH_SAFETY) {
                 robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
+                robot.getLift().getTransitionState().setMaxTimeThreshold(Lift.MAX_TRANSFER_TIME);
                 robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
                 robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
             } else if (robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.TROUGH)
@@ -45,7 +46,7 @@ public class TransferState extends RobotState<LiftingSystem.StateType> {
                     robot.getGrabber().getTransitionState().setGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
                     robot.getGrabber().setBlockColorHeld(robot.getCollector().getBlockColorSensor().getValidatedColor());
                 }
-                    // moving lift back up
+                // moving lift back up
                 else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
                     robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_POS, Lift.StateType.TROUGH);
                     transferredOnce = true;

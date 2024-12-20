@@ -35,6 +35,7 @@ public class Arm extends Subsystem<Arm.StateType> {
     public static double TRANSFER_POS = 0.01,
         KNOCK_BLOCK_POS = 0.15,
         DROP_OFF_POS = 0.32,
+        DROP_OFF_AFTER_POS = 0.35,
         BASKET_DROP_POS = 0.31, // might need to
         SPECIMEN_HANG_POS = 0.925,
         BASKET_SAFETY_POS = 0.85;
@@ -42,6 +43,7 @@ public class Arm extends Subsystem<Arm.StateType> {
         TRANSFER,
         KNOCK_BLOCK,
         DROP_OFF,
+        DROP_OFF_AFTER,
         BASKET_DROP,
         UP,
         BASKET_SAFETY,
@@ -60,6 +62,7 @@ public class Arm extends Subsystem<Arm.StateType> {
         stateManager.addState(StateType.TRANSFER, new NothingState<>(StateType.TRANSFER));
         stateManager.addState(StateType.KNOCK_BLOCK, new NothingState<>(StateType.KNOCK_BLOCK));
         stateManager.addState(StateType.DROP_OFF, new NothingState<>(StateType.DROP_OFF));
+        stateManager.addState(StateType.DROP_OFF_AFTER, new NothingState<>(StateType.DROP_OFF_AFTER));
         stateManager.addState(StateType.BASKET_DROP, new NothingState<>(StateType.BASKET_DROP));
         stateManager.addState(StateType.UP, new NothingState<>(StateType.UP));
         stateManager.addState(StateType.BASKET_SAFETY, new NothingState<>(StateType.BASKET_SAFETY));

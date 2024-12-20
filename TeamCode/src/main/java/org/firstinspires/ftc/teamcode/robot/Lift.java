@@ -41,7 +41,7 @@ public class Lift extends Subsystem<Lift.StateType> {
         ABSOLUTE_MAX = 3420;
 
     public enum StateType {
-        TROUGH, KNOCK_BLOCK, TROUGH_SAFETY, DROP_AREA, DROP_AREA_AFTER, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
+        TROUGH, KNOCK_BLOCK, TROUGH_SAFETY, DROP_AREA, RAM_BEFORE, RAM_AFTER, BASKET_DEPOSIT, TRANSITION
     }
     private final MotorTransitionState<StateType> transitionState;
 
@@ -67,7 +67,6 @@ public class Lift extends Subsystem<Lift.StateType> {
         stateManager.addState(StateType.KNOCK_BLOCK, new NothingState<>(StateType.KNOCK_BLOCK));
         stateManager.addState(StateType.TROUGH_SAFETY, new NothingState<>(StateType.TROUGH_SAFETY, liftMotor));
         stateManager.addState(StateType.DROP_AREA, new NothingState<>(StateType.DROP_AREA, liftMotor));
-        stateManager.addState(StateType.DROP_AREA_AFTER, new NothingState<>(StateType.DROP_AREA_AFTER, liftMotor));
         stateManager.addState(StateType.RAM_BEFORE, new NothingState<>(StateType.RAM_BEFORE, liftMotor));
         stateManager.addState(StateType.RAM_AFTER, new NothingState<>(StateType.RAM_AFTER, liftMotor));
         stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT, liftMotor));

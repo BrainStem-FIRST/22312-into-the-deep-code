@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.robotStates;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -17,9 +16,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     private int absoluteMin;
     private int absoluteMax;
-    // if true, returns done during transition as soon as encoder passes goal position; doesn't take into account whether subsystem is in range or not
-    // Note: reset to false at the end of every transition
-    private boolean tempDoneWhenPassPosition;
     private int startPos;
 
     // stateType is enum of transition state type
@@ -28,7 +24,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.motor = motor;
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         usingPid = false;
-        tempDoneWhenPassPosition = false;
         startPos = motor.getCurrentPosition();
     }
     public MotorTransitionState(StateType stateType, DcMotorEx motor, int DESTINATION_THRESHOLD, PIDController pid) {
@@ -37,7 +32,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
         this.DESTINATION_THRESHOLD = DESTINATION_THRESHOLD;
         this.pid = pid;
         usingPid = true;
-        tempDoneWhenPassPosition = false;
         startPos = motor.getCurrentPosition();
     }
     public void setMaxTimeThreshold(double time) {
@@ -49,9 +43,12 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public void executeOnExited() {
-        if(pid != null)
+        // resetting things for future use
+        if(pid != null) {
             pid.reset();
-        tempDoneWhenPassPosition = false;
+            usingPid = true;
+        }
+        maxTime = 0;
     }
     @Override
     public void setGoalState(double goalPosition, StateType goalStateType) {
@@ -91,9 +88,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
 
     @Override
     public void execute(double dt) {
-
-        if(maxTime != 0 && getTime() >= maxTime)
-            stateManager.tryEnterState(goalStateType);
         // checking hardstops
         if(motor.getCurrentPosition() < absoluteMin)
             Subsystem.setMotorPosition(motor, absoluteMin);
@@ -114,14 +108,13 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDone() {
-        if(tempDoneWhenPassPosition)
-            return Math.signum(motor.getCurrentPosition() - goalPosition) == Math.signum(goalPosition - startPos);
-        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD);
+        // evaluates transition as finished once motor close enough OR an optional time threshold is passed
+        return Subsystem.inRange(motor, (int)goalPosition, DESTINATION_THRESHOLD) || (maxTime != 0 && maxTime > getTime());
     }
 
     public PIDController getPid() {
@@ -130,12 +123,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     public int getDirection() {
         return (int) Math.signum(getGoalStatePosition() - motor.getCurrentPosition());
     }
-    public boolean isUsingPid() {
-        return usingPid;
-    }
-    public void setDoneWhenPassPosition() {
-        tempDoneWhenPassPosition = true;
-    }
     @NonNull
     public String toString() {
         return toStringBase() +
@@ -143,7 +130,6 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
                 " | cur power: " + motor.getPower() + " | cur pos: " + motor.getCurrentPosition() +
                 " | start pos: " + startPos + " | goal pos: " + goalPosition + " | goal state: " + goalStateType +
                 " | using pid: " + usingPid +
-                " | kP, kI: " + (pid != null ? pid.getkP() + ", " + pid.getkI(): "null") +
-                " | done when pass position: " + tempDoneWhenPassPosition;
+                " | kP, kI: " + (pid != null ? pid.getkP() + ", " + pid.getkI(): "null");
     }
 }
