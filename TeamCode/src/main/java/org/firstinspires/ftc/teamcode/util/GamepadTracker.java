@@ -25,6 +25,9 @@ public class GamepadTracker {
     }
 
     public void update() {
+        if (gamepad == null)
+            return;
+
         // Update each button's frame count
         updateButtonFrame(gamepad.a, () -> aFrameCount, (c) -> aFrameCount = c);
         updateButtonFrame(gamepad.b, () -> bFrameCount, (c) -> bFrameCount = c);
@@ -50,10 +53,6 @@ public class GamepadTracker {
         } else {
             frameCountSetter.accept(0);
         }
-    }
-
-    public Gamepad getGamepad() {
-        return gamepad;
     }
 
     // First-frame checker methods

@@ -65,11 +65,10 @@ public class PinpointDrive extends MecanumDrive {
     public static Params PARAMS = new Params();
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
-    private final BrainSTEMRobot robot;
+    private BrainSTEMRobot robot;
 
-    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, BrainSTEMRobot robot) {
+    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose) {
         super(hardwareMap, pose);
-        this.robot = robot;
         FlightRecorder.write("PINPOINT_PARAMS",PARAMS);
         pinpoint = hardwareMap.get(GoBildaPinpointDriverRR.class,"odo");
 
@@ -99,6 +98,10 @@ public class PinpointDrive extends MecanumDrive {
         }
 
         pinpoint.setPosition(pose);
+    }
+
+    public void setRobot(BrainSTEMRobot robot) {
+        this.robot = robot;
     }
     @Override
     public PoseVelocity2d updatePoseEstimate() {
@@ -144,12 +147,10 @@ public class PinpointDrive extends MecanumDrive {
     }
 
     public void addTelemetry(Telemetry telemetry) {
-        // robot's pose
-        telemetry.addData("", "");
-        telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
-        telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
-        telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
-        telemetry.addData("robot state", robot.getStateManager().getActiveStateType());
+        // pose
+        telemetry.addData("drivetrain x", pose.position.x);
+        telemetry.addData("drivetrain y", pose.position.y);
+        telemetry.addData("drivetrain angle", pose.heading.toDouble());
     }
 
     public void listenForDriveTrainInput() {
@@ -157,6 +158,8 @@ public class PinpointDrive extends MecanumDrive {
         final double TURN_AMP = 0.8;
         final double hangAndExtendPower = 0.2;
 
+        if (robot == null)
+            return;
         if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER
                 && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
             robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(new Vector2d(hangAndExtendPower, 0), 0));

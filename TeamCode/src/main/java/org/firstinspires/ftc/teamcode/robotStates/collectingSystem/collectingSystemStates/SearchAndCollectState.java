@@ -10,31 +10,40 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     public SearchAndCollectState() {
         super(CollectingSystem.StateType.SEARCH_AND_COLLECT);
     }
+
+    @Override
+    public void executeOnEntered() {
+        robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
+        robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
+    }
     @Override
     public void execute(double dt) {
-        if (isFirstTime()) {
-            robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
-            robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
-        }
-        // collect once hinging is finished
-        if (robot.getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
-        // once spitting finishes, go to collecting
+        // go to search mode
+        if (robot.getInput().getGamepadTracker1().isRightTriggerPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+
+        // collect once hinging is finished
+        // nothing is default state - only collect then b/c do not want to override collect/spit temp
         if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING)
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING);
 
-        // transitioning between collecting and spitting
+        // collector determines state of hinge
+        // transitioning between collecting and spitting hinge states
         if (robot.getCollector().isCollecting())
             robot.getHinge().goToHingeDownState();
         else if (robot.getCollector().isSpitting())
             robot.getHinge().goToHingeMiddleState();
+
+        // left trigger retracts
+        if (robot.getInput().getGamepadTracker1().isFirstFrameLeftTrigger())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
     }
 
     @Override
     public boolean canEnter() {
         return (stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH || stateManager.getActiveStateType() == CollectingSystem.StateType.SHORT_EXTEND)
-                && robot.getExtension().getExtensionMotor().getCurrentPosition() >= Extension.MIN_SEARCH_AND_COLLECT_POSITION;
+                && robot.getExtension().getExtensionMotorPosition() >= Extension.MIN_SEARCH_AND_COLLECT_POSITION;
     }
 
     @Override

@@ -49,7 +49,6 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
                 // end state
                 if (robot.getExtension().hitRetractHardStop()) {
                     done = true;
-                    robot.getExtension().setTargetPower(0);
                     robot.getExtension().setExtensionMotorPower(0);
                 }
             }

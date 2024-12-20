@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
+import org.firstinspires.ftc.teamcode.util.Input;
 
 import java.util.Arrays;
 
@@ -138,7 +139,7 @@ public class AutoSpecimenOld extends LinearOpMode {
         Pose2d wallPickupPose2 = new Pose2d(params.wallPickupX2, params.wallPickupY2, params.wallPickupA);
         Pose2d wallPickupPose3 = new Pose2d(params.wallPickupX3, params.wallPickupY3, params.wallPickupA);
 
-        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
+        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose, Input.NOTHING_INPUT);
         robot.getLift().getLiftMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         PinpointDrive drive = robot.getDriveTrain();
 

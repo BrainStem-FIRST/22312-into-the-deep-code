@@ -9,12 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.FindingBlockState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.InState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.JumpToMin;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates.RetractingState;
-import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -29,7 +27,8 @@ public class Extension extends Subsystem<Extension.StateType> {
     public static int GO_TO_THRESHOLD = 10, // if extension going to target position and is within this threshold of distance, from it, we consider the transition complete
             EXTRA_MIN_SAFETY_DIST = GO_TO_THRESHOLD + 10;  // extra distance that extension goes to in short extend to ensure you can hinge down straight after
 
-    public static double SEARCH_POWER = 0.6,
+    public static double JUMP_TO_MIN_POWER = 1,
+            SEARCH_POWER = 0.6,
             RETRACT_POWER_FAST = -1,
             RETRACT_POWER_SLOW = -0.7,
             RETRACT_POWER_IN = -0.3,
@@ -39,9 +38,7 @@ public class Extension extends Subsystem<Extension.StateType> {
         IN, JUMP_TO_MIN, FINDING_BLOCK, RETRACTING
     }
     private final DcMotorEx extensionMotor;
-    private final PIDController pid;
     private final DigitalChannel magnetResetSwitch;
-    private double targetPower;
 
     public Extension(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, BrainSTEMRobot robot) {
         super(hwMap, telemetry, allianceColor, robot, StateType.IN);
@@ -54,10 +51,6 @@ public class Extension extends Subsystem<Extension.StateType> {
         magnetResetSwitch = hwMap.get(DigitalChannel.class, "ExtensionMagnetSwitch");
         magnetResetSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        pid = new PIDController(0.01, 0, 0);
-        pid.setTarget(MIN_POSITION);
-        pid.setOutputBounds(-1,1);
-
         stateManager.addState(StateType.IN, new InState());
         stateManager.addState(StateType.JUMP_TO_MIN, new JumpToMin());
         stateManager.addState(StateType.FINDING_BLOCK, new FindingBlockState());
@@ -66,8 +59,20 @@ public class Extension extends Subsystem<Extension.StateType> {
         stateManager.setupStates(getRobot(), stateManager);
     }
 
-    public DcMotorEx getExtensionMotor() {
-        return extensionMotor;
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
+        telemetry.addData("      extension encoder", robot.getExtension().getExtensionMotorPosition());
+        telemetry.addData("      extension power", robot.getExtension().getExtensionMotorPower());
+        telemetry.addData("      hitting extension hard stop", robot.getExtension().hitRetractHardStop());
+        telemetry.addData("      magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
+        telemetry.addData("raw magnet sensor state", robot.getExtension().getMagnetSwitch().getState());
+    }
+
+    public int getExtensionMotorPosition() {
+        return extensionMotor.getCurrentPosition();
+    }
+    public double getExtensionMotorPower() {
+        return extensionMotor.getPower();
     }
     public void setExtensionMotorPosition(int position) {
         Subsystem.setMotorPosition(extensionMotor, position);
@@ -76,15 +81,7 @@ public class Extension extends Subsystem<Extension.StateType> {
         Subsystem.setMotorPower(extensionMotor, power);
     }
     public void retractExtensionMotor() {
-        targetPower = extensionMotor.getCurrentPosition() > RETRACT_SLOW_POSITION ? RETRACT_POWER_FAST : RETRACT_POWER_SLOW;
-        Subsystem.setMotorPower(extensionMotor, targetPower);
-    }
-
-    public double getTargetPower() {
-        return targetPower;
-    }
-    public void setTargetPower(double targetPower) {
-        this.targetPower = targetPower;
+        setExtensionMotorPower(extensionMotor.getCurrentPosition() > RETRACT_SLOW_POSITION ? RETRACT_POWER_FAST : RETRACT_POWER_SLOW);
     }
     public DigitalChannel getMagnetSwitch() {
         return magnetResetSwitch;
@@ -100,6 +97,10 @@ public class Extension extends Subsystem<Extension.StateType> {
     @Override
     public void update(double dt) {
         stateManager.update(dt);
+
+        // reset encoders
+        if (hitRetractHardStop())
+            extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     // returns true to keep going
@@ -108,32 +109,14 @@ public class Extension extends Subsystem<Extension.StateType> {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 setExtensionMotorPosition(targetPosition);
-                return !Subsystem.inRange(getExtensionMotor(), targetPosition, GO_TO_THRESHOLD);
-                //return Math.abs(getExtensionMotor().getCurrentPosition() - targetPosition) > GO_TO_THRESHOLD;
-            }
-        };
-    }
-    public Action stopExtensionAction() {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                setExtensionMotorPower(0);
-                return false;
+                return !Subsystem.inRange(extensionMotor, targetPosition, GO_TO_THRESHOLD);
             }
         };
     }
     public Action retractAction() {
-        return new TimedAction() {
+        return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                updateFramesRunning();
-
-                //if (getFramesRunning() == 1)
-                //    pid.reset();
-                //if(getRobot().getInPidMode())
-                //    setExtensionMotorPower(pid.update(extensionMotor.getCurrentPosition()));
-                //else
-                //  setExtensionMotorPower(Extension.RETRACT_POWER_FAST);
                 retractExtensionMotor();
 
                 if (hitRetractHardStop()) {
@@ -152,9 +135,5 @@ public class Extension extends Subsystem<Extension.StateType> {
                 setExtensionMotorPower(0);
             return false;
         };
-    }
-
-    public PIDController getPid() {
-        return pid;
     }
 }

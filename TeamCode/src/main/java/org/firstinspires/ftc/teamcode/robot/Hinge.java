@@ -13,11 +13,8 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.auto.TimedAction;
-import org.firstinspires.ftc.teamcode.robotStates.MotorTransitionState;
 import org.firstinspires.ftc.teamcode.robotStates.NothingState;
 import org.firstinspires.ftc.teamcode.robotStates.ServoTransitionState;
-import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
 
 @Config
 public class Hinge extends Subsystem<Hinge.StateType> {
@@ -53,10 +50,15 @@ public class Hinge extends Subsystem<Hinge.StateType> {
 
         stateManager.setupStates(getRobot(), stateManager);
     }
+
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
+        telemetry.addData("      hinge goal pwm", robot.getHinge().getTransitionState().getGoalStatePosition());
+        telemetry.addData("      hinge transition finish time", robot.getHinge().getTransitionState().getTimeDone());
+    }
     public ServoTransitionState<StateType> getTransitionState() {
         return transitionState;
     }
-    public ServoImplEx getHingeServo() { return hingeServo; }
     public void setHingeServoPosition(double position) {
         hingeServo.setPosition(position);
     }

@@ -89,19 +89,36 @@ public class Collector extends Subsystem<Collector.StateType> {
         return autoCurrentTracker;
     }
 
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+        telemetry.addData("      collector motor current", robot.getCollector().getSpindleMotorCurrent());
+        telemetry.addData("      validated block color sensor", robot.getCollector().getBlockColorSensor().getValidatedColor());
+        telemetry.addData("      block color in trough", robot.getCollector().getBlockColorInTrough());
+    }
+
     public BlockColorSensor getBlockColorSensor() {
         return blockColorSensor;
     }
-    public DcMotorEx getSpindleMotor() { return spindleMotor; }
+    public double getSpindleMotorCurrent() { return spindleMotor.getCurrent(CurrentUnit.MILLIAMPS); }
     public void setSpindleMotorPower(double power) {
         Subsystem.setMotorPower(spindleMotor, power);
     }
     @Override
     public void update(double dt) {
-        blockColorSensor.update(dt);
-        stateManager.update(dt);
+        // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
+        if (robot.getInput().getGamepadTracker1().isDpadDownPressed())
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
+            // force spit in case block gets stuck - spits as long as gamepad up is pressed
+        else if (robot.getInput().getGamepadTracker1().isDpadUpPressed())
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
 
+        // update block color sensor values
+        blockColorSensor.update(dt);
+
+        // update state manager
+        stateManager.update(dt);
     }
+
 
     public BlockColor getBlockColorInTrough() {
         return blockColorInTrough;

@@ -74,83 +74,10 @@ public class TeleMain extends LinearOpMode {
             robot.addTelemetry();
             robot.getDriveTrain().addTelemetry(telemetry);
             robot.getLiftingSystem().addTelemetry(telemetry);
-
-            // robot's collecting system
-            telemetry.addData("", "");
-            telemetry.addData("can collect", robot.canCollect());
-            telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
-            telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
-            telemetry.addData("  collector motor current", robot.getCollector().getSpindleMotor().getCurrent(CurrentUnit.MILLIAMPS));
-            telemetry.addData("  validated block color sensor", robot.getCollector().getBlockColorSensor().getValidatedColor());
-            telemetry.addData("  block color in trough", robot.getCollector().getBlockColorInTrough());
-            telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
-            telemetry.addData("  hinge goal pwm", robot.getHinge().getTransitionState().getGoalStatePosition());
-            telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
-            telemetry.addData("  extension encoder", robot.getExtension().getExtensionMotor().getCurrentPosition());
-            telemetry.addData("  extension target power", robot.getExtension().getTargetPower());
-            telemetry.addData("  extension actual power", robot.getExtension().getExtensionMotor().getPower());
-            telemetry.addData("  hitting extension hard stop", robot.getExtension().hitRetractHardStop());
-            telemetry.addData("  magnet reset switch state", robot.getExtension().isMagnetSwitchActivated());
-            telemetry.addData(" raw magnet sensor state", robot.getExtension().getMagnetSwitch().getState());
-
+            robot.getCollectingSystem().addTelemetry(telemetry);
             robot.getHanger().addTelemetry(telemetry);
 
             telemetry.update();
         }
-    }
-    private void listenForCollectionInput(@NonNull GamepadTracker gamepadTracker) {
-        StateManager<CollectingSystem.StateType> collectingSystemManager = robot.getCollectingSystem().getStateManager();
-
-        // go into search mode
-        if (gamepadTracker.isRightBumperPressed()
-                && (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN
-                || collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.RETRACTING))
-            collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
-
-        // set extension target power
-        if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH ||
-                collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-            if (input.getGamepadTracker1().isRightBumperPressed())
-                robot.getExtension().setTargetPower(Extension.SEARCH_POWER);
-            else if ((input.getGamepadTracker1().isLeftBumperPressed())
-                    && (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH
-                    || robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MIN_SEARCH_AND_COLLECT_POSITION))
-                robot.getExtension().setTargetPower(-Extension.SEARCH_POWER);
-            else
-                robot.getExtension().setTargetPower(0);
-
-        // right trigger toggle between (hinging down and collecting) and (hinging up and doing nothing)
-        // or do a short extension and collection
-        if (gamepadTracker.isFirstFrameRightTrigger())
-
-            // short extension and collection
-            if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.IN)
-                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SHORT_EXTEND);
-
-            // go to search and collect mode
-            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH)
-                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
-
-                // go to search mode
-            else if (collectingSystemManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT)
-                collectingSystemManager.tryEnterState(CollectingSystem.StateType.SEARCH);
-
-        // left trigger retracts
-        if (gamepadTracker.isFirstFrameLeftTrigger())
-            collectingSystemManager.tryEnterState(CollectingSystem.StateType.RETRACTING);
-
-        // force spit in case block gets stuck - spits as long as gamepad up is pressed
-        if (gamepadTracker.isDpadUpPressed())
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.SPITTING_TEMP);
-
-        // force collect in case block is imperfectly collected - collects as long as gamepad down is pressed
-        if (gamepadTracker.isDpadDownPressed())
-            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
-
-        // short extend while hanging
-        if (gamepadTracker.isAPressed()
-                && robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER)
-            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
-
     }
 }

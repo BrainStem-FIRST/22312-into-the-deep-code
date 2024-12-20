@@ -37,7 +37,8 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
         super(hwMap, telemetry, allianceColor, null, StateType.SETTING_UP);
         this.input = input;
 
-        driveTrain = new PinpointDrive(hwMap, beginPose, this);
+        driveTrain = new PinpointDrive(hwMap, beginPose);
+        driveTrain.setRobot(this); // do not want to modify the constructor b/c other back end files use it
 
         collector = new Collector(hwMap, telemetry, allianceColor, this);
         extension = new Extension(hwMap, telemetry, allianceColor, this);

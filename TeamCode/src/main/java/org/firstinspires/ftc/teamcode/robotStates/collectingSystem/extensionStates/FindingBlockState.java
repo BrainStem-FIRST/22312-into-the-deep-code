@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotStates.collectingSystem.extensionStates;
 
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
 import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
@@ -11,14 +12,21 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute(double dt) {
+        double power = 0;
+        // set extension target power
+            if (robot.getInput().getGamepadTracker1().isRightBumperPressed())
+                power = Extension.SEARCH_POWER;
+            else if (robot.getInput().getGamepadTracker1().isLeftBumperPressed())
+                power = -Extension.SEARCH_POWER;
+
         // hard stop
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() > Extension.MAX_POSITION)
-            robot.getExtension().setTargetPower(Math.min(0, robot.getExtension().getTargetPower()));
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)
-            robot.getExtension().setTargetPower(Math.max(0, robot.getExtension().getTargetPower()));
+        if (robot.getExtension().getExtensionMotorPosition() > Extension.MAX_POSITION)
+            power = Math.min(0, power);
+        if (robot.getExtension().getExtensionMotorPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)
+            power = Math.max(0, power);
 
         // move extension
-        robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
+        robot.getExtension().setExtensionMotorPower(power);
     }
 
     @Override
@@ -36,10 +44,5 @@ public class FindingBlockState extends RobotState<Extension.StateType> {
     @Override
     public boolean isDone() {
         return false;
-    }
-
-    @Override
-    public Extension.StateType getNextStateType() {
-        return Extension.StateType.FINDING_BLOCK;
     }
 }

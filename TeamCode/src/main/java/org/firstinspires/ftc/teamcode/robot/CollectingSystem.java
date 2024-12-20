@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchAndCollectState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.SearchingState;
 import org.firstinspires.ftc.teamcode.robotStates.collectingSystem.collectingSystemStates.InState;
@@ -45,16 +46,28 @@ public class CollectingSystem {
         return stateManager;
     }
 
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("can collect", robot.canCollect());
+        telemetry.addData("collecting system state", robot.getCollectingSystem().getStateManager().getActiveStateType());
+        robot.getCollector().addTelemetry(telemetry);
+        robot.getHinge().addTelemetry(telemetry);
+        robot.getExtension().addTelemetry(telemetry);
+    }
     public boolean hingeMustBeUp() {
         if (getRobot().getHinge().getStateManager().getActiveStateType() == Hinge.StateType.MIDDLE)
-            return getRobot().getExtension().getExtensionMotor().getCurrentPosition() <= FORCE_HINGE_UP_FROM_MIDDLE_POSITION;
+            return getRobot().getExtension().getExtensionMotorPosition() <= FORCE_HINGE_UP_FROM_MIDDLE_POSITION;
         if (getRobot().getHinge().getStateManager().getActiveStateType() == Hinge.StateType.DOWN)
-            return getRobot().getExtension().getExtensionMotor().getCurrentPosition() <= FORCE_HINGE_UP_FROM_DOWN_POSITION;
+            return getRobot().getExtension().getExtensionMotorPosition() <= FORCE_HINGE_UP_FROM_DOWN_POSITION;
         return false;
     }
 
     public void update(double dt) {
         stateManager.update(dt);
+
+        // short extend while hanging
+        if (robot.getInput().getGamepadTracker1().isAPressed()
+                && robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER)
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
     }
     public BrainSTEMRobot getRobot() {
         return robot;

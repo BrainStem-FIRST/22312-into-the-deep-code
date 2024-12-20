@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class Input {
+
+    public static Input NOTHING_INPUT = new Input(null, null);
     private final GamepadTracker gamepadTracker1, gamepadTracker2;
 
     public Input(Gamepad gamepad1, Gamepad gamepad2) {

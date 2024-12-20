@@ -21,7 +21,7 @@ public class CollectTempState extends RobotState<Collector.StateType> {
 
     @Override
     public boolean canBeOverridden() {
-        return true;
+        return false;
     }
 
     @Override

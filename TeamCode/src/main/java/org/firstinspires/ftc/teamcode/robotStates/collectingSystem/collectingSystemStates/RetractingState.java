@@ -10,6 +10,11 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
     public RetractingState() {
         super(CollectingSystem.StateType.RETRACTING);
     }
+
+    @Override
+    public void executeOnEntered() {
+        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.NOTHING);
+    }
     @Override
     public void execute(double dt) {
         // force hinge to be in up position
@@ -21,13 +26,18 @@ public class RetractingState extends RobotState<CollectingSystem.StateType> {
                 robot.getExtension().getStateManager().tryEnterState(Extension.StateType.RETRACTING);
 
         // collect while retracting to make sure block stays in
-        robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
+        // this way, user can still spit temp
+        if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING)
+            robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
+
+        // go into search mode
+        if (robot.getInput().getGamepadTracker1().isRightBumperPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
     }
 
     @Override
     public boolean canEnter() {
-        return stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH
-                || stateManager.getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT;
+        return stateManager.getActiveStateType() != CollectingSystem.StateType.RETRACTING;
     }
 
     @Override

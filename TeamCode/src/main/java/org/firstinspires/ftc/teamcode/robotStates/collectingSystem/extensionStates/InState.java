@@ -12,15 +12,13 @@ public class InState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute(double dt) {
+        double power = 0;
         if(!robot.getExtension().hitRetractHardStop())
-            robot.getExtension().setTargetPower(Extension.RETRACT_POWER_IN);
+            power = Extension.RETRACT_POWER_IN;
         else if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.TROUGH)
-            robot.getExtension().setTargetPower(Extension.TRANSFER_POWER_IN);
-        else {
-            robot.getExtension().setTargetPower(0);
-            robot.getExtension().getExtensionMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-        robot.getExtension().setExtensionMotorPower(robot.getExtension().getTargetPower());
+            power = Extension.TRANSFER_POWER_IN;
+
+        robot.getExtension().setExtensionMotorPower(power);
 
     }
 

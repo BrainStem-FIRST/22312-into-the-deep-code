@@ -22,6 +22,10 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
         this.FULL_ROTATION_TIME = fullRotationTime;
     }
 
+    public double getTimeDone() {
+        return timeDone;
+    }
+
     @Override
     public void setGoalState(double goalPosition, StateType goalStateType) {
         // only sets goal state the current state in stateManager is not in transition and if not already headed to goal state

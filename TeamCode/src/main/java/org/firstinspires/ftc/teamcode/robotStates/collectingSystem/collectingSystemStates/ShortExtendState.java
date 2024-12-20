@@ -19,6 +19,13 @@ public class ShortExtendState extends RobotState<CollectingSystem.StateType> {
     }
 
     @Override
+    public void execute(double dt) {
+        // left trigger retracts
+        if (robot.getInput().getGamepadTracker1().isLeftTriggerPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+    }
+
+    @Override
     public boolean canBeOverridden() {
         return true;
     }

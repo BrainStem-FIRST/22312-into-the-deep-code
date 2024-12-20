@@ -5,12 +5,12 @@ import org.firstinspires.ftc.teamcode.robotStates.RobotState;
 
 public class CollectState extends RobotState<Collector.StateType> {
     public CollectState() {
-
         super(Collector.StateType.COLLECTING);
     }
 
     @Override
     public void execute(double dt) {
+        // collect and handle block jamming
         if (robot.getCollector().getTeleCurrentTracker().hasValidatedAbnormalCurrent())
             robot.getCollector().setSpindleMotorPower(Collector.SPIT_TEMP_POWER);
         else
@@ -34,8 +34,6 @@ public class CollectState extends RobotState<Collector.StateType> {
 
     @Override
     public Collector.StateType getNextStateType() {
-        if (robot.getCollector().hasValidBlockColor())
-            return Collector.StateType.VALID_BLOCK;
-        return Collector.StateType.SPITTING;
+        return robot.getCollector().hasValidBlockColor() ? Collector.StateType.VALID_BLOCK : Collector.StateType.SPITTING;
     }
 }

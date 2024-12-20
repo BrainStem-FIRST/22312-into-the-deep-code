@@ -15,11 +15,11 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
 
     @Override
     public void executeOnEntered() {
-        Subsystem.setMotorPower(robot.getExtension().getExtensionMotor(), 0);
 
         // make the extension go to min position
-        if (robot.getExtension().getExtensionMotor().getCurrentPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)
+        if (robot.getExtension().getExtensionMotorPosition() < Extension.MIN_SEARCH_AND_COLLECT_POSITION)
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.JUMP_TO_MIN);
+        // allow user input to control extension
         else
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
 
@@ -29,6 +29,15 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
     }
     @Override
     public void execute(double dt) {
+
+        // go to search and collect mode
+        if (robot.getInput().getGamepadTracker1().isRightTriggerPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH_AND_COLLECT);
+
+        // left trigger retracts
+        if (robot.getInput().getGamepadTracker1().isLeftTriggerPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.RETRACTING);
+
         // transitioning between collector doing nothing and spitting
         if (robot.getCollector().getStateManager().getActiveStateType() == Collector.StateType.NOTHING)
             robot.getHinge().goToHingeUpState();
@@ -49,10 +58,5 @@ public class SearchingState extends RobotState<CollectingSystem.StateType> {
     @Override
     public boolean isDone() {
         return false;
-    }
-
-    @Override
-    public CollectingSystem.StateType getNextStateType() {
-        return CollectingSystem.StateType.SEARCH;
     }
 }

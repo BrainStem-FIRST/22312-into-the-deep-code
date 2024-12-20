@@ -24,11 +24,9 @@ import org.slf4j.LoggerFactory;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "CollectingSystemTestingTele")
 @Config
 public class CollectingSystemTestingTele extends LinearOpMode {
-    private static final Logger log = LoggerFactory.getLogger(CollectingSystemTestingTele.class);
-
     /*
     controls
-    left and right bumpers: move extension in and out - cannot go beyong params.maxExtensionTick and 0
+    left and right bumpers: move extension in and out - cannot go beyond params.maxExtensionTick and 0
     left and right triggers: hinge up and down - goes to hingeUpPosition and hingeDownPosition
     a and b - collect and collect temp - uses collectPower and collectTempPower to determine spindle motor power
     x and y - spit and spit temp - uses spitPower and spitTempPower

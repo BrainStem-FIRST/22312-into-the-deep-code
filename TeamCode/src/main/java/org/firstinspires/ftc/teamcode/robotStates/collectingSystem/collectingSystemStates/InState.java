@@ -21,6 +21,15 @@ public class InState extends RobotState<CollectingSystem.StateType> {
     public void execute(double dt) {
         robot.getExtension().getStateManager().tryEnterState(Extension.StateType.IN);
 
+        // go into search mode
+        if (robot.getInput().getGamepadTracker1().isRightBumperPressed())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SEARCH);
+
+        // short extension and collection
+        if (robot.getInput().getGamepadTracker1().isFirstFrameRightTrigger())
+            robot.getCollectingSystem().getStateManager().tryEnterState(CollectingSystem.StateType.SHORT_EXTEND);
+
+        // make sure block is aligned while block knocking
         if (robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.KNOCK_BLOCK)
             robot.getCollector().getStateManager().tryEnterState(Collector.StateType.COLLECTING_TEMP);
     }
@@ -38,10 +47,5 @@ public class InState extends RobotState<CollectingSystem.StateType> {
     @Override
     public boolean isDone() {
         return false;
-    }
-
-    @Override
-    public CollectingSystem.StateType getNextStateType() {
-        return CollectingSystem.StateType.IN;
     }
 }

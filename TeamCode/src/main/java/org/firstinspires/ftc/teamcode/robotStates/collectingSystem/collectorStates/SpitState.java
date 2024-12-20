@@ -24,6 +24,7 @@ public class SpitState extends RobotState<Collector.StateType> {
         // reset the starting time
         if (robot.getCollector().getBlockColorSensor().hasValidatedColor())
             startTime = 0;
+
     }
 
     @Override

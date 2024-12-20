@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.robot.AllianceColor;
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
 import org.firstinspires.ftc.teamcode.robot.Extension;
+import org.firstinspires.ftc.teamcode.util.Input;
 
 @Autonomous(name="AutoYellow")
 @Config
@@ -59,7 +60,7 @@ public class AutoYellow extends LinearOpMode {
         Pose2d leftBlockCollectedPose = new Pose2d(params.leftBlockX2, params.leftBlockY2, params.leftBlockA);
 
 
-        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose);
+        BrainSTEMRobot robot = new BrainSTEMRobot(hardwareMap, telemetry, AllianceColor.RED, beginPose, Input.NOTHING_INPUT);
 
         // automatically resetting encoder
         robot.getLift().getLiftMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
