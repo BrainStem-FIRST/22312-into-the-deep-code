@@ -103,4 +103,18 @@ public class GamepadTracker {
     public boolean isRightBumperPressed() { return rightBumperFrameCount > 0; }
     public boolean isLeftTriggerPressed() { return leftTriggerFrameCount > 0; }
     public boolean isRightTriggerPressed() { return rightTriggerFrameCount > 0; }
+
+    // joystick getters
+    public double getLeftStickX() {
+        return gamepad.left_stick_x;
+    }
+    public double getLeftStickY() {
+        return gamepad.left_stick_y;
+    }
+    public double getRightStickX() {
+        return gamepad.right_stick_x;
+    }
+    public double getRightStickY() {
+        return gamepad.right_stick_y;
+    }
 }

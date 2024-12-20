@@ -2,24 +2,22 @@ package org.firstinspires.ftc.teamcode.driveTrain;
 
 
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Trajectory;
-import com.acmerobotics.roadrunner.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
+import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
+import org.firstinspires.ftc.teamcode.robot.Lift;
 
 /**
  * Experimental extension of MecanumDrive that uses the Gobilda Pinpoint sensor for localization.
@@ -67,9 +65,11 @@ public class PinpointDrive extends MecanumDrive {
     public static Params PARAMS = new Params();
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
+    private final BrainSTEMRobot robot;
 
-    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose) {
+    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, BrainSTEMRobot robot) {
         super(hardwareMap, pose);
+        this.robot = robot;
         FlightRecorder.write("PINPOINT_PARAMS",PARAMS);
         pinpoint = hardwareMap.get(GoBildaPinpointDriverRR.class,"odo");
 
@@ -128,8 +128,6 @@ public class PinpointDrive extends MecanumDrive {
 
         return pinpoint.getVelocityRR();
     }
-
-
     // for debug logging
     public static final class FTCPoseMessage {
         public long timestamp;
@@ -145,53 +143,63 @@ public class PinpointDrive extends MecanumDrive {
         }
     }
 
+    public void addTelemetry(Telemetry telemetry) {
+        // robot's pose
+        telemetry.addData("", "");
+        telemetry.addData("robot x", robot.getDriveTrain().pose.position.x);
+        telemetry.addData("robot y", robot.getDriveTrain().pose.position.y);
+        telemetry.addData("robot angle", robot.getDriveTrain().pose.heading.toDouble());
+        telemetry.addData("robot state", robot.getStateManager().getActiveStateType());
+    }
 
-    // moves in spline with constant heading
-    public Action splineToConstantHeading(Vector2d pos, double heading) {
-        updatePoseEstimate();
-        return actionBuilder(pose)
-                .splineToConstantHeading(pos, heading)
-                .build();
-    }
-    public Action lineToX(double x) {
-        updatePoseEstimate();
-        if (x == pose.position.x)
-            return telemetryPacket -> false;
+    public void listenForDriveTrainInput() {
+        final double STRAFE_Y_AMP = 0.8;
+        final double TURN_AMP = 0.8;
+        final double hangAndExtendPower = 0.2;
 
-        return actionBuilder(pose).
-                lineToX(x)
-                .build();
-    }
-    public Action lineToY(double y) {
-        updatePoseEstimate();
-        if (y == pose.position.y)
-            return telemetryPacket -> false;
+        if (robot.getLift().getTransitionState().getNextStateType() == Lift.StateType.RAM_AFTER
+                && robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH)
+            robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(new Vector2d(hangAndExtendPower, 0), 0));
 
-        return actionBuilder(pose).
-                lineToY(y)
-                .build();
-    }
-    public Action turnTo(double heading) {
-        updatePoseEstimate();
-        if (heading == pose.heading.toDouble())
-            return telemetryPacket -> false;
+        int strafeDirY = robot.getInput().getGamepadTracker1().isDpadRightPressed() ? 1 : robot.getInput().getGamepadTracker1().isDpadLeftPressed() ? -1 : 0;
 
-        return actionBuilder(pose)
-                .turnTo(heading)
-                .build();
+        if (strafeDirY != 0)
+            robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(0, -strafeDirY * STRAFE_Y_AMP),
+                    0
+            ));
+        else
+            robot.getDriveTrain().setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(-robot.getInput().getGamepadTracker1().getLeftStickY(), -robot.getInput().getGamepadTracker1().getLeftStickX()),
+                    -robot.getInput().getGamepadTracker1().getRightStickX() * TURN_AMP
+            ));
     }
-    // moves in a straight line to a target position and heading
-    public Action lineToPos(Vector2d pos, double heading) {
-        return new ParallelAction(
-                lineToX(pos.x),
-                lineToY(pos.y),
-                turnTo(heading)
-        );
-    }
-    public Action lineToPos(Vector2d pos) {
-        return new ParallelAction(
-                lineToX(pos.x),
-                lineToY(pos.y)
-        );
+
+    private void listenForDriveTrainInputOld() {
+        // drivetrain
+        double leftStickX = robot.getInput().getGamepadTracker1().getLeftStickX();
+        double leftStickY = robot.getInput().getGamepadTracker1().getLeftStickY() * -1;
+        double rightStickX = robot.getInput().getGamepadTracker1().getRightStickX();
+        double threshold = 0.1F;
+        if (Math.abs(rightStickX) > threshold) {
+            if (rightStickX < 0) {
+                rightStickX = (rightStickX * rightStickX * -1 * (4.0 / 5.0) - (1.0 / 5.0));
+            } else {
+                rightStickX = (rightStickX * rightStickX * (4.0 / 5.0) + (1.0 / 5.0));
+            }
+        } else {
+            rightStickX = 0;
+        }
+        if ((Math.abs(leftStickY) > threshold) || (Math.abs(leftStickX) > threshold) || Math.abs(rightStickX) > threshold) {
+            //Calculate formula for mecanum drive function
+            double addValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) + leftStickX * Math.abs(leftStickX))))) / 100;
+            double subtractValue = (double) (Math.round((100 * (leftStickY * Math.abs(leftStickY) - leftStickX * Math.abs(leftStickX))))) / 100;
+
+
+            //Set motor speed variables
+            //robot.getDriveTrain().setMotorPowers((addValue + rightStickX), (subtractValue - rightStickX), (subtractValue + rightStickX), (addValue - rightStickX));
+        } else {
+            stop();
+        }
     }
 }

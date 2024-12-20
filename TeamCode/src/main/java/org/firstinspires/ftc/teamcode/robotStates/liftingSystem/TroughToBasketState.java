@@ -32,13 +32,12 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
                 robot.getLift().getTransitionState().getPid().setkP(Lift.BIG_TRANSITION_KP);
                 // robot.telemetry.addData("basket overriding during transition", "");
             }
-            // optimization did not work as of 12/1; i don't know why
             // moves arm down once lift is within range of basket (not necessarily there yet)
             if(robot.getLift().getLiftMotor().getCurrentPosition() >= robot.getLift().getBasketSafetyPos()
             && robot.getLift().getLiftMotor().getCurrentPosition() <= robot.getLift().getTransitionState().getGoalStatePosition() + Lift.DESTINATION_THRESHOLD)
                 robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
         }
-        // lowers arm once lift reach destination
+        // lowers arm once lift reach destination if basket safety optimization does not trigger
         else if(robot.getLift().getStateManager().getActiveStateType() == Lift.StateType.BASKET_DEPOSIT)
             robot.getArm().getTransitionState().setGoalState(Arm.BASKET_DROP_POS, Arm.StateType.BASKET_DROP, Arm.BASKET_SAFETY_TO_BASKET_DROP_TIME);
     }
@@ -62,6 +61,6 @@ public class TroughToBasketState extends RobotState<LiftingSystem.StateType> {
     @Override
     public LiftingSystem.StateType getNextStateType() {
         // automatically drops and resets lift if button already cued; else goes to state in which waits for user input
-        return robot.getLiftingSystem().getButtonACued() ? LiftingSystem.StateType.BASKET_TO_DROP_AREA : LiftingSystem.StateType.BASKET_DEPOSIT;
+        return LiftingSystem.StateType.BASKET_DEPOSIT;
     }
 }

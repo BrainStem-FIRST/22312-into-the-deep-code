@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates.liftingSystem;
+import org.firstinspires.ftc.teamcode.robot.BlockColor;
 import org.firstinspires.ftc.teamcode.robot.CollectingSystem;
+import org.firstinspires.ftc.teamcode.robot.Grabber;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.LiftingSystem;
 import org.firstinspires.ftc.teamcode.robotStates.RobotState;
@@ -11,20 +13,47 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
     }
     @Override
     public void execute(double dt) {
-        // checking if grabber has specimen (means need to move lift up to clear specimen from wall)
-        if (robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.DROP_AREA_AFTER && robot.getGrabber().hasSpecimen()) {
-            robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_AFTER_POS, Lift.StateType.DROP_AREA_AFTER);
-            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
-            robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+        if (robot.getInput().getGamepadTracker1().isFirstFrameA()) {
+            // what to do if grabber is closed
+            if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED)
+                // if doesn't have specimen (means has block) then open grabber to drop off block
+                if (!robot.getGrabber().hasSpecimen()) {
+                    robot.getGrabber().getTransitionState().setGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                    robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                }
+                // if has specimen then proceed to prep for ram
+                else
+                    robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_RAM);
+            // grabbing specimen if grabber is open and moving lift to clear specimen off wall
+            else if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.OPEN) {
+                robot.getGrabber().getTransitionState().overrideGoalState(Grabber.CLOSE_POS, Grabber.StateType.CLOSED);
+                robot.getGrabber().setHasSpecimen(true);
+                robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_AFTER_POS, Lift.StateType.DROP_AREA_AFTER);
+                robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+                robot.getLift().getTransitionState().getPid().setkP(Lift.MEDIUM_TRANSITION_KP);
+            }
         }
 
-        // checking if grabber does not have specimen but lift is setup as if it does (means need to lower lift so grabber can grab onto specimen)
-        else if (robot.getLift().getStateManager().getActiveStateType() != Lift.StateType.DROP_AREA && !robot.getGrabber().hasSpecimen()) {
-            robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
-            robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+        // if grabber is closing or already closed, then open grabber (should run when fails to grab specimen)
+        if (robot.getGrabber().getStateManager().getActiveStateType() == Grabber.StateType.CLOSED) {
+            // transitioning to trough for deposit bc u have block
+            if(!robot.getGrabber().hasSpecimen() && robot.getInput().getGamepadTracker2().isFirstFrameB())
+                robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+            // in case driver misses specimen and closes grabber; needs way to reset
+            else if (robot.getGrabber().hasSpecimen() && robot.getInput().getGamepadTracker1().isFirstFrameB()) {
+                robot.getGrabber().getTransitionState().overrideGoalState(Grabber.OPEN_POS, Grabber.StateType.OPEN);
+                robot.getGrabber().setBlockColorHeld(BlockColor.NONE);
+                robot.getLift().getTransitionState().overrideGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
+                robot.getLift().getTransitionState().getPid().setkI(Lift.SMALL_TRANSITION_KI);
+            }
+        }
+        // resetting lifting system to trough for transfer again
+        else if ((robot.getInput().getGamepadTracker2().isFirstFrameB() || robot.getInput().getGamepadTracker1().isFirstFrameB())
+                && robot.getGrabber().getTransitionState().getGoalStatePosition() == Grabber.OPEN_POS) {
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
         }
 
-        // automatically transitions to trough once start collecting or if too close to basket and has block
+        // automatically transitions to trough once start collecting or if block detected in trough
         if (robot.getCollectingSystem().getStateManager().getActiveStateType() == CollectingSystem.StateType.SEARCH_AND_COLLECT || robot.getCollector().hasValidBlockColor())
             stateManager.tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
     }
@@ -32,7 +61,8 @@ public class DropAreaState extends RobotState<LiftingSystem.StateType> {
     @Override
     public boolean canEnter() {
         return robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.TROUGH_TO_DROP_AREA
-                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_DROP_AREA;
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.BASKET_TO_DROP_AREA
+                || robot.getLiftingSystem().getStateManager().getActiveStateType() == LiftingSystem.StateType.RAM_TO_DROP_AREA;
     }
 
     @Override

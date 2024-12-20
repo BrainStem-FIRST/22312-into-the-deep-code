@@ -13,8 +13,6 @@ public class SearchAndCollectState extends RobotState<CollectingSystem.StateType
     @Override
     public void execute(double dt) {
         if (isFirstTime()) {
-            robot.getLiftingSystem().setStayInTrough(true);
-
             robot.getExtension().getStateManager().tryEnterState(Extension.StateType.FINDING_BLOCK);
             robot.getHinge().getTransitionState().setGoalState(Hinge.HINGE_DOWN_POSITION, Hinge.StateType.DOWN);
         }

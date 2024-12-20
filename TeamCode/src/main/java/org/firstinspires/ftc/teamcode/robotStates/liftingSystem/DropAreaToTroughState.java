@@ -12,7 +12,6 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void executeOnEntered() {
         robot.setIsDepositing(true);
-        robot.getLiftingSystem().setStayInTrough(true);
 
         robot.getLift().getTransitionState().setGoalState(Lift.TROUGH_SAFETY_POS, Lift.StateType.TROUGH_SAFETY);
         robot.getLift().getTransitionState().getPid().setkP(Lift.SMALL_TRANSITION_KP);
@@ -22,6 +21,14 @@ public class DropAreaToTroughState extends RobotState<LiftingSystem.StateType> {
             robot.getArm().getTransitionState().setGoalState(Arm.BASKET_SAFETY_POS, Arm.StateType.BASKET_SAFETY);
         else
             robot.getArm().getTransitionState().overrideGoalState(Arm.TRANSFER_POS, Arm.StateType.TRANSFER);
+    }
+
+    @Override
+    public void execute(double dt) {
+        // checking for overriding to immediately transition to basket to save time
+        if(robot.getInput().getGamepadTracker2().isFirstFrameA()
+                && robot.getGrabber().hasBlock())
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.TROUGH_TO_BASKET);
     }
 
     @Override

@@ -12,6 +12,10 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
 
     @Override
     public void execute(double dt) {
+        // checking for overriding back to trough
+        if (robot.getInput().getGamepadTracker2().isFirstFrameB())
+            robot.getLiftingSystem().getStateManager().tryEnterState(LiftingSystem.StateType.DROP_AREA_TO_TROUGH);
+
         if(robot.getArm().getStateManager().getActiveStateType() == Arm.StateType.DROP_OFF
         || robot.getArm().getTransitionState().getTime() >= Arm.TRANSFER_TO_KNOCK_BLOCK_TIME) {
             robot.getLift().getTransitionState().setGoalState(Lift.DROP_AREA_POS, Lift.StateType.DROP_AREA);
@@ -22,8 +26,6 @@ public class TroughToDropAreaState extends RobotState<LiftingSystem.StateType> {
     @Override
     public void executeOnEntered() {
         robot.setIsDepositing(false);
-        robot.getLiftingSystem().setStayInTrough(false);
-
         robot.getArm().getTransitionState().setGoalState(Arm.DROP_OFF_POS, Arm.StateType.DROP_OFF, Arm.TRANSFER_TO_DROP_AREA_TIME);
 
     }

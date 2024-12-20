@@ -10,8 +10,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveTrain.PinpointDrive;
 import org.firstinspires.ftc.teamcode.robotStates.robot.PlayingState;
 import org.firstinspires.ftc.teamcode.robotStates.robot.SettingUpState;
+import org.firstinspires.ftc.teamcode.util.Input;
 
 public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
+    private final Input input;
     private final PinpointDrive driveTrain;
     private final Extension extension;
     private final Hinge hinge;
@@ -22,7 +24,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     private final Lift lift;
     private final LiftingSystem liftingSystem;
     private final Hanger hanger;
-    private boolean canTransfer; // resets during retraction of collecting system
     private boolean isHighDeposit;
     private boolean isHighRam;
     private boolean isDepositing;
@@ -32,10 +33,11 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
         PLAYING
     }
 
-    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor) {
+    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, Pose2d beginPose, Input input) {
         super(hwMap, telemetry, allianceColor, null, StateType.SETTING_UP);
+        this.input = input;
 
-        driveTrain = new PinpointDrive(hwMap, new Pose2d(0, 0, 0));
+        driveTrain = new PinpointDrive(hwMap, beginPose, this);
 
         collector = new Collector(hwMap, telemetry, allianceColor, this);
         extension = new Extension(hwMap, telemetry, allianceColor, this);
@@ -53,33 +55,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
         stateManager.addState(StateType.PLAYING, new PlayingState());
         stateManager.setupStates(this, stateManager);
 
-        canTransfer = false; // only set to false in collectTemp and spitTemp states; reset to true for every retraction and after every transfer
-        isHighDeposit = true;
-        isHighRam = true;
-        isDepositing = true;
-    }
-    public BrainSTEMRobot(HardwareMap hwMap, Telemetry telemetry, AllianceColor allianceColor, Pose2d beginPose) {
-        super(hwMap, telemetry, allianceColor, null, StateType.SETTING_UP);
-
-        driveTrain = new PinpointDrive(hwMap, beginPose);
-
-        collector = new Collector(hwMap, telemetry, allianceColor, this);
-        extension = new Extension(hwMap, telemetry, allianceColor, this);
-        hinge = new Hinge(hwMap, telemetry, allianceColor, this);
-        collectingSystem = new CollectingSystem(this);
-
-        grabber = new Grabber(hwMap, telemetry, allianceColor, this);
-        arm = new Arm(hwMap, telemetry, allianceColor, this);
-        lift = new Lift(hwMap, telemetry, allianceColor, this);
-        liftingSystem = new LiftingSystem(this);
-
-        hanger = new Hanger(hwMap, telemetry, allianceColor, this);
-
-        stateManager.addState(StateType.SETTING_UP, new SettingUpState());
-        stateManager.addState(StateType.PLAYING, new PlayingState());
-        stateManager.setupStates(this, stateManager);
-
-        canTransfer = true;
         isHighDeposit = true;
         isHighRam = true;
         isDepositing = true;
@@ -88,6 +63,15 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     public void update(double dt) {
         // playing state now updates all the subsystems
         stateManager.update(dt);
+    }
+
+    public void addTelemetry() {
+        telemetry.addData("robot alliance", robot.getColorFromAlliance());
+        telemetry.addData("robot state", robot.getStateManager().getActiveStateType());
+    }
+
+    public Input getInput() {
+        return input;
     }
 
     public PinpointDrive getDriveTrain() {
@@ -128,12 +112,6 @@ public class BrainSTEMRobot extends Subsystem<BrainSTEMRobot.StateType> {
     }
     public boolean canCollect() {
         return !grabber.hasBlock();
-    }
-    public boolean canTransfer() {
-        return canTransfer;
-    }
-    public void setCanTransfer(boolean canTransfer) {
-        this.canTransfer = canTransfer;
     }
     public boolean isHighDeposit() {
         return isHighDeposit;

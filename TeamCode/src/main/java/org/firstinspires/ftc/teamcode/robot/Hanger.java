@@ -53,7 +53,14 @@ public class Hanger extends Subsystem<Hanger.StateType> {
 
         movingUp = true;
     }
-
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("", "");
+        telemetry.addData("hanging state", robot.getHanger().getStateManager().getActiveStateType());
+        telemetry.addData("  hang motor power", robot.getHanger().getHangMotor().getPower());
+        telemetry.addData("  hang motor encoder", robot.getHanger().getHangMotor().getCurrentPosition());
+        telemetry.addData("  hang goal encoder", robot.getHanger().getTransitionState().getGoalStatePosition());
+        telemetry.addData("  hang goal state", robot.getHanger().getTransitionState().getNextStateType());
+    }
     public DcMotorEx getHangMotor() {
         return hangMotor;
     }

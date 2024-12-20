@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
@@ -67,8 +69,10 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
         return time > timeDone;
     }
 
-    @Override
-    public StateType getNextStateType() {
-        return goalStateType;
+    @NonNull
+    public String toString() {
+        return toStringBase() +
+                " | goal pos: " + goalPosition +
+                " | goal state: " + goalStateType;
     }
 }

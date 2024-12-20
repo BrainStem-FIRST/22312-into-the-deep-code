@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotStates;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
 
@@ -133,5 +135,15 @@ public class MotorTransitionState<StateType extends Enum<StateType>> extends Tra
     }
     public void setDoneWhenPassPosition() {
         tempDoneWhenPassPosition = true;
+    }
+    @NonNull
+    public String toString() {
+        return toStringBase() +
+                " | max time: " + maxTime +
+                " | cur power: " + motor.getPower() + " | cur pos: " + motor.getCurrentPosition() +
+                " | start pos: " + startPos + " | goal pos: " + goalPosition + " | goal state: " + goalStateType +
+                " | using pid: " + usingPid +
+                " | kP, kI: " + (pid != null ? pid.getkP() + ", " + pid.getkI(): "null") +
+                " | done when pass position: " + tempDoneWhenPassPosition;
     }
 }

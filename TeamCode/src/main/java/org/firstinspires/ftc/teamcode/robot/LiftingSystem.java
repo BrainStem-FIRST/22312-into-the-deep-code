@@ -6,25 +6,19 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robotStates.NothingState;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robotStates.liftingSystem.*;
 import org.firstinspires.ftc.teamcode.stateMachine.StateManager;
-import org.firstinspires.ftc.teamcode.util.Helper;
 
 public class LiftingSystem {
     private final BrainSTEMRobot robot;
     public enum StateType {
-        TROUGH, KNOCK_BLOCK,
+        TROUGH, TRANSFER, KNOCK_BLOCK,
         TROUGH_TO_BASKET, BASKET_TO_BASKET, BASKET_DEPOSIT, BASKET_TO_DROP_AREA, // depositing block in basket
-        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, RAM_TO_RAM, SPECIMEN_RAM, RAM_TO_TROUGH // ramming specimen on bar
+        TROUGH_TO_DROP_AREA, DROP_AREA, DROP_AREA_TO_TROUGH, DROP_AREA_TO_RAM, RAM_TO_DROP_AREA, SPECIMEN_RAM // ramming specimen on bar
     }
-    private boolean buttonACued; // if a is cued during transition, an action should automatically occur once transition is done
-    private boolean stayInTrough;
-    private boolean needManualTransfer;
     private final StateManager<StateType> stateManager;
 
     public LiftingSystem(BrainSTEMRobot robot) {
@@ -33,51 +27,44 @@ public class LiftingSystem {
         stateManager = new StateManager<>(StateType.TROUGH);
 
         stateManager.addState(StateType.TROUGH, new TroughState());
+        stateManager.addState(StateType.TRANSFER, new TransferState());
         stateManager.addState(StateType.KNOCK_BLOCK, new KnockBlockState());
         stateManager.addState(StateType.TROUGH_TO_BASKET, new TroughToBasketState());
         stateManager.addState(StateType.BASKET_TO_BASKET, new BasketToBasketState());
-        stateManager.addState(StateType.BASKET_DEPOSIT, new NothingState<>(StateType.BASKET_DEPOSIT));
+        stateManager.addState(StateType.BASKET_DEPOSIT, new BasketDepositState());
         stateManager.addState(StateType.BASKET_TO_DROP_AREA, new BasketToDropAreaState());
         stateManager.addState(StateType.TROUGH_TO_DROP_AREA, new TroughToDropAreaState());
         stateManager.addState(StateType.DROP_AREA, new DropAreaState());
         stateManager.addState(StateType.DROP_AREA_TO_TROUGH, new DropAreaToTroughState());
         stateManager.addState(StateType.DROP_AREA_TO_RAM, new DropAreaToRamState());
-        stateManager.addState(StateType.SPECIMEN_RAM, new NothingState<>(StateType.SPECIMEN_RAM));
-        stateManager.addState(StateType.RAM_TO_TROUGH, new RamToTroughState());
+        stateManager.addState(StateType.SPECIMEN_RAM, new SpecimenRamState());
+        stateManager.addState(StateType.RAM_TO_DROP_AREA, new RamToDropAreaState());
 
         stateManager.setupStates(robot, stateManager);
 
-        buttonACued = false;
-        stayInTrough = true;
     }
 
     public void update(double dt) {
         stateManager.update(dt);
     }
+
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addData("", "");
+        telemetry.addData("is high basket", robot.isHighDeposit());
+        telemetry.addData("depositing mode", robot.isDepositing());
+        telemetry.addData("lifting system", robot.getLiftingSystem().getStateManager().getActiveState().toString());
+        telemetry.addData("lift", robot.getLift().getStateManager().getActiveState().toString());
+        telemetry.addData("arm", robot.getArm().getStateManager().getActiveStateType());
+        telemetry.addData("grabber", robot.getGrabber().getStateManager().getActiveStateType());
+        telemetry.addData("  grabber has specimen", robot.getGrabber().hasSpecimen());
+        telemetry.addData("  grabber block color", robot.getGrabber().getBlockColorHeld());
+    }
+
     public BrainSTEMRobot getRobot() {
         return robot;
     }
-
     public StateManager<StateType> getStateManager() {
         return stateManager;
-    }
-    public boolean getButtonACued() {
-        return buttonACued;
-    }
-    public void setButtonACued(boolean buttonACued) {
-        this.buttonACued = buttonACued;
-    }
-    public boolean getStayInTrough() {
-        return stayInTrough;
-    }
-    public void setStayInTrough(boolean stayInTrough) {
-        this.stayInTrough = stayInTrough;
-    }
-    public boolean getNeedManualTransfer() {
-        return needManualTransfer;
-    }
-    public void setNeedManualTransfer(boolean needManualTransfer) {
-        this.needManualTransfer = needManualTransfer;
     }
 
     // continuous block transfer until block is grabbed onto (also uses pid)
@@ -120,13 +107,6 @@ public class LiftingSystem {
                 robot.getLift().moveTo(Lift.TROUGH_SAFETY_POS, Lift.MEDIUM_TRANSITION_KP * 1.2, Lift.ZERO_KI)
         );
     }
-
-    public Action transferToDropOff() {
-        return new SequentialAction(
-                robot.getArm().rotateTo(Arm.DROP_OFF_POS, Arm.TRANSFER_TO_DROP_AREA_TIME),
-                robot.getLift().moveTo(Lift.DROP_AREA_POS, Lift.SMALL_TRANSITION_KP, Lift.SMALL_TRANSITION_KI)
-        );
-    }
     public Action depositHighInitial() {
         return new SequentialAction(
             robot.getLift().moveTo(Lift.HIGH_BASKET_POS, Lift.BIG_TRANSITION_KP, Lift.SMALL_TRANSITION_KI),
@@ -163,21 +143,6 @@ public class LiftingSystem {
         robot.telemetry.addData("ramming specimen", "");
         robot.telemetry.update();
         return new SequentialAction(
-                robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS + 80, 2, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
-                robot.getGrabber().open()
-        );
-    }
-    public Action tryRamHighSpecimen() {
-        robot.telemetry.addData("trying to ram specimen", "");
-        robot.telemetry.update();
-        return new SequentialAction(
-                new Action() {
-                    @Override
-                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                        //return robot.getLift().get;
-                        return false;
-                    }
-                },
                 robot.getLift().moveToTime(Lift.HIGH_RAM_AFTER_POS + 80, 2, Lift.BIG_TRANSITION_KP, Lift.ZERO_KI),
                 robot.getGrabber().open()
         );

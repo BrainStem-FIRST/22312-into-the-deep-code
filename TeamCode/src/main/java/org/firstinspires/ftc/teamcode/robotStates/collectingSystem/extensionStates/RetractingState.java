@@ -11,8 +11,6 @@ public class RetractingState extends RobotState<Extension.StateType> {
 
     @Override
     public void execute(double dt) {
-        if (isFirstTime())
-            robot.setCanTransfer(true);
         robot.getExtension().retractExtensionMotor();
     }
 

@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.robotStates.robot;
 
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
 import org.firstinspires.ftc.teamcode.robot.Arm;
 import org.firstinspires.ftc.teamcode.robot.BrainSTEMRobot;
-import org.firstinspires.ftc.teamcode.robot.Extension;
 import org.firstinspires.ftc.teamcode.robot.Grabber;
-import org.firstinspires.ftc.teamcode.robot.Hanger;
 import org.firstinspires.ftc.teamcode.robot.Hinge;
 import org.firstinspires.ftc.teamcode.robot.Lift;
 import org.firstinspires.ftc.teamcode.robot.Subsystem;
@@ -23,8 +20,11 @@ public class SettingUpState extends RobotState<BrainSTEMRobot.StateType> {
 
     @Override
     public void execute(double dt) {
-        // ensuring odometry pose is updated when setting up
+        robot.getInput().update();
+
+        // drivetrain
         robot.getDriveTrain().updatePoseEstimate();
+        robot.getDriveTrain().listenForDriveTrainInput();
 
         if (isFirstTime()) {
             done = false;

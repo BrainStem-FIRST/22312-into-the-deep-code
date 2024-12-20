@@ -13,11 +13,13 @@ public abstract class BaseState<StateType extends Enum<StateType>> implements St
         time = 0;
         framesRunning = 0;
     }
-
+    public String toStringBase() {
+        return "stateType: " + stateType + " | " + "time:" + time + " | isDone: " + isDone() + " overridable: " + canBeOverridden() + " next stateType: " + getNextStateType();
+    }
     @NonNull
     @Override
     public String toString() {
-        return "BaseState(" + stateType + " | " + "time:" + time + ")";
+        return toStringBase();
     }
 
     public double getTime() {
