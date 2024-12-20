@@ -90,7 +90,7 @@ public class Collector extends Subsystem<Collector.StateType> {
     }
 
     public void addTelemetry(Telemetry telemetry) {
-        telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveStateType());
+        telemetry.addData("collector state", robot.getCollector().getStateManager().getActiveState());
         telemetry.addData("      collector motor current", robot.getCollector().getSpindleMotorCurrent());
         telemetry.addData("      validated block color sensor", robot.getCollector().getBlockColorSensor().getValidatedColor());
         telemetry.addData("      block color in trough", robot.getCollector().getBlockColorInTrough());

@@ -52,9 +52,7 @@ public class Hinge extends Subsystem<Hinge.StateType> {
     }
 
     public void addTelemetry(Telemetry telemetry) {
-        telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveStateType());
-        telemetry.addData("      hinge goal pwm", robot.getHinge().getTransitionState().getGoalStatePosition());
-        telemetry.addData("      hinge transition finish time", robot.getHinge().getTransitionState().getTimeDone());
+        telemetry.addData("hinge state", robot.getHinge().getStateManager().getActiveState());
     }
     public ServoTransitionState<StateType> getTransitionState() {
         return transitionState;

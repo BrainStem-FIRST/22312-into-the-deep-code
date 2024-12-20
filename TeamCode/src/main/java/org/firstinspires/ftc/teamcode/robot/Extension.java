@@ -60,7 +60,7 @@ public class Extension extends Subsystem<Extension.StateType> {
     }
 
     public void addTelemetry(Telemetry telemetry) {
-        telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveStateType());
+        telemetry.addData("extension state", robot.getExtension().getStateManager().getActiveState());
         telemetry.addData("      extension encoder", robot.getExtension().getExtensionMotorPosition());
         telemetry.addData("      extension power", robot.getExtension().getExtensionMotorPower());
         telemetry.addData("      hitting extension hard stop", robot.getExtension().hitRetractHardStop());

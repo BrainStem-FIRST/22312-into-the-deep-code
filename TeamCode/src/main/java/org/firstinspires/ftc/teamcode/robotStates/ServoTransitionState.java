@@ -77,6 +77,7 @@ public class ServoTransitionState<StateType extends Enum<StateType>> extends Tra
     public String toString() {
         return toStringBase() +
                 " | goal pos: " + goalPosition +
-                " | goal state: " + goalStateType;
+                " | goal state: " + goalStateType +
+                " | time done: " + timeDone;
     }
 }
